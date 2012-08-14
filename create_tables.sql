@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS `login_attempts` (
   `ip` VARCHAR(15),
   `username` VARCHAR(16),
   `password` VARCHAR(20),
-  `ip_numeric` INT(10) UNSIGNED
+  `ip_numeric` UNSIGNED INT(10)
 );
 
 CREATE TABLE IF NOT EXISTS `executed_commands` (
@@ -16,5 +16,5 @@ CREATE TABLE IF NOT EXISTS `executed_commands` (
   `time` TIMESTAMP,
   `ip` VARCHAR(15),
   `command` VARCHAR(100)
-  `ip_numeric` INT(10) UNSIGNED
+  `ip_numeric` UNSIGNED INT(10)
 );
