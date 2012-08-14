@@ -42,6 +42,38 @@ else
 	exit
 fi
 
+NEED_DATABASE="unspecified"
+while [ $NEED_DATABASE == 'unspecified' ]
+do
+	echo -e "Do you need to create a database for Kojoney? (yes/no)"
+	read create_db
+	if [[ $create_db == 'yes' || $create_db == 'no' ]]; then
+		NEED_DATABASE="specified"
+	fi
+done
+
+if [ $create_db == 'yes' ]; then
+	echo We will now create the Kojoney database.  The credentials used to create the
+	echo database are stored in coret_config.py and can be changed at a later time if
+	echo necessary.  By default the database will be called kojoney.
+	echo Please enter the MySQL username that can create the kojoney database and tables:
+	read mysql_user
+	echo Please enter the MySQL password for this user:
+	read mysql_password
+	echo -e "Please enter the MySQL database server (i.e. localhost)"
+	read mysql_host
+	if [! /usr/bin/mysql -u $mysql_user -p$mysql_root_pw -h $mysql_host < create_tables.sql ]; then
+		echo Error creating database.  Please create it manually using create_tables.sql.
+		echo Installer exiting...
+		exit
+	fi 
+fi
+
+echo "$create_db"
+exit;
+
+
+
 if [ -d $KOJONEY_PATH ]; then
 	echo Directory exists. Uninstall it first.
 	echo Exiting...
