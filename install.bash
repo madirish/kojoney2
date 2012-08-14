@@ -8,12 +8,16 @@ function die
 }
 
 KOJONEY_PATH=/usr/share/kojoney
+INSTALLER_VERSION=0.4
 
 echo Kojoney Honeypot installer. 
 echo
-echo "Press enter to view the license agreement(s) ..."
-read
-more LICENSE libs/license.zop libs/twisted.license 2>/dev/null || less LICENSE libs/license.zop libs/twisted.license 
+echo Kojoney is bound by a number of license agreements
+echo which are included in the install path.
+echo
+#echo "Press enter to view the license agreement(s) ..."
+#read
+#more LICENSE libs/license.zop libs/twisted.license 2>/dev/null || less LICENSE libs/license.zop libs/twisted.license 
 
 echo -e "Do you accept the ZPL, MIT and GPL license terms (yes/no) ?"
 read license_accept
@@ -28,7 +32,7 @@ if [ "$license_accept" = 'yes' ]; then
 	echo
 	clear
 	echo "******************************************"
-	echo " Kojoney Honeypot Installer version 0.0.3 "
+	echo " Kojoney Honeypot Installer version $INSTALLER_VERSION "
 	echo "******************************************"
 	echo
 else
