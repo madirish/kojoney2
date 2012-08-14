@@ -11,10 +11,10 @@
 import os
 import sys
 
-DATABASE_USER = 'root'
-DATABASE_PASS = ''
-DATABASE_HOST = 'localhost'
-DATABASE_NAME = 'kojoney'
+DATABASE_USER = 'db_user'
+DATABASE_PASS = 'db_password'
+DATABASE_HOST = 'db_host'
+DATABASE_NAME = 'db_database'
 
 if os.getuid() == 0:
 #################################################################
