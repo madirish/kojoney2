@@ -63,11 +63,7 @@ if [ $create_db == 'yes' ]; then
 	read mysql_password
 	echo -e "Please enter the MySQL database server (i.e. localhost)"
 	read mysql_host
-	if [ ! /usr/bin/mysql -u $mysql_user -p$mysql_root_pw -h $mysql_host < create_tables.sql ]; then
-		echo Error creating database.  Please create it manually using create_tables.sql.
-		echo Installer exiting...
-		exit
-	fi 
+	/usr/bin/mysql -u $mysql_user -p$mysql_root_pw -h $mysql_host < create_tables.sql
 fi
 
 echo "$create_db"
