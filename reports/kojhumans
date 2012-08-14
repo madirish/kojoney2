@@ -1,0 +1,95 @@
+#!/bin/bash
+
+version=0.0.2
+tool_dir=`dirname $0`
+
+function show_usage
+{
+	echo "Kojoney Honeypot non-bot attacks recognition tool version $version"
+	echo ""
+	echo "Usage: $0 <log file> {--by-session|--by-ip}"
+	echo ""
+}
+
+function show_total
+{
+	if [ $2 -eq 0 ]; then # By session
+		is_session=1
+	else
+		is_session=0
+	fi
+
+	if [ $is_session -eq 1 ]; then
+		humans=`cat $1 | grep 'error changing window size' | awk -F, '{ print $2 }' | uniq -u | uniq`
+	else
+		humans=`cat $1 | grep 'error changing window size' | awk '{ print $11 }' | awk -F, '{ print $3 }' | sed 's/]//' | uniq -u | uniq`
+	fi
+
+	human_totals=0
+	for human in $humans
+	do
+		human_totals=`expr $human_totals + 1`
+
+		if [ $is_session -eq 1 ]; then
+			echo "Window Change Filter: Session with id $human opened by a human"
+		else
+			echo "Window Change Filter: Human detected at $human (`$tool_dir/kip2country $human`)"
+		fi
+			
+	done
+	
+	cool_char=`echo -e "\x7f"`
+
+	if [ $is_session -eq 1 ]; then
+		humans=`cat $1 | grep $cool_char | awk -F, '{ print $2 }' | uniq -u | uniq`
+	else
+		humans=`cat $1 | grep $cool_char | awk '{ print $11 }' | awk -F, '{ print $3 }' | sed 's/]//' | uniq -u | uniq`
+	fi
+
+	for human in $humans
+	do
+		human_totals=`expr $human_totals + 1`
+
+		if [ $is_session -eq 1 ]; then
+			echo "Typo error filter: Session with id $human opened by a human"
+		else
+			echo "Typo error filter: Human detected at $human (`$tool_dir/kip2country $human`)"
+		fi
+	done
+
+	if [ $human_totals -gt 0 ]; then
+		echo
+	fi
+
+	if [ $is_session -eq 1 ]; then
+		echo "$human_totals human session(s) total"
+	else
+		echo "$human_totals human(s) total"
+	fi
+
+}
+
+if [ $# -eq 0 ]; then
+	show_usage 
+	exit
+fi
+
+if [ $# -eq 1 ]; then
+	show_total $1 0
+	exit
+fi 
+
+if [ $# -eq 2 ]; then
+    if [ $2 = "--by-ip" ]; then
+    	show_total $1 1
+    else
+    	if [ $2 = "--by-session" ]; then
+    	    show_total $1 0
+	else
+	    show_usage 
+	fi
+    fi
+    exit
+else
+    show_usage
+fi 

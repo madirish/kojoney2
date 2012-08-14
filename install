@@ -1,0 +1,11 @@
+First, Create a MySQL user for kojoney, and create a database to use.
+
+When this is done, modify the first line of create_tables.sql to use your
+database (default is kojoney) and run it.
+
+Modify coret_config.py to contain any settings changes you may want, being
+sure to add your mysql user, password, host, and database name.
+
+If you want e-mail alerts, be sure to change the address in reports/mailalert.bash.
+
+Execute the script install.bash

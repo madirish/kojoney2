@@ -1,0 +1,48 @@
+.TH "kojreport" "1" "0.0.3" "Jose Antonio Coret" "Reports"
+.SH "NAME"
+.LP 
+kojreport \- Generate reports from the Kojoney Honeypot log files.
+.SH "SYNTAX"
+.LP 
+kojreport <\fIlog file\fP> <\fItraceroute\fP> <\fInmap\fP> <\fIcountry\fP>
+.br 
+.SH "DESCRIPTION"
+.LP 
+Kojreport is a shell script to generate plain text reports from the Kojoney Honeypot log files. The generated reports includes statistics about successfull and unsuccessfull logons logons with null passwords X11 forward requests, commands executeds when connected to the fake shell, intruder's ip addresses and country, etc... 
+.LP 
+Report is printed to STDOUT.
+.SH "OPTIONS"
+.LP 
+.TP 
+\fBtraceroute\fR
+Print the route packets take to network host. Possible values are 0 (disabled) and 1 (enabled).
+.TP 
+\fBnmap\fR
+Print nmap output take to network host. Possible values are 0 (disable) and 1 (enabled).
+.TP 
+\fBcountry\fR
+Resolve intruder's country using kip2country tool. Possible values are 0 (disable) and 1 (enabled).
+.SH "EXAMPLES"
+.LP 
+The following are examples of how is the correct way to run the tool:
+.LP 
+# kojreport /var/log/honeypot.log
+.IP 
+Generates a \fBnormal\fR report without traceroute and nmap output and without ip address to host resolution.
+.LP 
+# kojreport /var/log/honeypot.log 0 0 1
+.IP 
+Generates a \fBnormal\fR report without traceroute and nmap output but with ip address to host resolution.
+.LP 
+# kojreport /var/log/honeypot.log 1 0 1
+.IP 
+Generates a report with traceroute output, without nmap output and with ip address to host resolution.
+.SH "FILES"
+.LP 
+\fI/var/log/honeypot.log\fP \- Common path to the Koret Honeypot log file.
+.SH "AUTHORS"
+.LP 
+Jose Antonio Coret <joxeankoret@yahoo.es>
+.SH "SEE ALSO"
+.LP 
+kip2country(1), kojreport\-filter(1), traceroute(8), nmap(1).

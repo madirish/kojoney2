@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Project SYSTEM "Project-3.5.dtd">
+<!-- Project file for project KoJoney -->
+<!-- Saved: 2006-04-03, 20:56:57 -->
+<!-- Copyright (C) 2006 Jose Antonio Coret, joxeankoret@yahoo.es -->
+<Project version="3.5">
+  <Description></Description>
+  <Version>0.1</Version>
+  <Author>Jose Antonio Coret</Author>
+  <Email>joxeankoret@yahoo.es</Email>
+  <Sources>
+    <Source>
+      <Name>kojoney.py</Name>
+    </Source>
+    <Source>
+      <Name>coret_honey.py</Name>
+    </Source>
+    <Source>
+      <Name>coret_fake.py</Name>
+    </Source>
+    <Source>
+      <Name>coret_users.py</Name>
+    </Source>
+    <Source>
+      <Name>coret_log.py</Name>
+    </Source>
+    <Source>
+      <Name>coret_config.py</Name>
+    </Source>
+    <Source>
+      <Name>coret_command.py</Name>
+    </Source>
+    <Source>
+      <Name>coret_std_unix.py</Name>
+    </Source>
+  </Sources>
+  <Forms>
+  </Forms>
+  <Translations>
+  </Translations>
+  <Interfaces>
+  </Interfaces>
+  <Others>
+  </Others>
+  <MainScript>
+    <Name>kojoney.py</Name>
+  </MainScript>
+  <Vcs>
+    <VcsType>None</VcsType>
+  </Vcs>
+</Project>

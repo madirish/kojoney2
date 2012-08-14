@@ -1,0 +1,29 @@
+.TH "kojhumans" "1" "0.0.1" "Jose Antonio Coret" "Tools"
+.SH "NAME"
+.LP 
+kojhumans \- A tool to differ between humans and bots.
+.SH "SYNTAX"
+.LP 
+kojhumans \fI<log file>\fP {\fI\-\-by\-session\fP|\fI\-\-by\-ip\fP}
+.SH "DESCRIPTION"
+.LP 
+The script works as follow: We, the humans, are clumsy. The script seeks for SUPR and BACKSPACE characters in the executed commands. The script also checks if the intruder tried to change the window size.
+.SH "EXAMPLES"
+.LP 
+$ ./kojhumans log.txt \-\-by\-session
+.LP 
+Typo error filter: Session with id 2952 opened by a human
+.LP 
+1 human session(s) total
+.LP .BR 
+$ ./kojhumans log.txt \-\-by\-filter
+.LP 
+Typo error filter: Human detected at 81.33.84.225 (ES, Spain)
+.LP 
+1 human(s) total
+.SH "AUTHORS"
+.LP 
+Jose Antonio Coret <joxeankoret@yahoo.es>
+.SH "SEE ALSO"
+.LP 
+kojreport(1) kojreport\-filter(1) kip2country(1)

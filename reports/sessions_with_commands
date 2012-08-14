@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# 2009/08/13 by henryblu
+# This script locates the session id and IP combination of each session
+# during which commands were executed.
+# Then those identifiers are printed, line delimited.
+# Produces output like:
+# SSHServerTransport,7268,85.21.72.149]
+# which is used to match lines in a kojoney logfile.
+
+grep "] COMMAND IS :" $1 | awk '
+{ 
+  if (sessions[$10] < 1) {
+    sessions[$10]++
+    print $10
+  } 
+} 
+'

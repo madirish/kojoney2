@@ -1,0 +1,47 @@
+#! /bin/sh
+set -e
+
+# /etc/init.d/ssh: start and stop the Koret honeypot for the "secure shell(tm)" protocol
+
+test -x /usr/bin/kojoneyd || exit 0
+
+case "$1" in
+  start)
+        echo -n "Starting Koret Honeypot: kojoney"
+	/usr/bin/kojoneyd 2>&1 >/dev/null&
+        echo "."
+	;;
+  stop)
+        echo -n "Stopping Koret Honeypot: kojoney"
+	kill `ps aux | grep /usr/bin/kojoney | grep -v grep | awk '{ print $2 }'`
+        echo "."
+	;;
+
+  kill)
+        echo -n "Killing Koret Honeypot: kojoney"
+	kill -9 `ps aux | grep /usr/bin/kojoneyd | grep -v grep | awk '{ print $2 }'`
+        echo "."
+	;;
+
+   restart)
+        echo -n "Restarting Koret Honeypot: kojoney"
+        /etc/init.d/kojoney stop > /dev/null
+        /etc/init.d/kojoney start > /dev/null
+        echo "."
+        ;;
+
+  status)
+	value=`ps aux | grep /usr/bin/kojoneyd | grep -v grep | wc -l`
+
+	if [ $value -eq 0 ]; then
+		echo "Server is stopped."
+	else
+		echo "Server is up and running."
+	fi
+	;;
+  *)
+	echo "Usage: /etc/init.d/kojoney {start|stop|kill|restart|status}"
+	exit 1
+esac
+
+exit 0

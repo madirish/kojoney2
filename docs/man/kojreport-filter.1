@@ -1,0 +1,45 @@
+.TH "kojreport-filter" "1" "0.0.1" "Jose Antonio Coret" "Reports"
+.SH "NAME"
+.LP 
+kojreport\-filter \- Generate reports from the Kojoney Honeypot log files but filtering to lines matching an specified filter.
+.SH "SYNTAX"
+.LP 
+kojreport <\fIlog file\fP> <\fIfilter\fP> <\fItraceroute\fP> <\fInmap\fP> <\fIcountry\fP>
+.br 
+.SH "DESCRIPTION"
+.LP 
+Kojreport\-filter is a shell script to generate plain text reports from the Kojoney Honeypot log files by filtering to lines matching an specified filter, such as one ip addressess, dates, etc...
+.SH "OPTIONS"
+.LP 
+.TP 
+\fBfilter\fR
+The report will be generated only for lines matching the specified \fIfilter\fR. This may be one ip address, date, etc...
+.TP 
+\fBtraceroute\fR
+Print the route packets take to network host. Possible values are 0 (disabled) and 1 (enabled).
+.TP 
+\fBnmap\fR
+Print nmap output take to network host. Possible values are 0 (disable) and 1 (enabled).
+.TP 
+\fBcountry\fR
+Resolve intruder's country using kip2country tool. Possible values are 0 (disable) and 1 (enabled).
+.SH "EXAMPLES"
+.LP 
+The following are examples of how is the correct way to run the tool:
+.LP 
+# kojreport\-filter /var/log/honeypot.log '^2005/07/17' 0 0 1 
+.IP 
+Generates a \fBnormal\fR report without traceroute and nmap output and without ip address to host resolution with the records in /var/log/honeypot that were generateds at 2005/07/17.
+.LP 
+# kojreport\-filter /var/log/honeypot.log '61.75.4.142' 0 0 1 
+.IP 
+Generates a \fBnormal\fR report without traceroute and nmap output and without ip address to host resolution with the records in /var/log/honeypot that matches the ip address specified.
+.SH "FILES"
+.LP 
+\fI/var/log/honeypot.log\fP
+.SH "AUTHORS"
+.LP 
+Jose Antonio Coret <joxeankoret@yahoo.es>
+.SH "SEE ALSO"
+.LP 
+kip2country(1), kojreport(1)

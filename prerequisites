@@ -1,0 +1,9 @@
+NOTE: All the packages mentioned above except Python are distributeds.
+
+1.- Python 2.2, 2.3 or 2.4.
+2.- Twisted, Twisted Internet, Twisted Conch and Zope-Interfaces.
+3.- MySQL and MySQL-python 
+
+Python is available at http://www.python.org
+Twisted is available at http://twistedmatrix.com/
+Zope-Interfaces is available at http://www.zope.org/Products/ZopeInterface

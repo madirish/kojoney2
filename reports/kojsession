@@ -1,0 +1,38 @@
+#!/bin/bash
+
+version=0.0.1
+tool_dir=`dirname $0`
+
+function show_usage
+{
+	echo "Koret Honeypot Session reporting tool Version $version"
+	echo "Copyright(c) 2005 Jose Antonio Coret"
+	echo
+	echo "Usage: $0 <logfile> [-total|<session-number>] [traceroute] [nmap] [country]"
+	echo
+	echo "If no session number is specified will show the total of sessions"
+	echo
+}
+
+function show_total
+{
+	echo -e "`cat $1 | grep '\[SSHServerTransport,' | awk -F, '{ print $2 }' | uniq | wc -l ` session(s)"
+}
+
+if [ $# -eq 0 ]; then
+	show_usage
+	exit
+fi
+
+if [ $# -eq 1 ]; then
+	show_total $1
+	exit
+fi
+
+if [ $# -gt 1 ]; then
+	if [ $2 = '-total' ]; then
+		show_total $1
+	else
+		$tool_dir/kojreport-filter $1 "SSHServerTransport,$2," $3 $4 $5
+	fi
+fi

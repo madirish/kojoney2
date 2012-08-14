@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# 8/13/2009 by henryblu
+# This script takes a file and a string from sessions_with_commands
+# that has the IP and session id of a session where commands were
+# executed. 
+# Then it prints out the commands of that session in the same order 
+# they were entered, for use in kojreport.
+
+grep "$2" "$1" | awk '
+
+/Login attempt with this username and password:/ {
+  pass=$15
+}
+
+/SSHService ssh-userauth on/ && $8=="authenticated" {
+  split($6,source, ",")
+  user=$7
+  print substr(source[3], 0, length(source[3])-1), "session id", source[2], "using", user ":" pass
+}
+
+/COMMAND IS/ {
+  prompt="$"  
+  if ( user=="root" ) { prompt="#" }
+  sub(/\[.*\] COMMAND IS :/, prompt)
+  print "\t" $0
+}
+
+END {
+  print ""
+}
+'

@@ -1,0 +1,51 @@
+Version 0.0.4.1 - <joxeankoret@yahoo.es>
+
+	* Support to download files solicited by the attacker.
+	* Upgraded IP-Country to 2.21. Fix for bug 1465862.
+	* Fix for bug 1507382 (amd64/fc5).
+	* Applied patch for bug 1507380 (A bug in ZopeInterface-3.0.1 prevents
+	to compile on amd64). Also fixes bug 1505078.
+	* Username & password file updated from 42 combinations to 23752.
+	* Other minor fixes.
+
+Version 0.0.4 - <joxeankoret@yahoo.es>
+
+	* Support to implement commands in a more efficient way than using
+	regular expressions. ++INITIAL STATE++
+	* Fixed for bug 1463701 "Nmap recognizes Kojoney as a Honeypot".
+	* Applied a patch from Nicolas Surribas that fixes bug 1463713.
+
+Version 0.0.3.2 - <joxeankoret@yahoo.es>
+
+	* Various bug fixed in the installer and uninstaller scripts. Now
+	installer works under Cygwin (a Win32 unix emulator layer).
+	* Corrected an stupid bug in the documentation.
+	* Upgraded base libraries to fix bug 1255822.
+
+Version 0.0.3.1 - <joxeankoret@yahoo.es>
+
+	* Silently fixed various stupid errors in the package uploaded to the
+	sourceforge site.
+
+Version 0.0.3 - <joxeankoret@yahoo.es> 
+
+	* Corrected the error 'Use of uninitialized value in concatenation'
+	when calling kip2country with an IP address that doesn't known the
+	country.
+	* Stupid change to the kojhuman tool.
+	* Changes to the installation script. Vital libraries are added to the
+	main package.
+	* Small change to kojoney.py to address a currently known bug.
+
+Version 0.0.2 - <joxeankoret@yahoo.es> 31 jul 2005 23:18:13 CEST
+
+	* Corrections to the install and uninstall scripts.
+	* Corrections to the reporting tools.
+	* Added support to get the full name of a country from the IP address,
+	not only the prefix (i.e. US -> United States, KR -> Korea, etc...).
+	* Added the reporting tool 'kojsession' to generate report of an
+	specified session.
+	* Added the reporting tool 'kojhumans' to detect what intruders were
+	humans (not bots).
+	* Added more "popular" username and password combinations.
+

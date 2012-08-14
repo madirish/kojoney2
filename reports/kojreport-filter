@@ -1,0 +1,25 @@
+#!/bin/bash
+
+version=0.0.1
+tools_dir=`dirname $0`
+
+function show_usage
+{
+        echo "Koret Honeypot Filtered reports generator $version"
+	echo "Copyright (c) 2005 Jose Antonio Coret"
+	echo
+	echo -e "Usage: $0 file <filter> <traceroute> <nmap> <country>" 
+	echo 
+	exit
+}
+
+if [ $# -eq 0 ]; then
+	show_usage
+	exit
+fi
+
+file=`mktemp`
+
+cat $1 | grep $2 > $file
+$tools_dir/kojreport $file $3 $4 $5 $6
+rm -f $file

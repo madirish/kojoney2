@@ -1,0 +1,47 @@
+#!/usr/bin/perl
+
+use strict;
+use English;
+use IP::Country::Fast;
+use Geography::Countries;
+
+my $version = "0.0.2";
+my $argnum = 0;
+my $ip = "";
+my $country_prefix = "";
+my $country = "";
+
+if ($#ARGV == -1)
+{
+	print "Koret IP Address to Country Tool Version " . $version . "\n";
+	print "Copyright (c) 2005 Jose Antonio Coret\n\n";
+	print "Usage: $0 <ip>\n";
+	die "\n";
+}
+
+foreach $argnum (0 .. $#ARGV) 
+{
+	$ip="$ARGV[$argnum]";
+	my $reg = IP::Country::Fast->new();
+	my $country_prefix=$reg->inet_atocc($ip);
+	
+	$country_prefix = "??" if (! defined $country_prefix );
+
+	if ($country_prefix =~ /^[A-Z]{2}$/)
+	{
+		$country = country($country_prefix);
+	}
+	elsif ($country_prefix =~ /^\*\*$/)
+	{
+		$country = "Intranet address";
+	}
+	else
+	{
+		$country = "Unknown";
+	}
+
+	$country = "Unknown" if (! defined $country);
+	
+	print $country_prefix . ", " . $country . "\n";
+}
+   

@@ -1,0 +1,102 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML><HEAD><TITLE>Man page of kojreport-filter</TITLE>
+</HEAD><BODY>
+<H1>kojreport-filter</H1>
+Section: Reports (1)<BR>Updated: 0.0.1<BR><A HREF="#index">Index</A>
+<A HREF="/cgi-bin/man/man2html">Return to Main Contents</A><HR>
+
+<A NAME="lbAB">&nbsp;</A>
+<H2>NAME</H2>
+
+<P>
+
+kojreport-filter - Generate reports from the Kojoney Honeypot log files but filtering to lines matching an specified filter.
+<A NAME="lbAC">&nbsp;</A>
+<H2>SYNTAX</H2>
+
+<P>
+
+kojreport &lt;<I>log file</I>&gt; &lt;<I>filter</I>&gt; &lt;<I>traceroute</I>&gt; &lt;<I>nmap</I>&gt; &lt;<I>country</I>&gt;
+<BR>
+
+<A NAME="lbAD">&nbsp;</A>
+<H2>DESCRIPTION</H2>
+
+<P>
+
+Kojreport-filter is a shell script to generate plain text reports from the Kojoney Honeypot log files by filtering to lines matching an specified filter, such as one ip addressess, dates, etc...
+<A NAME="lbAE">&nbsp;</A>
+<H2>OPTIONS</H2>
+
+<P>
+
+<DL COMPACT>
+<DT><B>filter</B><DD>
+The report will be generated only for lines matching the specified <I>filter</I>. This may be one ip address, date, etc...
+<DT><B>traceroute</B><DD>
+Print the route packets take to network host. Possible values are 0 (disabled) and 1 (enabled).
+<DT><B>nmap</B><DD>
+Print nmap output take to network host. Possible values are 0 (disable) and 1 (enabled).
+<DT><B>country</B><DD>
+Resolve intruder's country using kip2country tool. Possible values are 0 (disable) and 1 (enabled).
+</DL>
+<A NAME="lbAF">&nbsp;</A>
+<H2>EXAMPLES</H2>
+
+<P>
+
+The following are examples of how is the correct way to run the tool:
+<P>
+
+# kojreport-filter /var/log/honeypot.log '^2005/07/17' 0 0 1 
+<DL COMPACT>
+<DT><DD>
+Generates a <B>normal</B> report without traceroute and nmap output and without ip address to host resolution with the records in /var/log/honeypot that were generateds at 2005/07/17.
+</DL>
+<P>
+
+# kojreport-filter /var/log/honeypot.log '61.75.4.142' 0 0 1 
+<DL COMPACT>
+<DT><DD>
+Generates a <B>normal</B> report without traceroute and nmap output and without ip address to host resolution with the records in /var/log/honeypot that matches the ip address specified.
+</DL>
+<A NAME="lbAG">&nbsp;</A>
+<H2>FILES</H2>
+
+<P>
+
+<I>/var/log/honeypot.log</I>
+<A NAME="lbAH">&nbsp;</A>
+<H2>AUTHORS</H2>
+
+<P>
+
+Jose Antonio Coret &lt;<A HREF="mailto:joxeankoret@yahoo.es">joxeankoret@yahoo.es</A>&gt;
+<A NAME="lbAI">&nbsp;</A>
+<H2>SEE ALSO</H2>
+
+<P>
+
+<A HREF="/cgi-bin/man/man2html?1+kip2country">kip2country</A>(1), <A HREF="/cgi-bin/man/man2html?1+kojreport">kojreport</A>(1)
+<P>
+
+<HR>
+<A NAME="index">&nbsp;</A><H2>Index</H2>
+<DL>
+<DT><A HREF="#lbAB">NAME</A><DD>
+<DT><A HREF="#lbAC">SYNTAX</A><DD>
+<DT><A HREF="#lbAD">DESCRIPTION</A><DD>
+<DT><A HREF="#lbAE">OPTIONS</A><DD>
+<DT><A HREF="#lbAF">EXAMPLES</A><DD>
+<DT><A HREF="#lbAG">FILES</A><DD>
+<DT><A HREF="#lbAH">AUTHORS</A><DD>
+<DT><A HREF="#lbAI">SEE ALSO</A><DD>
+</DL>
+<HR>
+This document was created by
+<A HREF="/cgi-bin/man/man2html">man2html</A>,
+using the manual pages.<BR>
+Time: 20:33:45 GMT, August 11, 2005
+</BODY>
+</HTML>
