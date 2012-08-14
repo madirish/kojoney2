@@ -56,13 +56,14 @@ if [ $create_db == 'yes' ]; then
 	echo We will now create the Kojoney database.  The credentials used to create the
 	echo database are stored in coret_config.py and can be changed at a later time if
 	echo necessary.  By default the database will be called kojoney.
+	echo
 	echo Please enter the MySQL username that can create the kojoney database and tables:
 	read mysql_user
 	echo Please enter the MySQL password for this user:
 	read mysql_password
 	echo -e "Please enter the MySQL database server (i.e. localhost)"
 	read mysql_host
-	if [! /usr/bin/mysql -u $mysql_user -p$mysql_root_pw -h $mysql_host < create_tables.sql ]; then
+	if [ ! /usr/bin/mysql -u $mysql_user -p$mysql_root_pw -h $mysql_host < create_tables.sql ]; then
 		echo Error creating database.  Please create it manually using create_tables.sql.
 		echo Installer exiting...
 		exit
