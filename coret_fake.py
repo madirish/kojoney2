@@ -5,11 +5,8 @@ from datetime import datetime
 FAKE_USERNAME = ""
 TIMESTAMP = datetime.now().strftime("%b %d %H:%M:%S %Z %Y")
 FAKEYEAR = datetime.now().strftime("%Y")
-FAKEYEARM1 = FAKEYEAR - 1
-FAKEYEARM2 = FAKEYEAR - 2
-FAKEYEARM3 = FAKEYEAR - 3
-FAKEYEARM4 = FAKEYEAR - 4
-FAKEYEARM5 = FAKEYEAR - 5
+FAKEYEARM1 = int(FAKEYEAR) - 1
+FAKEYEARM5 = int(FAKEYEAR) - 5
 FQDN = "fqdn_placeholder" #www.example.com
 FAKE_CWD = "/"
 
