@@ -91,6 +91,8 @@ class CoretProtocol(protocol.Protocol):
     def connectionMade(self):
         global FAKE_USERNAME
         self.fake_username = FAKE_USERNAME
+        if self.fake_username == 'root':
+            FAKE_PROMPT = string.replace(FAKE_PROMPT, '$', '#')
         #self.transport.write('howdy ' + FAKE_USERNAME + '!\r\n\r\n')
         self.transport.write('Welcome to ' + str(FAKE_OS) + '!\r\n\r\n' +str(FAKE_PROMPT))
 
@@ -99,8 +101,7 @@ class CoretProtocol(protocol.Protocol):
     #removal of line breaks from commands (to prevent logs from being broken).
     def dataReceived(self, data):
         global FAKE_PROMPT
-        if self.fake_username == 'root':
-            FAKE_PROMPT = string.replace(FAKE_PROMPT, '$', '#')
+        
         if data == '\r':
             self.lastCmd = string.replace(self.lastCmd, '\r', '')
             self.lastCmd = string.replace(self.lastCmd, '\n', '')
