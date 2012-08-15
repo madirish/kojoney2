@@ -10,6 +10,25 @@ function die
 KOJONEY_PATH=/usr/share/kojoney
 INSTALLER_VERSION=0.4
 
+clear
+echo "******************************************"
+echo " Kojoney Honeypot Installer version $INSTALLER_VERSION "
+echo "******************************************"
+echo
+echo Checking for prerequisite dependencies...
+
+# Do prerequisites for RedHat systems
+if [ -e /etc/redhat-release ]; then
+	if rpm -q python-devel | grep not ; then
+	  echo Python-devel s NOT installed!
+	  yum install python-devel
+	fi
+	if [ ! -e /usr/bin/gcc ]; then
+		yum install gcc
+	fi
+fi
+
+echo 
 echo Kojoney Honeypot installer. 
 echo
 echo Kojoney is bound by a number of license agreements
@@ -21,30 +40,6 @@ echo
 
 echo -e "Do you accept the ZPL, MIT and GPL license terms (yes/no) ?"
 read license_accept
-
-
-if [ ! -e /usr/bin/gcc ]; then
-	echo
-	clear
-	echo "******************************************"
-	echo " Kojoney Honeypot Installer version $INSTALLER_VERSION "
-	echo "******************************************"
-	echo
-	echo GCC must be installed!
-	echo
-	echo Attempting to install GCC
-	echo
-	if [ ! -e /usr/bin/yum ]; then
-	  if [ ! -e /usr/bin/apt-get ]; then
-	    echo Could not install automatically, please do so manually.
-	    exit
-	  else
-	  	/usr/bin/apt-get install gcc
-	  fi
-	else
-		/usr/bin/yum install gcc
-	fi
-fi
 
 #
 # Bug 1463831
