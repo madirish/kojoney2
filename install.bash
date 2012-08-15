@@ -63,13 +63,15 @@ if [ $create_db == 'yes' ]; then
 	read mysql_password
 	echo -e "Please enter the MySQL database server (i.e. localhost)"
 	read mysql_host
-	/usr/bin/mysql -u $mysql_user -p$mysql_password -h $mysql_host < create_tables.sql
+	/usr/bin/mysql -u $mysql_user --password=$mysql_password -h $mysql_host < create_tables.sql
 fi
 
-echo "$create_db"
-exit;
+# Replace tokens with user specified values
+sed '/s/db_user/$mysql_user/g' coret_config.py
+sed '/s/db_pass/$mysql_password/g' coret_config.py
+sed '/s/db_host/$mysql_host/g' coret_config.py
 
-
+exit
 
 if [ -d $KOJONEY_PATH ]; then
 	echo Directory exists. Uninstall it first.
