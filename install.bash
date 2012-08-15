@@ -7,13 +7,17 @@ function die
 	#exit 1
 }
 
-if [ ! gcc ]; then 
+if [ ! -e /usr/bin/gcc ]; then
 	echo GCC must be installed.
-	if [ ! yum install -y gcc ]; then
-	  if [ ! apt-get install gcc ]; then
+	if [ ! -e /usr/bin/yum ]; then
+	  if [ ! -e /usr/bin/apt-get ]; then
 	    echo Could not install automatically, please do so manually.
 	    exit
+	  else
+	  	/usr/bin/apt-get install gcc
 	  fi
+	else
+		/usr/bin/yum install gcc
 	fi
 fi
 
