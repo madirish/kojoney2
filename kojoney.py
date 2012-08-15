@@ -89,7 +89,7 @@ class CoretProtocol(protocol.Protocol):
 
 
     def connectionMade(self):
-        global FAKE_USERNAME
+        global FAKE_USERNAME, FAKE_PROMPT
         self.fake_username = FAKE_USERNAME
         if self.fake_username == 'root':
             FAKE_PROMPT = string.replace(FAKE_PROMPT, '$', '#')
