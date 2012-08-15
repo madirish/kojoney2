@@ -20,15 +20,16 @@ echo Checking for prerequisite dependencies...
 # Do prerequisites for RedHat systems
 if [ -e /etc/redhat-release ]; then
 	if rpm -q python-devel | grep not ; then
-	  echo Python-devel s NOT installed!
+	  echo Python development libraries and C headers aren't installed!
 	  yum install python-devel
 	fi
 	if [ ! -e /usr/bin/gcc ]; then
+		echo GNU C compiler isn't installed!
 		yum install gcc
 	fi
 	if rpm -q mysql-devel | grep not ; then
-	  echo Python-devel s NOT installed!
-	  yum install python-devel
+	  echo MySQL development libraries and C headers aren't installed!
+	  yum install mysql-devel
 	fi
 fi
 
