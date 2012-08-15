@@ -4,7 +4,7 @@ function die
 {
 	echo Error at $1
 	echo Kojoney installation failed
-	#exit 1
+	exit 1
 }
 
 KOJONEY_PATH=/usr/share/kojoney
@@ -25,6 +25,10 @@ if [ -e /etc/redhat-release ]; then
 	fi
 	if [ ! -e /usr/bin/gcc ]; then
 		yum install gcc
+	fi
+	if rpm -q mysql-devel | grep not ; then
+	  echo Python-devel s NOT installed!
+	  yum install python-devel
 	fi
 fi
 
@@ -48,11 +52,6 @@ read license_accept
 #
 if [ "$license_accept" = 'yes' ]; then
 	echo All licenses accepted
-	echo
-	clear
-	echo "******************************************"
-	echo " Kojoney Honeypot Installer version $INSTALLER_VERSION "
-	echo "******************************************"
 	echo
 else
 	echo You need to accept ALL the licenses to install it.
