@@ -1,4 +1,7 @@
 #!/bin/bash
+# Kojoney install script
+# Modified by Justin C. Klein Keane <jukeane@sas.upenn.edu>
+# Last updated August 15, 2012
 
 function die
 {
@@ -20,15 +23,15 @@ echo Checking for prerequisite dependencies...
 # Do prerequisites for RedHat systems
 if [ -e /etc/redhat-release ]; then
 	if rpm -q python-devel | grep not ; then
-	  echo Python development libraries and C headers aren't installed!
+	  echo Python development libraries and C headers are not installed!
 	  yum install python-devel
 	fi
 	if [ ! -e /usr/bin/gcc ]; then
-		echo GNU C compiler isn't installed!
+		echo GNU C compiler is not installed!
 		yum install gcc
 	fi
 	if rpm -q mysql-devel | grep not ; then
-	  echo MySQL development libraries and C headers aren't installed!
+	  echo MySQL development libraries and C headers are not installed!
 	  yum install mysql-devel
 	fi
 fi
