@@ -102,6 +102,11 @@ if [ $want_reports == 'yes' ]; then
 	sed -i "s/root\@localhost/$email_to/g" reports/mailalert.bash
 fi
 
+# Customize honeypot
+echo Please enter the fully qualified hostname for your honeypot:
+read user_fqdn
+sed -i "s/fqdn_placeholder/$user_fqdn/g" coret_fake.py
+
 if [ -d $KOJONEY_PATH ]; then
 	echo Directory exists. Uninstall it first.
 	echo Exiting...
