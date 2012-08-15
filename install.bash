@@ -7,6 +7,17 @@ function die
 	#exit 1
 }
 
+if [ ! gcc ]; then 
+	echo GCC must be installed.
+	if [ ! yum install -y gcc ]; then
+	  if [ ! apt-get install gcc ]; then
+	    echo Could not install automatically, please do so manually.
+	    exit
+	  fi
+	fi
+fi
+
+exit
 KOJONEY_PATH=/usr/share/kojoney
 INSTALLER_VERSION=0.4
 
