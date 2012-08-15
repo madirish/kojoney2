@@ -106,11 +106,11 @@ fi
 
 # Assume logrotate is installed
 touch /etc/logrotate.d/kojoney
-echo "/var/log/honeypot.log {" > etc/logrotate.d/kojoney
-echo "    sharedscripts" >> etc/logrotate.d/kojoney
-echo "    daily" >> etc/logrotate.d/kojoney
-echo "    endscript" >> etc/logrotate.d/kojoney
-echo "}" >> etc/logrotate.d/kojoney
+echo "/var/log/honeypot.log {" > /etc/logrotate.d/kojoney
+echo "    sharedscripts" >> /etc/logrotate.d/kojoney
+echo "    daily" >> /etc/logrotate.d/kojoney
+echo "    endscript" >> /etc/logrotate.d/kojoney
+echo "}" >> /etc/logrotate.d/kojoney
 
 
 if cat /etc/crontab | grep kojreport ; then
