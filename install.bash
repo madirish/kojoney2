@@ -3,7 +3,7 @@
 # Modified by Justin C. Klein Keane <jukeane@sas.upenn.edu>
 # Last updated August 15, 2012
 # ToDo: Modify SSH keys to hide Kojoney from NMAP
-#				Add cron job for e-mail 
+#				Check for logrotate and handle non-logrotate configurations
 
 function die
 {
@@ -102,6 +102,21 @@ if [ $want_reports == 'yes' ]; then
 	echo Please enter e-mail of desired recipient:
 	read email_to
 	sed -i "s/root\@localhost/$email_to/g" reports/mailalert.bash
+fi
+
+# Assume logrotate is installed
+touch /etc/logrotate.d/kojoney
+echo "/var/log/honeypot.log {" > etc/logrotate.d/kojoney
+echo "    sharedscripts" >> etc/logrotate.d/kojoney
+echo "    daily" >> etc/logrotate.d/kojoney
+echo "    endscript" >> etc/logrotate.d/kojoney
+echo "}" >> etc/logrotate.d/kojoney
+
+
+if cat /etc/crontab | grep kojreport ; then
+	# Do nothing
+else 
+	echo "  59  23  *  *  * root /usr/share/kojoney/mailalert.sh > /dev/null" >> /etc/crontab
 fi
 
 # Customize honeypot
