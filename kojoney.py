@@ -99,7 +99,7 @@ class CoretProtocol(protocol.Protocol):
     #removal of line breaks from commands (to prevent logs from being broken).
     def dataReceived(self, data):
         global FAKE_PROMPT
-        if self.fak_username == 'root':
+        if self.fake_username == 'root':
             FAKE_PROMPT = string.replace(FAKE_PROMPT, '$', '#')
         if data == '\r':
             self.lastCmd = string.replace(self.lastCmd, '\r', '')
