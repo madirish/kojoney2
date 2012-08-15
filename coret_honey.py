@@ -45,7 +45,9 @@ denied_re = re.compile("""
 (umount(\ )*.*)|(useradd(\ )*.*)|(grpadd(\ )*.*)""", re.VERBOSE)
 
 def processCmd(data, transport, attacker_username, ip):
-    global FAKE_SHELL, FAKE_CWD, con
+    global FAKE_SHELL, FAKE_CWD, con, FAKE_PROMPT
+    if attacker_username == 'root':
+        FAKE_PROMPT = '#'
     
     retvalue = 1
     print "COMMAND IS : " + data
