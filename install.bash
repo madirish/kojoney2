@@ -113,9 +113,7 @@ echo "    endscript" >> /etc/logrotate.d/kojoney
 echo "}" >> /etc/logrotate.d/kojoney
 
 
-if cat /etc/crontab | grep kojreport ; then
-	# Do nothing
-else 
+if ! cat /etc/crontab | grep kojreport ; then
 	echo "  59  23  *  *  * root /usr/share/kojoney/mailalert.sh > /dev/null" >> /etc/crontab
 fi
 
