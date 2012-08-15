@@ -74,7 +74,7 @@ sed -i "s/db_host/$mysql_host/g" coret_config.py
 # Daily reports
 echo -e "Would you like daily reports e-mailed? (yes/no)"
 read want_reports
-if [ $want_reports == 'yes' ]
+if [ $want_reports == 'yes' ]; then
 	echo Please enter e-mail of desired recipient:
 	read email_to
 	sed -i "s/root\@localhost/$email_to/g" reports/mailalert.bash
