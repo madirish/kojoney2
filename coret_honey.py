@@ -45,9 +45,7 @@ denied_re = re.compile("""
 (umount(\ )*.*)|(useradd(\ )*.*)|(grpadd(\ )*.*)""", re.VERBOSE)
 
 def processCmd(data, transport, attacker_username, ip):
-    global FAKE_SHELL, FAKE_CWD, con, FAKE_PROMPT
-    if attacker_username == 'root':
-        FAKE_PROMPT = '#'
+    global FAKE_SHELL, FAKE_CWD, con
     
     retvalue = 1
     print "COMMAND IS : " + data
@@ -56,15 +54,22 @@ def processCmd(data, transport, attacker_username, ip):
     #directory changing
     if re.match('^cd',data):
         directory = data.split()
-        
-        if directory[1] == "/root": 
-            if attacker_username != "root":
-                transport.write('-bash: cd: /root: Permission denied')
+        if len(directory) == 1:
+            if attacker_username == "root":
+                FAKE_CWD = "/root"
+            elif attacker_username == "oracle":
+                FAKE_CWD = "/oracle"
+            else:
                 FAKE_CWD = "/"
-        elif len(directory) > 1:
-            FAKE_CWD = directory[1]
         else:
-            FAKE_CWD = "/"
+            if directory[1] == "/root": 
+                if attacker_username != "root":
+                    transport.write('-bash: cd: /root: Permission denied')
+                    FAKE_CWD = "/"
+            elif len(directory) > 1:
+                FAKE_CWD = directory[1]
+            else:
+                FAKE_CWD = "/"
     
     if uname_re.match(data):
         transport.write(FAKE_OS)
