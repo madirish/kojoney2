@@ -1,4 +1,7 @@
 """
+    Modified by Justin C. Klein Keane <justin@madirish.net>
+    Last modified: April 26, 2012
+    
     Kojoney - A honeypot that emules a secure shell (SSH) server.
     Copyright (C) 2005 Jose Antonio Coret
 
@@ -36,42 +39,82 @@ passwd_re = re.compile("passwd(\ )*.*")
 
 denied_re = re.compile("""
 (cat(\ )*.*)|(chgrp(\ )*.*)|(chmod(\ )*.*)|(chown(\ )*.*)|(cp(\ )*.*)|(cpio(\ )*.*)|(csh(\ )*.*)|(date(\ )*.*)|
-(dd(\ )*.*)|(df(\ )*.*)|(ed(\ )*.*)|(echo(\ )*.*)|(grep(\ )*.*)|(false(\ )*.*)|(hostname(\ )*.*)|(kill(\ )*.*)|(ln(\ )*.*)|
-(login(\ )*.*)|(mkdir(\ )*.*)|(mknod(\ )*.*)|(mktemp(\ )*.*)|(more(\ )*.*)|(cd(\ )*.*)|(mount(\ )*.*)|(more(\ )*.*)|
-(mv(\ )*.*)|(ping(\ )*.*)|(ps(\ )*.*)|(rmdir(\ )*.*)|(sed(\ )*.*)|(sh(\ )*.*)|(bash(\ )*.*)|(tar(\ )*.*)|(su(\ )*.*)|(true(\ )*.*)|
+(dd(\ )*.*)|(df(\ )*.*)|(ed(\ )*.*)|(echo(\ )*.*)|(grep(\ )*.*)|(false(\ )*.*)|(kill(\ )*.*)|(ln(\ )*.*)|
+(login(\ )*.*)|(mkdir(\ )*.*)|(mknod(\ )*.*)|(mktemp(\ )*.*)|(more(\ )*.*)|(mount(\ )*.*)|(more(\ )*.*)|
+(mv(\ )*.*)|(ping(\ )*.*)|(rmdir(\ )*.*)|(sed(\ )*.*)|(sh(\ )*.*)|(bash(\ )*.*)|(su(\ )*.*)|(true(\ )*.*)|
 (umount(\ )*.*)|(useradd(\ )*.*)|(grpadd(\ )*.*)""", re.VERBOSE)
 
-def processCmd(data, transport):
+def processCmd(data, transport, attacker_username, ip):
     global FAKE_SHELL, FAKE_CWD, con
-
+    
     retvalue = 1
     print "COMMAND IS : " + data
     transport.write('\r\n')
 
     #directory changing
     if re.match('^cd',data):
-		directory = data.split()
-		if len(directory) > 1:
-			FAKE_CWD = directory[1]
-		else:
-			FAKE_CWD = "/"
-	
+        directory = data.split()
+        
+        if directory[1] == "/root": 
+            if attacker_username != "root":
+                transport.write('-bash: cd: /root: Permission denied')
+                FAKE_CWD = "/"
+        elif len(directory) > 1:
+            FAKE_CWD = directory[1]
+        else:
+            FAKE_CWD = "/"
+    
     if uname_re.match(data):
         transport.write(FAKE_OS)
     elif data == "ps":
         for line in FAKE_PLAIN_PS:
             transport.write(line + '\r\n')
+    elif re.match('^unset ', data):
+        pass
+    elif re.match('^date', data):
+        transport.write(TIMESTAMP)
+    elif re.match('^whoami', data):
+        transport.write(attacker_username)
+    elif re.match('^hostname', data):
+        transport.write(FQDN)
     elif re.match('^ps ', data):
-	    for line in FAKE_PS:
-			transport.write(line + '\r\n')
+        for line in FAKE_PS:
+            transport.write(line + '\r\n')
     elif data == "cat /etc/passwd":
         for line in FAKE_CAT_PASSWD:
             transport.write(line + '\r\n')
+    elif data == "cat /etc/issue":
+        for line in FAKE_ETC_ISSUE:
+            transport.write(line + '\r\n')
     elif data == "pwd":
-	    #transport.write('/\r\n')
-	    transport.write(FAKE_CWD + '\r\n')
+        transport.write(FAKE_CWD + '\r\n')
     elif re.match('^cd',data):
-	    pass
+        pass
+    elif re.match('^tar', data):
+            transport.write("tar: You must specify one of the `-Acdtrux' or `--test-label'  options\r\n")
+            transport.write("Try `tar --help' or `tar --usage' for more information.\r\n")
+    elif re.match('^history', data):
+            pass
+    elif re.match('^export', data):
+            pass
+    elif re.match('^gcc', data):
+            transport.write('gcc: no input files\r\n')
+    elif re.match('^make', data):
+            transport.write('make: *** No targets specified and no makefile found.  Stop.\r\n')
+    elif re.match('^perl', data):
+            transport.write('This is perl 5, version 12, subversion 4 (v5.12.4) ')
+            transport.write('built for i386-linux-thread-multi\r\n\r\n')
+            transport.write('Copyright 1987-2010, Larry Wall\r\n\r\n')
+            transport.write('Perl may be copied only under the terms of either the')
+            transport.write('Artistic License or the\r\nGNU General Public License, ')
+            transport.write('which may be found in the Perl 5 source kit.\r\n\r\n')
+            transport.write('Complete documentation for Perl, including FAQ lists, ')
+            transport.write('should be found on\r\nthis system using "man perl" or ')
+            transport.write('"perldoc perl".  If you have access to the\r\nInternet, ')
+            transport.write( 'point your browser at http://www.perl.org/, the Perl Home Page.\r\n')
+    elif re.match('^passwd', data):
+            transport.write('Changing password for user.\r\n')
+            return 'New password: '
 
     #Removal of unnecessary functionality
     #Modified by Martin Barbella
@@ -97,7 +140,7 @@ def processCmd(data, transport):
                 for line in FAKE_DIR_STRUCT[dir_to_ls]:
                     transport.write(line + '\r\n')
             else:
-                 transport.write('ls: cannot access ' + dir_to_ls + ': No such file or directory\r\n')
+                 transport.write('ls: cannot access ' + dir_to_ls + ': No such file or directory')
         elif (FAKE_CWD in FAKE_DIR_STRUCT):
             for line in FAKE_DIR_STRUCT[FAKE_CWD]:
                 transport.write(line + '\r\n')
@@ -114,11 +157,16 @@ def processCmd(data, transport):
     #Added by Martin Barbella
     elif data == "logout":
         transport.loseConnection()
+    elif data == "id":
+        if attacker_username == "root":
+            transport.write('uid=0(root) gid=0(root) groups=0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel)')
+        else:
+            transport.write('uid=501('+attacker_username+') gid=502('+attacker_username+') groups=100(users)')
     elif data == "w":
-        for line in FAKE_W:
-            transport.write(line + '\r\n')
+        transport.write('USER\tTTY\tFROM\tLOGIN@\t\tIDLE\tJCPU\tPCPU\tWHAT\r\n')
+        transport.write(attacker_username + '\tpts/1\t'+ip+'\t09:05\t0.00s\t0.04s\t0.00s\tw')
     elif data == "who":
-        transport.write(FAKE_USER)
+        transport.write(attacker_username + '\tpts/1')
     elif data == "ftp ..":
         for line in FAKE_FTP:
             transport.write(line + '\r\n')
