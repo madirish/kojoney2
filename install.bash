@@ -68,7 +68,7 @@ fi
 
 # Replace tokens with user specified values
 sed -i "s/db_user/$mysql_user/g" coret_config.py
-sed -i "s/db_pass/$mysql_password/g" coret_config.py
+sed -i "s/db_password/$mysql_password/g" coret_config.py
 sed -i "s/db_host/$mysql_host/g" coret_config.py
 
 exit

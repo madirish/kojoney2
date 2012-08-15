@@ -14,7 +14,7 @@ import sys
 DATABASE_USER = 'db_user'
 DATABASE_PASS = 'db_password'
 DATABASE_HOST = 'db_host'
-DATABASE_NAME = 'db_database'
+DATABASE_NAME = 'kojoney'
 
 if os.getuid() == 0:
 #################################################################
