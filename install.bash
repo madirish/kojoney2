@@ -7,8 +7,6 @@ function die
 	#exit 1
 }
 
-
-exit
 KOJONEY_PATH=/usr/share/kojoney
 INSTALLER_VERSION=0.4
 
