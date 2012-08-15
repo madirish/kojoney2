@@ -67,9 +67,9 @@ if [ $create_db == 'yes' ]; then
 fi
 
 # Replace tokens with user specified values
-sed "s/db_user/$mysql_user/g" coret_config.py
-sed "s/db_pass/$mysql_password/g" coret_config.py
-sed "s/db_host/$mysql_host/g" coret_config.py
+sed -i "s/db_user/$mysql_user/g" coret_config.py
+sed -i "s/db_pass/$mysql_password/g" coret_config.py
+sed -i "s/db_host/$mysql_host/g" coret_config.py
 
 exit
 
