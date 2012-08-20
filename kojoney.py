@@ -46,7 +46,7 @@ from coret_log import *
 #
 start_logging()
 # This line magically logs auth attempts to the database via mod in userauth.py in modified Twisted
-userauth.conch_mysql_connect(DATABASE_USER, DATABASE_PASS, DATABASE_HOST, DATABASE_NAME)
+#userauth.conch_mysql_connect(DATABASE_USER, DATABASE_PASS, DATABASE_HOST, DATABASE_NAME)
 
 # Global holder
 FAKE_USERNAME = ""
