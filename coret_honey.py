@@ -88,11 +88,11 @@ def processCmd(data, transport, attacker_username, ip):
             transport.write(line + '\r\n')
     elif re.match('^id', data):
         if attacker_username == "root":
-            transport_write('uid=0(root) gid=0(root) groups=0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel)')
+            transport.write('uid=0(root) gid=0(root) groups=0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel)')
         else:
-            transport_write("uid=312("+attacker_username+") gid=312(")
-            transport_write(attacker_username+") groups=312("+attacker_username+")")
-            transport_write('\r\n')
+            transport.write("uid=312("+attacker_username+") gid=312(")
+            transport.write(attacker_username+") groups=312("+attacker_username+")")
+            transport.write('\r\n')
     elif re.match('^whoami', data):
         transport.write(attacker_username)
     elif re.match('^hostname', data):
