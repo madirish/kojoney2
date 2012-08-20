@@ -80,6 +80,19 @@ def processCmd(data, transport, attacker_username, ip):
         pass
     elif re.match('^date', data):
         transport.write(TIMESTAMP)
+    elif re.match('^ifconfig', data):
+        for line in FAKE_IFCONFIG:
+            transport.write(line + '\r\n')
+    elif re.match('^netstat', data):
+        for line in FAKE_NETSTAT:
+            transport.write(line + '\r\n')
+    elif re.match('^id', data):
+        if attacker_username == "root":
+            transport_write('uid=0(root) gid=0(root) groups=0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel)')
+        else:
+            transport_write("uid=312("+attacker_username+") gid=312(")
+            transport_write(attacker_username+") groups=312("+attacker_username+")")
+            transport_write('\r\n')
     elif re.match('^whoami', data):
         transport.write(attacker_username)
     elif re.match('^hostname', data):
