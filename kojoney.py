@@ -241,13 +241,13 @@ class CoretPasswordChecker:
         success = False
         for line in file:
             i += 1
-        data = line.split(' ')
-        try:
-            if username == data[0] and password == data[1].rstrip():
-                success = True
-                break
-        except:
-            log.msg("Error in fake users file at line " + str(i))
+            data = line.split(' ')
+            try:
+                if username == data[0] and password == data[1].rstrip():
+                    success = True
+                    break
+            except:
+                log.msg("Error in fake users file at line " + str(i))
     
         file.close()
         if success:
