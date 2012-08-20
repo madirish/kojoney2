@@ -1,6 +1,6 @@
 """
     Modified by Justin C. Klein Keane <justin@madirish.net>
-    Last modified: April 26, 2012
+    Last modified: August 20, 2012
     
     Kojoney - A honeypot that emules a secure shell (SSH) server.
     Copyright (C) 2005 Jose Antonio Coret

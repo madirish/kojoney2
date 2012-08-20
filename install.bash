@@ -1,7 +1,7 @@
 #!/bin/bash
 # Kojoney install script
 # Modified by Justin C. Klein Keane <jukeane@sas.upenn.edu>
-# Last updated August 15, 2012
+# Last updated August 20, 2012
 # ToDo: Modify SSH keys to hide Kojoney from NMAP
 #				Check for logrotate and handle non-logrotate configurations
 

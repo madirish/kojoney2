@@ -1,5 +1,5 @@
 # Modified by Justin Klein Keane <justin@madirish.net>
-# Last modified: 15 August, 2012
+# Last modified: 20 August, 2012
 import time
 from datetime import datetime
 FAKE_USERNAME = ""

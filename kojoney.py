@@ -27,7 +27,7 @@ import sys
 import string
 import MySQLdb
 
-from twisted.cred import portal, checkers, credentials, erro
+from twisted.cred import portal, checkers, credentials, error
 from twisted.conch import error, avatar, interfaces as conchinterfaces
 from twisted.conch.checkers import SSHPublicKeyDatabase
 from twisted.conch.ssh import factory, userauth, connection, keys, session, transport
