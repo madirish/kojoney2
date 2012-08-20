@@ -36,6 +36,23 @@ if [ -e /etc/redhat-release ]; then
 	  echo MySQL development libraries and C headers are not installed!
 	  yum install mysql-devel
 	fi
+	# Install the Python libraries
+	if rpm -q MySQL-python | grep not ; then
+		echo Python MySQL library not installed!
+		yum install MySQL-python
+	if rpm -q python-crypto | grep not ; then
+	  echo Python crypto library not installed!
+	  yum install python-crypt
+	fi
+	if rpm -q python-twisted-conch | grep not ; then
+	  echo Python Twisted Conch (SSH) library not installed!
+	  yum install python-twisted-conch
+	fi
+	if rpm -q python-zope-interface | grep not ; then
+	  echo Zope library not installed!
+	  yum install python-zope-interface
+	fi
+	
 fi
 
 echo 
@@ -140,65 +157,65 @@ echo "Step 1 - Copying files"
 cp *.py* $KOJONEY_PATH
 cp fake_users /etc/kojoney
 cp -f reports/* $KOJONEY_PATH 2>/dev/null
-temp_dir=`mktemp -d`
-echo " [+] Working on temp directory $temp_dir"
-echo " [+] Copying base libraries"
-cp -f libs/* $temp_dir 
-echo " [+] Copying optional libraries"
-cp -f reports/ip_country/* $temp_dir
+#temp_dir=`mktemp -d`
+#echo " [+] Working on temp directory $temp_dir"
+#echo " [+] Copying base libraries"
+#cp -f libs/* $temp_dir 
+#echo " [+] Copying optional libraries"
+#cp -f reports/ip_country/* $temp_dir
 
-old_dir=`pwd`
-cd $temp_dir
+#old_dir=`pwd`
+#cd $temp_dir
 
-echo " [+] Extracting libraries in temporary directory"
-find . -name "*.tar.gz" -exec tar -xzf {} ';' > /dev/null
+#echo " [+] Extracting libraries in temporary directory"
+#find . -name "*.tar.gz" -exec tar -xzf {} ';' > /dev/null
 
-echo "Step 2 - Building libraries"
-echo " [+] Building and installing [IP-Country]"
-cd IP*
+#echo "Step 2 - Building libraries"
+#echo " [+] Building and installing [IP-Country]"
+#cd IP*
 
-perl Makefile.PL > /dev/null || die "Step 2" 
-make > /dev/null || die "Step 2" 
-make install > /dev/null || die "Step 2" 
+#perl Makefile.PL > /dev/null || die "Step 2" 
+#make > /dev/null || die "Step 2" 
+#make install > /dev/null || die "Step 2" 
 
-cd $temp_dir
-cd G*
+#cd $temp_dir
+#cd G*
 
-echo " [+] Building and installing [Geography-Countries]"
-perl Makefile.PL > /dev/null || die "Step 2" 
-make > /dev/null || die "Step 2" 
-make install > /dev/null || die "Step 2" 
+#echo " [+] Building and installing [Geography-Countries]"
+#perl Makefile.PL > /dev/null || die "Step 2" 
+#make > /dev/null || die "Step 2" 
+#make install > /dev/null || die "Step 2" 
 
-cd $temp_dir
-cd Zope*
+#cd $temp_dir
+#cd Zope*
 
-echo " [+] Building and installing [Zope Interfaces]"
-python setup.py build > /dev/null || die "Step 2" 
-python setup.py install > /dev/null || die "Step 2" 
+#echo " [+] Building and installing [Zope Interfaces]"
+#python setup.py build > /dev/null || die "Step 2" 
+#python setup.py install > /dev/null || die "Step 2" 
 
-cd $temp_dir
-cd pycrypto*
+#cd $temp_dir
+#cd pycrypto*
 
-echo " [+] Building and installing [PyCrypto]"
-python setup.py build > /dev/null || die "Step 2" 
-python setup.py install > /dev/null || die "Step 2" 
+#echo " [+] Building and installing [PyCrypto]"
+#python setup.py build > /dev/null || die "Step 2" 
+#python setup.py install > /dev/null || die "Step 2" 
 
-cd $temp_dir
-cd MySQL*
+#cd $temp_dir
+#cd MySQL*
 
-echo " [+] Building and installing [MySQL-python]"
-python setup.py build > /dev/null || die "Step 2" 
-python setup.py install > /dev/null || die "Step 2" 
+#echo " [+] Building and installing [MySQL-python]"
+#python setup.py build > /dev/null || die "Step 2" 
+#python setup.py install > /dev/null || die "Step 2" 
 
-cd $temp_dir
-cd Twisted-*
+#cd $temp_dir
+#cd Twisted-*
 
-echo " [+] Building and installing [Twisted extension]"
-python setup.py build > /dev/null || die "Step 2" 
-python setup.py install > /dev/null || die "Step 2" 
+#echo " [+] Building and installing [Twisted extension]"
+#python setup.py build > /dev/null || die "Step 2" 
+#python setup.py install > /dev/null || die "Step 2" 
 
-cd $old_dir
-rm -fr $temp_dir
+#cd $old_dir
+#rm -fr $temp_dir
 
 echo "Step 3 - Installing documentation "
 echo " [+] Installing man pages"
