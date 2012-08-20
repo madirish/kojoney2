@@ -27,8 +27,8 @@ import sys
 import string
 import MySQLdb
 
-from twisted.cred import portal, checkers
-from twisted.conch import error, avatar
+from twisted.cred import portal, checkers, credentials, erro
+from twisted.conch import error, avatar, interfaces as conchinterfaces
 from twisted.conch.checkers import SSHPublicKeyDatabase
 from twisted.conch.ssh import factory, userauth, connection, keys, session, transport
 from twisted.internet import reactor, protocol, defer
@@ -71,7 +71,7 @@ class CoretRealm:
         print "BUG #1255822: " + str(sys.exc_info()[1])
         print ""
         print "For more details see https://sourceforge.net/tracker/index.php?func=detail&aid=1255822&group_id=143961&atid=758336"
-        print "If you are using standar Ubuntu Hoary packages I recommend you to download and compile the source code of Zope Interfaces as well as Twisted libraries."
+        print "If you are using standard Ubuntu Hoary packages I recommend you to download and compile the source code of Zope Interfaces as well as Twisted libraries."
         print ""
         print "NOTE: If you known how to solve this problem, please, contact me at joxeankoret@yahoo.es"
         print ""
