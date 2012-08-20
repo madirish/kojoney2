@@ -40,6 +40,7 @@ if [ -e /etc/redhat-release ]; then
 	if rpm -q MySQL-python | grep not ; then
 		echo Python MySQL library not installed!
 		yum install MySQL-python
+	fi
 	if rpm -q python-crypto | grep not ; then
 	  echo Python crypto library not installed!
 	  yum install python-crypt
@@ -52,7 +53,6 @@ if [ -e /etc/redhat-release ]; then
 	  echo Zope library not installed!
 	  yum install python-zope-interface
 	fi
-	
 fi
 
 echo 
