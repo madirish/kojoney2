@@ -45,7 +45,7 @@ if [ -e /etc/redhat-release ]; then
 	  yum install python-crypt
 	fi
 	if rpm -q python-twisted-conch | grep not ; then
-	  echo Python Twisted Conch (SSH) library not installed!
+	  echo Python Twisted Conch library not installed!
 	  yum install python-twisted-conch
 	fi
 	if rpm -q python-zope-interface | grep not ; then
