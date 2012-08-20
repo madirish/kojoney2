@@ -254,6 +254,10 @@ class CoretPasswordChecker:
             log.msg('login attempt %s:%s succeeded' % (username, password))
         else:
             log.msg('login attempt %s:%s failed' % (username, password))
+        connection = MySQLdb.connect(host=DATABASE_HOST, user=DATABASE_USER, passwd=DATABASE_PASS, db=DATABASE_NAME)
+        cursor = connection.cursor()
+        escaped_ip = connection.escape_string(self.transport.session.conn.transport.transport.getPeer()[1])
+        cursor.execute("INSERT INTO login_attempts SET time=now(), ip='%s', username='%s', password='%s'" % (escaped_ip, username, password))
         return success
 
 portal = portal.Portal(CoretRealm())
