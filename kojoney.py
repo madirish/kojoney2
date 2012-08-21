@@ -204,71 +204,14 @@ class CoretFactory(factory.SSHFactory):
         t.factory = self
         return t
 
-#From Kippo via https://code.google.com/p/kojoney-patch/
-#
-#Update: Nov 2011 - Mehdi Poustchi Amin
-#
-class CoretPasswordChecker:
-    implements(checkers.ICredentialsChecker)
-
-    credentialInterfaces = (credentials.IUsernamePassword,
-        credentials.IPluggableAuthenticationModules)
-
-    def requestAvatarId(self, credentials):
-        if hasattr(credentials, 'password'):
-            if self.checkUserPass(credentials.username, credentials.password):
-                return defer.succeed(credentials.username)
-            else:
-                return defer.fail(error.UnauthorizedLogin())
-        elif hasattr(credentials, 'pamConversion'):
-            return self.checkPamUser(credentials.username,
-                credentials.pamConversion)
-        return defer.fail(error.UnhandledCredentials())
-        
-    def checkPamUser(self, username, pamConversion):
-        r = pamConversion((('Password:', 1),))
-        return r.addCallback(self.cbCheckPamUser, username)
-
-    def cbCheckPamUser(self, responses, username):
-        for response, zero in responses:
-            if self.checkUserPass(username, response):
-                return defer.succeed(username)
-        return defer.fail(error.UnauthorizedLogin())
-
-    def checkUserPass(self, username, password):
-        file = open("/etc/kojoney/fake_users", "r")
-        i = 0
-        success = False
-        for line in file:
-            i += 1
-            data = line.split(' ')
-            try:
-                if username == data[0] and password == data[1].rstrip():
-                    success = True
-                    break
-            except:
-                log.msg("Error in fake users file at line " + str(i))
-    
-        file.close()
-        if success:
-            log.msg('login attempt %s:%s succeeded' % (username, password))
-        else:
-            log.msg('login attempt %s:%s failed' % (username, password))
-        connection = MySQLdb.connect(host=DATABASE_HOST, user=DATABASE_USER, passwd=DATABASE_PASS, db=DATABASE_NAME)
-        cursor = connection.cursor()
-        escaped_ip = connection.escape_string(self.transport.session.conn.transport.transport.getPeer()[1])
-        cursor.execute("INSERT INTO login_attempts SET time=now(), ip='%s', username='%s', password='%s'" % (escaped_ip, username, password))
-        return success
-
 portal = portal.Portal(CoretRealm())
 
 #
 # Register the fake username and password
 #
-#passwdDB = checkers.InMemoryUsernamePasswordDatabaseDontUse()
-#add_users(passwdDB)
-#portal.registerChecker(passwdDB)
-portal.registerChecker(CoretPasswordChecker())
+passwdDB = checkers.InMemoryUsernamePasswordDatabaseDontUse()
+add_users(passwdDB)
+portal.registerChecker(passwdDB)
 portal.registerChecker(InMemoryPublicKeyChecker())
 
 CoretFactory.portal = portal
