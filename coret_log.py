@@ -6,9 +6,11 @@ from coret_config import *
 from twisted.python import log
 
 def log_machine(data):
+    print "Log_machine: " + data
     pass
 
 def log_cmd_session(session, data):
+    print "Log_cmd_session: " + session + " :: " + data
     pass
 
 def start_logging():
