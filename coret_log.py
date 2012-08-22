@@ -24,7 +24,7 @@ def start_logging():
         log.startLogging(log_file)
         log.FileLogObserver.emit=koj_watcher
     
-def kojWAtcher(self,eventDict):
+def koj_watcher(self,eventDict):
   """Custom emit for FileLogObserver"""
   text = log.textFromEventDict(eventDict)
   if text is None:
