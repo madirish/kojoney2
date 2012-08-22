@@ -22,7 +22,7 @@ def start_logging():
     for log_file in log_file_list:
         print "Ok, starting log to "  + str(log_file)
         log.startLogging(log_file)
-        log.FileLogObserver.emit=koj_watcher
+        log.addObserver(koj_watcher)
     
 def koj_watcher(self,eventDict):
   """Custom emit for FileLogObserver"""
@@ -33,5 +33,6 @@ def koj_watcher(self,eventDict):
   timeStr = self.formatTime(eventDict['time'])
   fmtDict = {'text': text.replace("\n", "\n\t")}
   msgStr = log._safeFormat("%(text)s\n", fmtDict)
-  print "::: " + msgStr
+  util.untilConcludes(self.write, timeStr + " " + msgStr)
+  util.untilConcludes(self.flush)
 
