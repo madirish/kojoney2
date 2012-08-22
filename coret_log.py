@@ -22,8 +22,16 @@ def start_logging():
     for log_file in log_file_list:
         print "Ok, starting log to "  + str(log_file)
         log.startLogging(log_file)
+        log.FileLogObserver.emit=koj_watcher
     
-    twisted.python.log.addObserver(kojWatcher)
-    
-def kojWAtcher(msg, isError):
-    print "Observed the log message: " + msg
+def kojWAtcher(self,eventDict):
+  """Custom emit for FileLogObserver"""
+  text = log.textFromEventDict(eventDict)
+  if text is None:
+    return
+  self.timeFormat='[%Y-%m-%d %H:%M:%S]'
+  timeStr = self.formatTime(eventDict['time'])
+  fmtDict = {'text': text.replace("\n", "\n\t")}
+  msgStr = log._safeFormat("%(text)s\n", fmtDict)
+  print "::: " + msgStr
+
