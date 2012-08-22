@@ -24,15 +24,6 @@ def start_logging():
         log.startLogging(log_file)
         log.addObserver(koj_watcher)
     
-def koj_watcher(self,eventDict):
-  """Custom emit for FileLogObserver"""
-  text = log.textFromEventDict(eventDict)
-  if text is None:
-    return
-  self.timeFormat='[%Y-%m-%d %H:%M:%S]'
-  timeStr = self.formatTime(eventDict['time'])
-  fmtDict = {'text': text.replace("\n", "\n\t")}
-  msgStr = log._safeFormat("%(text)s\n", fmtDict)
-  util.untilConcludes(self.write, timeStr + " " + msgStr)
-  util.untilConcludes(self.flush)
+def koj_watcher(msg):
+  print "Observed message " + msg
 
