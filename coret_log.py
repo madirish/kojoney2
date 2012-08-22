@@ -29,10 +29,7 @@ def koj_watcher(eventDict):
   text = log.textFromEventDict(eventDict)
   if text is None:
     return
-  self.timeFormat='[%Y-%m-%d %H:%M:%S]'
-  timeStr = self.formatTime(eventDict['time'])
   fmtDict = {'text': text.replace("\n", "\n\t")}
   msgStr = log._safeFormat("%(text)s\n", fmtDict)
-  util.untilConcludes(self.write, timeStr + " " + msgStr)
-  util.untilConcludes(self.flush)
+  print "Observed " + msgStr
 
