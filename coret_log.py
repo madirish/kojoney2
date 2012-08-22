@@ -5,6 +5,10 @@ from coret_config import *
 
 from twisted.python import log
 
+def msg(data):
+    print "Intercepted log message"
+    twisted.python.log.msg(data)
+
 def log_machine(data):
     print "Log_machine: " + data
     pass
