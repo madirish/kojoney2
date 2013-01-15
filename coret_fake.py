@@ -1,5 +1,5 @@
 # Modified by Justin Klein Keane <justin@madirish.net>
-# Last modified: 20 August, 2012
+# Last modified: January 15, 2013
 import time
 from datetime import datetime
 FAKE_USERNAME = ""
@@ -10,7 +10,7 @@ FAKEYEARM2 = int(FAKEYEAR) - 2
 FAKEYEARM3 = int(FAKEYEAR) - 3
 FAKEYEARM4 = int(FAKEYEAR) - 4
 FAKEYEARM5 = int(FAKEYEAR) - 5
-FQDN = "fqdn_placeholder" #www.example.com
+FQDN = "centos6.jukeane01.sas.upenn.edu" #www.example.com
 FAKE_CWD = "/"
 
 FAKE_DIR_STRUCT = {
@@ -63,9 +63,9 @@ FAKE_DIR_STRUCT = {
 				"drwxrwxrwt.  3 root root  4.0K Apr 26 12:29 tmp",
 				"drwxr-xr-x.  6 root root  4.0K Mar  5 05:53 www",
 				"drwxr-xr-x.  3 root root  4.0K Jan 20 04:36 yp"),
-	'/var/www/html': 	("-rwxr-xr-x.  2 root root  112 Jan 20 04:42 index.htm"),
-	'/dev/shm': 	(""),
-	'/var/tmp':	("drwx------  3  506  506 4.0K Feb  1  " + str(FAKEYEAR) + " yum-charlie-yqZ0Yv"),
+	'/var/www/html': 	("-rwxr-xr-x.  2 root root  112 Jan 20 04:42 index.htm",),
+	'/dev/shm': 	("", ),
+	'/var/tmp':	("drwx------  3  506  506 4.0K Feb  1  " + str(FAKEYEAR) + " yum-charlie-yqZ0Yv",),
 	'/usr/bin': 	("-rwxr-xr-x    1 root root     37K May 30  " + str(FAKEYEAR) + " [",
 				"-rwxr-xr-x    1 root root    110K Nov 11  " + str(FAKEYEAR) + " a2p",
 				"-rwxr-xr-x.   1 root root     50K Jul  7  " + str(FAKEYEAR) + " ab",
@@ -1053,7 +1053,7 @@ FAKE_DIR_STRUCT = {
 				"drwx--x--x 70 sales       users 4.0K " + str(FAKEYEARM1) + "-05-22 10:59 Pictures/",
 				"drwx--x--x 70 sales       users 4.0K " + str(FAKEYEARM1) + "-05-22 10:59 Video/",
 				"-rwx--x--x 70 sales       users 5.1K " + str(FAKEYEARM1) + "-05-22 10:59 stats"),
-	'/home':	("drwx--x--x 70 bob       users  4.0K " + str(FAKEYEAR) + "-05-22 10:59 bob/",
+	'/home':	("drwx--x--x 70 bob      users  4.0K " + str(FAKEYEAR) + "-05-22 10:59 bob/",
 				"drwx--x--x 70 charlie   users 4.0K " + str(FAKEYEARM1) + "-05-20 11:44 charlie/",
 				"drwx--x--x 70 dierdre   users 4.0K " + str(FAKEYEARM1) + "-05-12 14:39 dierdre/",
 				"drwx--x--x 70 francis   users 4.0K " + str(FAKEYEARM1) + "-05-22 16:33 francis/",

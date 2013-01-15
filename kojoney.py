@@ -2,7 +2,7 @@
 
 """
     Modified by Justin C. Klein Keane <jukeane@sas.upenn.edu>
-    Last updated: August 20, 2012
+    Last updated: January 15, 2013
 
     Kojoney - A honeypot that emules a secure shell (SSH) server.
     Copyright (C) 2005 Jose Antonio Coret
@@ -100,7 +100,7 @@ class CoretProtocol(protocol.Protocol):
     #backspace bug fix, arrow key bug fix (by ignoring arrow input),
     #removal of line breaks from commands (to prevent logs from being broken).
     def dataReceived(self, data):
-        global FAKE_PROMPT
+        global FAKE_PROMPT, FAKE_USERNAME
         
         if data == '\r':
             self.lastCmd = string.replace(self.lastCmd, '\r', '')
@@ -109,8 +109,9 @@ class CoretProtocol(protocol.Protocol):
             cursor = connection.cursor()
             escaped_command = connection.escape_string(self.lastCmd)
             escaped_ip = connection.escape_string(self.transport.session.conn.transport.transport.getPeer()[1])
-            cursor.execute("INSERT INTO executed_commands SET command='%s', ip='%s'" % (escaped_command, escaped_ip))
-            retvalue = processCmd(self.lastCmd, self.transport, self.fake_username, escaped_ip)
+            cursor.execute("INSERT INTO executed_commands SET command='%s', ip='%s'" % (escaped_command, escaped_ip)) 
+            #retvalue = processCmd(self.lastCmd, self.transport, self.fake_username, escaped_ip)
+            retvalue = processCmd(self.lastCmd, self.transport, FAKE_USERNAME, escaped_ip)
             self.lastCmd = ""
             #data = '\r\n' + str(FAKE_PROMPT) 
             

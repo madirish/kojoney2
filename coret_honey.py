@@ -45,11 +45,11 @@ denied_re = re.compile("""
 (umount(\ )*.*)|(useradd(\ )*.*)|(grpadd(\ )*.*)""", re.VERBOSE)
 
 def processCmd(data, transport, attacker_username, ip):
-    global FAKE_SHELL, FAKE_CWD, con
+    global FAKE_SHELL, FAKE_CWD, con, FAKE_USERNAME
     
     retvalue = 1
     print "COMMAND IS : " + data
-    transport.write('\r\n')
+    
 
     #directory changing
     if re.match('^cd',data):
@@ -70,7 +70,9 @@ def processCmd(data, transport, attacker_username, ip):
                 FAKE_CWD = directory[1]
             else:
                 FAKE_CWD = "/"
-    
+    # cd shouldn't produce a blank line
+    else:
+        transport.write('\r\n')
     if uname_re.match(data):
         transport.write(FAKE_OS)
     elif data == "ps":
@@ -135,16 +137,6 @@ def processCmd(data, transport, attacker_username, ip):
     elif re.match('^passwd', data):
             transport.write('Changing password for user.\r\n')
             return 'New password: '
-
-    #Removal of unnecessary functionality
-    #Modified by Martin Barbella
-    #elif data == "help":
-        #transport.write('No soup for you!\r\n')
-    #elif data == "bye":
-        #transort.write('Goodbye\r\n')
-    #elif re.match('fuck', data):
-        #transport.write('Well fuck you too!')
-        
     elif ls_re.match(data):
         if len(data.split()) > 1:
             input = data.split()
@@ -158,12 +150,18 @@ def processCmd(data, transport, attacker_username, ip):
                     dir_to_ls = FAKE_CWD
             if (dir_to_ls in FAKE_DIR_STRUCT):
                 for line in FAKE_DIR_STRUCT[dir_to_ls]:
-                    transport.write(line + '\r\n')
+                    if (line == FAKE_DIR_STRUCT[dir_to_ls][-1]):
+                        transport.write(line)
+                    else:
+                        transport.write(line + '\r\n')
             else:
                  transport.write('ls: cannot access ' + dir_to_ls + ': No such file or directory')
         elif (FAKE_CWD in FAKE_DIR_STRUCT):
             for line in FAKE_DIR_STRUCT[FAKE_CWD]:
-                transport.write(line + '\r\n')
+                if (line == FAKE_DIR_STRUCT[FAKE_CWD][-1]):
+                    transport.write(line)
+                else:
+                    transport.write(line + '\r\n')
         else:
             transport.write('ls: Error.\r\n')
     
@@ -191,7 +189,14 @@ def processCmd(data, transport, attacker_username, ip):
         for line in FAKE_FTP:
             transport.write(line + '\r\n')
     elif su_re.match(data):
-        pass
+        switchtouser = data.split()[1]
+        print "Attempting to su to " + switchtouser
+        valid_users = "charlie bob dierdre francis marketing sales web root oracle"
+        if switchtouser in valid_users:
+            FAKE_USERNAME = switchtouser
+            print 'Changing FAKE_USERNAME to ' + switchtouser
+        else:
+            transport.write('Unknown user: ' + switchtouser)
     elif passwd_re.match(data):
         transport.write('geteuid: _getuid: Invalid operation')
     elif denied_re.match(data):
