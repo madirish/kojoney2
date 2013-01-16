@@ -31,5 +31,4 @@ def koj_watcher(eventDict):
     return
   fmtDict = {'text': text.replace("\n", "\n\t")}
   msgStr = log._safeFormat("%(text)s\n", fmtDict)
-  print "Observed " + msgStr
 
