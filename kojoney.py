@@ -34,7 +34,6 @@ from twisted.internet import reactor, protocol, defer
 from twisted.python import log
 from zope.interface import implements
 
-from coret_users import add_users
 from coret_honey import *
 from coret_config import *
 from coret_fake import *
