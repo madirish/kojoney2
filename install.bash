@@ -1,7 +1,7 @@
 #!/bin/bash
 # Kojoney install script
 # Modified by Justin C. Klein Keane <jukeane@sas.upenn.edu>
-# Last updated August 20, 2012
+# Last updated 16 January 2013
 # ToDo: Modify SSH keys to hide Kojoney from NMAP
 #				Check for logrotate and handle non-logrotate configurations
 
@@ -130,7 +130,7 @@ echo "}" >> /etc/logrotate.d/kojoney
 
 
 if ! cat /etc/crontab | grep kojreport ; then
-	echo "  59  23  *  *  * root /usr/share/kojoney/mailalert.sh > /dev/null" >> /etc/crontab
+	echo "  59  23  *  *  * root /usr/share/kojoney/mailalert.bash > /dev/null" >> /etc/crontab
 fi
 
 # Customize honeypot
