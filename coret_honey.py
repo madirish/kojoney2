@@ -1,6 +1,6 @@
 """
     Modified by Justin C. Klein Keane <justin@madirish.net>
-    Last modified: August 20, 2012
+    Last modified: January 16, 2013
     
     Kojoney - A honeypot that emules a secure shell (SSH) server.
     Copyright (C) 2005 Jose Antonio Coret
@@ -24,105 +24,150 @@ import re
 
 from coret_fake import *
 from coret_log import *
-
 from coret_command import *
-
 import coret_std_unix
 
 
 # Koret Honey ;)
 
-uname_re = re.compile("uname(\ )*.*")
-ls_re = re.compile("ls(\ )*.*")
-su_re = re.compile("su(\ )*.*")
-passwd_re = re.compile("passwd(\ )*.*")
 
 denied_re = re.compile("""
 (cat(\ )*.*)|(chgrp(\ )*.*)|(chmod(\ )*.*)|(chown(\ )*.*)|(cp(\ )*.*)|(cpio(\ )*.*)|(csh(\ )*.*)|(date(\ )*.*)|
 (dd(\ )*.*)|(df(\ )*.*)|(ed(\ )*.*)|(echo(\ )*.*)|(grep(\ )*.*)|(false(\ )*.*)|(kill(\ )*.*)|(ln(\ )*.*)|
-(login(\ )*.*)|(mkdir(\ )*.*)|(mknod(\ )*.*)|(mktemp(\ )*.*)|(more(\ )*.*)|(mount(\ )*.*)|(more(\ )*.*)|
+(login(\ )*.*)|(mknod(\ )*.*)|(mktemp(\ )*.*)|(more(\ )*.*)|(mount(\ )*.*)|(more(\ )*.*)|
 (mv(\ )*.*)|(ping(\ )*.*)|(rmdir(\ )*.*)|(sed(\ )*.*)|(sh(\ )*.*)|(bash(\ )*.*)|(su(\ )*.*)|(true(\ )*.*)|
 (umount(\ )*.*)|(useradd(\ )*.*)|(grpadd(\ )*.*)""", re.VERBOSE)
 
-def processCmd(data, transport, attacker_username, ip):
-    global FAKE_SHELL, FAKE_CWD, con, FAKE_USERNAME
+def processCmd(data, transport, attacker_username, ip, fake_workingdir):
+    global FAKE_SHELL, con, FAKE_USERNAME
     
-    retvalue = 1
+    printlinebreak = 0
     print "COMMAND IS : " + data
-    
+    transport.write('\r\n')
 
     #directory changing
     if re.match('^cd',data):
         directory = data.split()
         if len(directory) == 1:
-            if attacker_username == "root":
-                FAKE_CWD = "/root"
-            elif attacker_username == "oracle":
-                FAKE_CWD = "/oracle"
+            if attacker_username in FAKE_HOMEDIRS:
+                fake_workingdir = FAKE_HOMEDIRS[attacker_username]
             else:
-                FAKE_CWD = "/"
+                fake_workingdir = "/"
         else:
             if directory[1] == "/root": 
                 if attacker_username != "root":
                     transport.write('-bash: cd: /root: Permission denied')
-                    FAKE_CWD = "/"
+                    fake_workingdir = "/"
             elif len(directory) > 1:
-                FAKE_CWD = directory[1]
+                # Descending (cd foo) or absolute (cd /foo)
+                old_dir = fake_workingdir
+                if directory[1][0:1] == '/':
+                    fake_workingdir = directory[1]
+                else:
+                    fake_workingdir += '/' + directory[1]
+                if fake_workingdir not in FAKE_DIR_STRUCT:
+                    transport.write('-bash: cd: ' + directory[1] + ': No such file or directory')
+                    fake_workingdir = old_dir
             else:
-                FAKE_CWD = "/"
-    # cd shouldn't produce a blank line
-    else:
-        transport.write('\r\n')
-    if uname_re.match(data):
-        transport.write(FAKE_OS)
-    elif data == "ps":
-        for line in FAKE_PLAIN_PS:
-            transport.write(line + '\r\n')
-    elif re.match('^unset ', data):
-        pass
-    elif re.match('^date', data):
-        transport.write(TIMESTAMP)
-    elif re.match('^ifconfig', data):
-        for line in FAKE_IFCONFIG:
-            transport.write(line + '\r\n')
-    elif re.match('^netstat', data):
-        for line in FAKE_NETSTAT:
-            transport.write(line + '\r\n')
-    elif re.match('^id', data):
-        if attacker_username == "root":
-            transport.write('uid=0(root) gid=0(root) groups=0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel)')
-        else:
-            transport.write("uid=312("+attacker_username+") gid=312(")
-            transport.write(attacker_username+") groups=312("+attacker_username+")")
-            transport.write('\r\n')
-    elif re.match('^whoami', data):
-        transport.write(attacker_username)
-    elif re.match('^hostname', data):
-        transport.write(FQDN)
-    elif re.match('^ps ', data):
-        for line in FAKE_PS:
-            transport.write(line + '\r\n')
+                fake_workingdir = "/"
+    #cat /etc/passwd
     elif data == "cat /etc/passwd":
         for line in FAKE_CAT_PASSWD:
             transport.write(line + '\r\n')
+    #cat /etc/issue
     elif data == "cat /etc/issue":
         for line in FAKE_ETC_ISSUE:
             transport.write(line + '\r\n')
-    elif data == "pwd":
-        transport.write(FAKE_CWD + '\r\n')
-    elif re.match('^cd',data):
-        pass
-    elif re.match('^tar', data):
-            transport.write("tar: You must specify one of the `-Acdtrux' or `--test-label'  options\r\n")
-            transport.write("Try `tar --help' or `tar --usage' for more information.\r\n")
-    elif re.match('^history', data):
-            pass
+    #cat /proc/cpuinfo
+    elif data == "cat /proc/cpuinfo":
+        for line in FAKE_CPUINFO:
+            transport.write(line + '\r\n')
+    #date
+    elif re.match('^date', data):
+        transport.write(TIMESTAMP)
+        printlinebreak = 1
+    #exit
+    elif data == "exit":
+        transport.loseConnection()
+    #export
     elif re.match('^export', data):
             pass
+    #gcc
     elif re.match('^gcc', data):
             transport.write('gcc: no input files\r\n')
+    #history
+    elif re.match('^history', data):
+            pass
+    #hostname
+    elif re.match('^hostname', data):
+        transport.write(FQDN)
+    #id
+    elif data == "id":
+        printlinebreak = 1
+        if attacker_username == "root":
+            transport.write('uid=0(root) gid=0(root) groups=0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel)')
+        else:
+            transport.write('uid=501('+attacker_username+') gid=502('+attacker_username+') groups=100(users)')
+    #ifconfig
+    elif re.match('^ifconfig', data):
+        for line in FAKE_IFCONFIG:
+            transport.write(line + '\r\n')
+    #logout - Added by Martin Barbella
+    elif data == "logout":
+        transport.loseConnection()
+    #ls
+    elif re.match("ls(\ )*.*", data):
+        printlinebreak = 1
+        if len(data.split()) > 1:
+            input = data.split()
+            dir_to_ls = input[1]
+            #Fix for "cannot access [parameters]"
+            #Added by Martin Barbella
+            if(dir_to_ls[0] == '-'):
+                if(len(input) > 2):
+                    dir_to_ls = input[2]
+                else:
+                    dir_to_ls = fake_workingdir
+            if (dir_to_ls in FAKE_DIR_STRUCT):
+                for line in FAKE_DIR_STRUCT[dir_to_ls]:
+                    if (line == FAKE_DIR_STRUCT[dir_to_ls][-1]):
+                        transport.write(line)
+                    else:
+                        transport.write(line + '\r\n')
+            else:
+                 transport.write('ls: cannot access ' + dir_to_ls + ': No such file or directory')
+        elif (fake_workingdir in FAKE_DIR_STRUCT):
+            for line in FAKE_DIR_STRUCT[fake_workingdir]:
+                if (line == FAKE_DIR_STRUCT[fake_workingdir][-1]):
+                    transport.write(line)
+                else:
+                    transport.write(line + '\r\n')
+        else:
+            transport.write('ls: Error.\r\n')
+    #make
     elif re.match('^make', data):
             transport.write('make: *** No targets specified and no makefile found.  Stop.\r\n')
+    #mkdir
+    elif re.match('^mkdir',data):
+        directory = data.split()
+        if len(directory) == 1:
+            transport.write("mkdir: missing operand\r\nTry `mkdir --help' for more information.")
+        else:
+            print 'Appending directory ' + directory[1]
+            #format the new entry
+            newdirectory = 'drwx--x--x 70 ' + attacker_username + '     users 4.0K ' + datetime.now().strftime("%Y-%m-%d %H:%M ") + directory[1] + '/'
+            FAKE_DIR_STRUCT[fake_workingdir].append(newdirectory)
+            FAKE_DIR_STRUCT[fake_workingdir + '/' + directory[1]] = ""
+    #netstat
+    elif re.match('^netstat', data):
+        for line in FAKE_NETSTAT:
+            transport.write(line + '\r\n')
+    #passwd
+    elif re.match('^passwd', data):
+            printlinebreak = 1
+            transport.write('Changing password for user.\r\n')
+            transport.write('New password: ')
+    #perl
     elif re.match('^perl', data):
             transport.write('This is perl 5, version 12, subversion 4 (v5.12.4) ')
             transport.write('built for i386-linux-thread-multi\r\n\r\n')
@@ -134,94 +179,97 @@ def processCmd(data, transport, attacker_username, ip):
             transport.write('should be found on\r\nthis system using "man perl" or ')
             transport.write('"perldoc perl".  If you have access to the\r\nInternet, ')
             transport.write( 'point your browser at http://www.perl.org/, the Perl Home Page.\r\n')
-    elif re.match('^passwd', data):
-            transport.write('Changing password for user.\r\n')
-            return 'New password: '
-    elif ls_re.match(data):
-        if len(data.split()) > 1:
-            input = data.split()
-            dir_to_ls = input[1]
-            #Fix for "cannot access [parameters]"
-            #Added by Martin Barbella
-            if(dir_to_ls[0] == '-'):
-                if(len(input) > 2):
-                    dir_to_ls = input[2]
-                else:
-                    dir_to_ls = FAKE_CWD
-            if (dir_to_ls in FAKE_DIR_STRUCT):
-                for line in FAKE_DIR_STRUCT[dir_to_ls]:
-                    if (line == FAKE_DIR_STRUCT[dir_to_ls][-1]):
-                        transport.write(line)
-                    else:
-                        transport.write(line + '\r\n')
-            else:
-                 transport.write('ls: cannot access ' + dir_to_ls + ': No such file or directory')
-        elif (FAKE_CWD in FAKE_DIR_STRUCT):
-            for line in FAKE_DIR_STRUCT[FAKE_CWD]:
-                if (line == FAKE_DIR_STRUCT[FAKE_CWD][-1]):
-                    transport.write(line)
-                else:
-                    transport.write(line + '\r\n')
+    #ps
+    elif re.match('^ps ', data):
+        for line in FAKE_PS:
+            transport.write(line + '\r\n')
+    #pwd
+    elif data == "pwd":
+        transport.write(fake_workingdir + '\r\n')
+    #rpm
+    elif re.match("rpm(\ )*.*", data):
+        transport.write('RPM version 4.8.0\r\n')
+        transport.write('Copyright (C) 1998-2002 - Red Hat, Inc.\r\n')
+        transport.write('This program may be freely redistributed under the terms of the GNU GPL\r\n')
+    #su and sudo
+    elif re.match("su(\ )*.*", data):
+        if data == "sudo su" or data == "su":
+            attacker_username = 'root'
         else:
-            transport.write('ls: Error.\r\n')
-    
+            switchtouser = data.split()[1]
+            print "Attempting to su to " + switchtouser
+            if switchtouser in FAKE_HOMEDIRS:
+                attacker_username = switchtouser
+                print 'Changing FAKE_USERNAME to ' + switchtouser
+            else:
+                printlinebreak = 1
+                transport.write('Unknown user: ' + switchtouser)
+    #tar
+    elif re.match('^tar', data):
+            transport.write("tar: You must specify one of the `-Acdtrux' or `--test-label'  options\r\n")
+            transport.write("Try `tar --help' or `tar --usage' for more information.\r\n")
+    #uname
+    elif re.match("uname(\ )*.*", data):
+        printlinebreak = 1
+        transport.write(FAKE_OS)
+    #unset
+    elif re.match('^unset ', data):
+        pass
+    #uptime
     elif data == "uptime":
         transport.write(FAKE_UPTIME)
-    elif data == "cat /proc/cpuinfo":
-        for line in FAKE_CPUINFO:
-            transport.write(line + '\r\n')
-    elif data == "exit":
-        transport.loseConnection()
-    #Added by Martin Barbella
-    elif data == "logout":
-        transport.loseConnection()
-    elif data == "id":
-        if attacker_username == "root":
-            transport.write('uid=0(root) gid=0(root) groups=0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel)')
-        else:
-            transport.write('uid=501('+attacker_username+') gid=502('+attacker_username+') groups=100(users)')
+        printlinebreak = 1
+    #w
     elif data == "w":
+        printlinebreak = 1
         transport.write('USER\tTTY\tFROM\tLOGIN@\t\tIDLE\tJCPU\tPCPU\tWHAT\r\n')
         transport.write(attacker_username + '\tpts/1\t'+ip+'\t09:05\t0.00s\t0.04s\t0.00s\tw')
+    #who
     elif data == "who":
         transport.write(attacker_username + '\tpts/1')
-    elif data == "ftp ..":
-        for line in FAKE_FTP:
-            transport.write(line + '\r\n')
-    elif su_re.match(data):
-        switchtouser = data.split()[1]
-        print "Attempting to su to " + switchtouser
-        valid_users = "charlie bob dierdre francis marketing sales web root oracle"
-        if switchtouser in valid_users:
-            FAKE_USERNAME = switchtouser
-            print 'Changing FAKE_USERNAME to ' + switchtouser
-        else:
-            transport.write('Unknown user: ' + switchtouser)
-    elif passwd_re.match(data):
-        transport.write('geteuid: _getuid: Invalid operation')
+        printlinebreak = 1
+    #whoami
+    elif re.match('^whoami', data):
+        transport.write(attacker_username)
+        printlinebreak = 1
+    #yum
+    elif re.match('^yum(\ )*.*', data):
+        transport.write('Loaded plugins: fastestmirror\r\n')
+        transport.write('You need to give some command\r\n')
+        transport.write('Usage: yum [options] COMMAND\r\n')
+    # Fall through to anything else we haven't predefined
     elif denied_re.match(data):
         #
         # Patch from Nicolas Surribas to fix bug 1463713
         #
         transport.write(FAKE_SHELL+ data.split(" ")[0] + ": " + FAKE_DENIED)
+        printlinebreak = 1
     else:
+        print "Potentially unknown command"
         if data == "":
-            return 0
-
-        result_data = ""
-        try:
-            result_data = executeCommand(data.split())
-            
-            if type(result_data) is bool:
-                if not result_data:
-                    transport.write(FAKE_SHELL + ": " + str(data.split()[0]) + ": command not found")
-        except:
-            print "Internal error:", data, ":",str(sys.exc_info()[1])
-            transport.write(FAKE_SHELL + ": " + str(data.split()[0]) + ": command not found")
+            pass
+        else:
+            printlinebreak = 1
+            if len(data.split()) > 1:
+                transport.write(FAKE_SHELL + ": " + data.split()[0] + ": command not found")
+            else:
+                transport.write(FAKE_SHELL + ": " + data + ": command not found")
+                
         
-        data = ""
+        #result_data = ""
+        #try:
+        #    result_data = executeCommand(data.split())
+        #    
+        #    if type(result_data) is bool:
+        #        if not result_data:
+        #            transport.write(FAKE_SHELL + ":  command not found")
+        #except:
+        #    print "Internal error:", data, ":",str(sys.exc_info()[1])
+        #    transport.write(FAKE_SHELL + ": " + str(data.split()[0]) + ": command not found")
+        #
+        #data = ""
 
-        if type(result_data) is not bool and result_data != "":
-            transport.write(result_data)
+        #if type(result_data) is not bool and result_data != "":
+        #    transport.write(result_data)
             
-        return retvalue
+    return (printlinebreak, fake_workingdir, attacker_username)
