@@ -115,7 +115,6 @@ class CoretProtocol(protocol.Protocol):
             self.lastCmd = ""
             
             (printlinebreak, ret_workingdir, ret_username) = retvalue
-            print "Working dir returned as " + ret_workingdir
             self.fake_workingdir = ret_workingdir
             FAKE_USERNAME = ret_username
             if FAKE_USERNAME == 'root':
@@ -252,7 +251,6 @@ class HoneypotPasswordChecker:
 
     def checkUserPass(self, username, password):
         if username in self.authorizedCredentials:
-            print self.authorizedCredentials[username]
             passwords = self.authorizedCredentials[username].split(',')
             if passwords.count(password) > 0:
                 print '%s authenticated with password' % (username)
