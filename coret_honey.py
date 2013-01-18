@@ -1,9 +1,9 @@
 """
     Modified by Justin C. Klein Keane <justin@madirish.net>
-    Last modified: January 16, 2013
+    Last modified: January 18, 2013
     
     Kojoney - A honeypot that emules a secure shell (SSH) server.
-    Copyright (C) 2005 Jose Antonio Coret
+    Originally Copyright (C) 2005 Jose Antonio Coret
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -70,6 +70,12 @@ def processCmd(data, transport, attacker_username, ip, fake_workingdir):
                     fake_workingdir = old_dir
             else:
                 fake_workingdir = "/"
+    #apachectl
+    elif data == "apachectl status":
+        transport.write('Not Found\r\n\r\n')
+        transport.write('The requested URL /server-status was not found on this server.\r\n\r\n')
+        transport.write(' --------------------------------------------------------------------------\r\n\r\n')
+        transport.write('Apache/2.2.15 (CentOS) Server at localhost Port 80\r\n')
     #cat /etc/passwd
     elif data == "cat /etc/passwd":
         for line in FAKE_CAT_PASSWD:
@@ -191,6 +197,35 @@ def processCmd(data, transport, attacker_username, ip, fake_workingdir):
         transport.write('RPM version 4.8.0\r\n')
         transport.write('Copyright (C) 1998-2002 - Red Hat, Inc.\r\n')
         transport.write('This program may be freely redistributed under the terms of the GNU GPL\r\n')
+    #service
+    elif re.match("^(/sbin/)service", data):
+        servicecmd = data.split(" ")
+        printlinebreak = 1
+        if (len(servicecmd)) == 3:
+            if servicecmd[1] in FAKE_SERVICES:
+                if servicecmd[2] == "start":
+                    transport.write('Starting ' + servicecmd[1] + ":")
+                elif servicecmd[2] == "stop":
+                    transport.write('Stopping ' + servicecmd[1] + ":")
+                elif servicecmd[2] == "restart":
+                    transport.write('Restarting ' + servicecmd[1] + ":")
+                elif servicecmd[2] == "status":
+                    transport.write(servicecmd[1] + " dead but subsys locked")
+                else:
+                    transport.write(FAKE_SERVICE_USAGE.format(servicecmd[1]))
+            else:
+                transport.write(servicecmd[1] + ': unrecognized service')
+        elif (len(servicecmd)) == 2:
+            if servicecmd[1] == "--status-all":
+                for line in FAKE_SERVICE_ALL:
+                    transport.write(line + '\r\n')
+            elif servicecmd[1] in FAKE_SERVICES:
+                transport.write('Usage: ' + servicecmd[1] + ': {start|stop|restart}')
+            else:
+                transport.write(servicecmd[1] + ': unrecognized service')
+        else:
+            transport.write('Usage: service < option > | --status-all | [ service_name [ command | --full-restart ] ]')
+        
     #su and sudo
     elif re.match("su(\ )*.*", data):
         if data == "sudo su" or data == "su":
@@ -234,9 +269,12 @@ def processCmd(data, transport, attacker_username, ip, fake_workingdir):
         printlinebreak = 1
     #yum
     elif re.match('^yum(\ )*.*', data):
-        transport.write('Loaded plugins: fastestmirror\r\n')
-        transport.write('You need to give some command\r\n')
-        transport.write('Usage: yum [options] COMMAND\r\n')
+        if re.match('^yum install', data):
+            transport.write('Another app is currently holding the yum lock; waiting for it to exit...\r\n')
+        else:
+            transport.write('Loaded plugins: fastestmirror\r\n')
+            transport.write('You need to give some command\r\n')
+            transport.write('Usage: yum [options] COMMAND\r\n')
     # Fall through to anything else we haven't predefined
     elif denied_re.match(data):
         #
