@@ -187,7 +187,6 @@ FAKE_DIR_STRUCT = {
 				"-rwxr-xr-x    1 root root    6.2K Nov 12  " + str(FAKEYEAR) + " colrm",
 				"-rwxr-xr-x    1 root root    9.7K Nov 12  " + str(FAKEYEAR) + " column",
 				"-rwxr-xr-x    1 root root     31K May 30  " + str(FAKEYEAR) + " comm",
-				"lrwxrwxrwx    1 root root      45 Feb  4 12:40 commands_by_session_and_ip -> /usr/share/kojoney/commands_by_session_and_ip",
 				"-rwxr-xr-x    1 root root    1.5K Dec  7 15:39 compile_et",
 				"-rwxr-xr-x    1 root root     580 Aug 21  " + str(FAKEYEAR) + " conch",
 				"-rwxr-xr-x.   1 root root    7.1K Nov 11  " + str(FAKEYEAR) + " config_data",
@@ -453,13 +452,7 @@ FAKE_DIR_STRUCT = {
 				"lrwxrwxrwx.   1 root root      14 Aug  2  " + str(FAKEYEAR) + " kill -> ../../bin/kill",
 				"-rwxr-xr-x    1 root root     19K Nov 11  " + str(FAKEYEAR) + " killall",
 				"-rwxr-xr-x    1 root root     18K Dec 17 11:36 kinit",
-				"lrwxrwxrwx    1 root root      30 Feb  4 12:40 kip2country -> /usr/share/kojoney/kip2country",
 				"-rwxr-xr-x    1 root root     18K Dec 17 11:36 klist",
-				"lrwxrwxrwx    1 root root      28 Feb  4 12:40 kojhumans -> /usr/share/kojoney/kojhumans",
-				"lrwxrwxrwx    1 root root      29 Feb  4 12:40 kojoneyd -> /usr/share/kojoney/kojoney.py",
-				"lrwxrwxrwx    1 root root      28 Feb  4 12:40 kojreport -> /usr/share/kojoney/kojreport",
-				"lrwxrwxrwx    1 root root      35 Feb  4 12:40 kojreport-filter -> /usr/share/kojoney/kojreport-filter",
-				"lrwxrwxrwx    1 root root      29 Feb  4 12:40 kojsession -> /usr/share/kojoney/kojsession",
 				"-rwxr-xr-x    1 root root    9.4K Dec 17 11:36 kpasswd",
 				"-rwxr-xr-x    1 root root    6.1K Dec 17 11:36 krb5-config",
 				"-rwsr-xr-x    1 root root     54K Dec 17 11:36 ksu",
@@ -811,7 +804,6 @@ FAKE_DIR_STRUCT = {
 				"-rwxr-xr-x.   1 root root    9.7K Nov 10  " + str(FAKEYEAR) + " semodule_package",
 				"-rwxr-xr-x    1 root root     42K May 30  " + str(FAKEYEAR) + " seq",
 				"lrwxrwxrwx.   1 root root      28 Aug  2  " + str(FAKEYEAR) + " servertool -> /etc/alternatives/servertool",
-				"lrwxrwxrwx    1 root root      41 Feb  4 12:40 sessions_with_commands -> /usr/share/kojoney/sessions_with_commands",
 				"-rwxr-xr-x    1 root root     11K Nov 12  " + str(FAKEYEAR) + " setarch",
 				"-rwxr-xr-x    1 root root     31K Nov 10  " + str(FAKEYEAR) + " setfacl",
 				"-rwxr-xr-x    1 root root     14K Nov 10  " + str(FAKEYEAR) + " setfattr",
@@ -1113,7 +1105,7 @@ FAKE_PROMPT = FAKE_SHELL + str(FAKE_USER_CHAR) + " "
 
 FAKE_WGET = "--00:32:24--  http://../","           => `index.html'", "Resolving ..... Failed: unable to resolve domain name."
 FAKE_FTP = "ftp: ..: No address associated with name", "ftp> "
-FAKE_USERS_FILE = "/etc/kojoney/fake_users"
+FAKE_USERS_FILE = "/opt/kojoney/fake_users"
 FAKE_RM = "rm: Permission denied"
 FAKE_TOUCH = "touch: Permission denied"
 FAKE_DENIED = " Permission denied"
