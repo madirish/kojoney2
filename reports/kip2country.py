@@ -14,6 +14,5 @@ if len(sys.argv) > 2:
 ip = sys.argv[1]   
 response = urllib.urlopen('http://api.hostip.info/get_html.php?ip=' + ip + '&position=true').read()
 lines = response.split('\n')
-print ip
-print lines[0]
-print lines[1]
+print '\t\t' + lines[0]
+print '\t\t' + lines[1]
