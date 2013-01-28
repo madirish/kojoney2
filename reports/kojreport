@@ -1,6 +1,13 @@
 #!/bin/bash
+# This file is part of the Kojoney2 honeypot
+#
+# Main Developer - Justin C. Klein Keane <jukeane@sas.upenn.edu>
+# Original Developer - Jose Antonio Coret <joxeankoret@yahoo.es>
+# Last updated 28 January, 2013
+#
+# Kojoney reporting script
 
-version=0.0.3
+version=0.0.4
 tools_dir=`dirname $0`
 
 function show_authenticated
@@ -46,32 +53,9 @@ function show_ip_address
 	do
 		i=`expr $i + 1`
 
-		if [ $3 -eq 0 ]; then
-			if [ $4 -eq 0 ]; then
-			    if [ $5 -eq 1 ]; then
-			    	country=`$tools_dir/kip2country $ip`
-				echo -e "   $i\t$ip - $country"
-			    else
-				echo -e "   $i\t$ip - `cat $1 | grep $ip | grep 'authenticated with' | wc -l ` connection(s)"
-			    fi
-			fi
-		fi
-
-		if [ $3 -eq 1 ]; then
-			echo $i - Trace route to $ip ...
-			echo "***********************************************************************************"
-			echo
-			traceroute $ip
-			echo 
-		fi
-
-		if [ $4 -eq 1 ]; then
-			echo $i - Scanning $ip ...
-			echo "***********************************************************************************"
-			echo
-			nmap -vv -P0 -O $ip
-			echo 
-		fi
+		echo -e "   $i\t$ip - `cat $1 | grep $ip | grep 'authenticated with' | wc -l ` connection(s)"
+		/usr/bin/python $tools_dir/kip2country.py $ip
+		
 	done
 
 	echo
@@ -88,8 +72,9 @@ function show_passwords
 
 function show_usage
 {
-	echo "Koret Honeypot general report generator $version"
-	echo "Copyright (c) 2005 Jose Antonio Coret"
+	echo "Kojoney2 Honeypot general report generator $version"
+	echo "Modified by Justin C. Klein Keane"
+	echo "Original Copyright (c) 2005 Jose Antonio Coret"
 	echo
 	echo -e "Usage: $0 file <traceroute> <nmap> <country>"
 	echo
@@ -110,120 +95,125 @@ if [ $# -eq 0 ]; then
 	show_usage
 fi
 
-echo Kojoney Honeypot Report
+echo Kojoney2 Honeypot Report
 echo -----------------------
 echo
 echo Date: `date +%c`
 echo Log lines: `cat $1 | wc -l`
 echo Log size: `du -h $1`
-echo 
-echo Authenticated users. Successful logons
-echo ---------------------------------------
-echo
-show_authenticated $1 'authenticated with password'
-echo
-echo Unauthenticated users. Failed logons
-echo ------------------------------------
-echo
-show_unauthenticated $1 'failed auth password'
-echo
-echo Users successfully authenticated with publickey
-echo ------------------------------------------------
-echo
-show_authenticated $1 'authenticated with publickey'
-echo
-echo Users unsuccessfully authenticated with publickey
-echo --------------------------------------------------
-echo 
-show_unauthenticated $1 'failed auth publickey'
-echo
-echo Logons with null passwords
-echo --------------------------
-echo
-show_authenticated $1 'trying auth none'
-echo
-echo Logons with or without password
-echo -------------------------------
-echo
-show_authenticated $1 'trying auth'
 echo
 echo Number of times a remote shell was opened
 echo -----------------------------------------
 echo
 show_total $1 'getting shell'
-echo
-echo X11 forward requests
-echo --------------------
 echo 
-show_total $1 'request for x11'
-echo
-echo Executed different commands
-echo ---------------------------
-echo
-show_commands $1 
-echo
+
 echo Executed commands by session
 echo ----------------------------
 echo
 show_commands_by_session $1
 echo
-echo Number of times the intruder tries to change the terminal window size 
-echo ---------------------------------------------------------------------
-echo
-show_total $1 'error changing window size'
-echo
+
 echo IP Addresses
 echo ------------
 echo 
 show_ip_address $1 'SSHServerTransport' 0 0 0
 echo
 
-if [ $# -gt 1 ]; then
-    if [ $2 -eq 1 ]; then
-	echo Traceroute to intruders hosts
-	echo ------------------------------
-	echo
-	show_ip_address $1 'SSHServerTransport' 1 0 0
-	echo
-    fi
-fi
-
-if [ $# -gt 2 ]; then
-    if [ $3 -eq 1 ]; then
-	echo NMap scan against intruders hosts
-	echo ----------------------------------
-	echo
-	show_ip_address $1 'SSHServerTransport' 0 1 0
-	echo
-    fi
-fi
-
-if [ $# -gt 3 ]; then
-    if [ $4 -eq 1 ]; then
-    	echo IP Addresses and Countries
-	echo --------------------------
-	echo
-	show_ip_address $1 'SSHServerTransport' 0 0 1
-	echo
-    fi
-fi
-
-echo Sessions opened by humans
-echo -------------------------
+echo Authenticated users. Successful logons
+echo ---------------------------------------
 echo
-$tools_dir/kojhumans $1 --by-session
+show_authenticated $1 'authenticated with password'
 echo
-echo Humans detecteds by IP
-echo ----------------------
-$tools_dir/kojhumans $1 --by-ip
+
+echo Unauthenticated users. Failed logons
+echo ------------------------------------
 echo
+show_unauthenticated $1 'failed auth password'
+echo
+
+#echo Users successfully authenticated with publickey
+#echo ------------------------------------------------
+#echo
+#show_authenticated $1 'authenticated with publickey'
+#echo
+#echo Users unsuccessfully authenticated with publickey
+#echo --------------------------------------------------
+#echo 
+#show_unauthenticated $1 'failed auth publickey'
+#echo
+#echo Logons with null passwords
+#echo --------------------------
+#echo
+#show_authenticated $1 'trying auth none'
+#echo
+#echo Logons with or without password
+#echo -------------------------------
+#echo
+#show_authenticated $1 'trying auth'
+#echo
+#echo X11 forward requests
+#echo --------------------
+#echo 
+#show_total $1 'request for x11'
+#echo
+#echo Executed different commands
+#echo ---------------------------
+#echo
+#show_commands $1 
+#echo
+#echo Number of times the intruder tries to change the terminal window size 
+#echo ---------------------------------------------------------------------
+#echo
+#show_total $1 'error changing window size'
+#echo
+#
+#if [ $# -gt 1 ]; then
+#    if [ $2 -eq 1 ]; then
+#	echo Traceroute to intruders hosts
+#	echo ------------------------------
+#	echo
+#	show_ip_address $1 'SSHServerTransport' 1 0 0
+#	echo
+#    fi
+#fi
+#
+#if [ $# -gt 2 ]; then
+#    if [ $3 -eq 1 ]; then
+#	echo NMap scan against intruders hosts
+#	echo ----------------------------------
+#	echo
+#	show_ip_address $1 'SSHServerTransport' 0 1 0
+#	echo
+#    fi
+#fi
+#
+#if [ $# -gt 3 ]; then
+#    if [ $4 -eq 1 ]; then
+#    	echo IP Addresses and Countries
+#	echo --------------------------
+#	echo
+#	show_ip_address $1 'SSHServerTransport' 0 0 1
+#	echo
+#    fi
+#fi
+#
+#echo Sessions opened by humans
+#echo -------------------------
+#echo
+#$tools_dir/kojhumans $1 --by-session
+#echo
+#echo Humans detecteds by IP
+#echo ----------------------
+#$tools_dir/kojhumans $1 --by-ip
+#echo
 #echo Internal Honeypot Errors
 #echo ------------------------
 #echo
 #show_total $1 '<exception caught here>'
 #echo
-echo Passwords used for each user
-echo ------------------------
-echo
-show_passwords $1 'Login attempt with this username and password:'
+#echo Passwords used for each user
+#echo ------------------------
+#echo
+#show_passwords $1 'Login attempt with this username and password:'
 
