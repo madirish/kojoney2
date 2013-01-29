@@ -209,7 +209,7 @@ echo
 IS_CYGWIN=`uname -s | grep CYGWIN | grep -v grep | wc -l`
 
 if [ $IS_CYGWIN -eq 0 ]; then
-	echo -ed "Do you want to run it automatically at boot time (yes/no)? "
+	echo -e "Do you want to run it automatically at boot time (yes/no)? "
 	read res_sysv
 
 	if [ $res_sysv != 'yes' ]; then
