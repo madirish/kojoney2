@@ -1,19 +1,26 @@
+# This file is part of the Kojoney2 honeypot
 #
-# Kojonet configuration file
+# Main Developer - Justin C. Klein Keane <jukeane@sas.upenn.edu>
+# Original Developer - Jose Antonio Coret <joxeankoret@yahoo.es>
+# Last updated 29 January 2013
+#   
+# Kojoney2 configuration file
 #
-# We can run Kojoney in root or non root mode. When running as root we need to modify parameters that likes
-# ROOT_*. When running as a normal user we need to modify the parameters wihout the ROOT_ prefix.
+# We can run Kojoney2 in root or non root mode. When running as root we need to
+# modify parameters that likes ROOT_*. When running as a normal user we need to
+# modify the parameters without the ROOT_ prefix.
 #
-# In example: To change the listening port when running as root the parameter is ROOT_CONFIG_PORTS. When
-# running as a normal user the parameter is CONFIG_PORTS
+# In example: To change the listening port when running as root the parameter 
+# is ROOT_CONFIG_PORTS. When running as a normal user the parameter is 
+# CONFIG_PORTS
 #
 
 import os
 import sys
 
-DATABASE_USER = 'db_user'
-DATABASE_PASS = 'db_password'
-DATABASE_HOST = 'db_host'
+DATABASE_USER = 'root'
+DATABASE_PASS = ''
+DATABASE_HOST = 'localhost'
 DATABASE_NAME = 'kojoney'
 
 if os.getuid() == 0:
@@ -26,7 +33,7 @@ if os.getuid() == 0:
 #
 
 #
-# ROOT_CONFIG_LOGS - Log file(s). You can specify one, two or more files to log. 
+# ROOT_CONFIG_LOGS - Log file(s). You can specify one, two or more files to log 
 #
 # Examples:
 #   
@@ -38,7 +45,7 @@ if os.getuid() == 0:
 #
 #  ROOT_CONFIG_LOGS = [sys.stderr, open("/var/log/honeypot.log", "a"), open("/tmp/session.log", "w")]
 #       Append output to file /var/log/honeypot.log, output to stderr and stdout, and output to /tmp/session.log 
-#       overwritting any previous file contents.
+#       overwriting any previous file contents.
 #
     ROOT_CONFIG_LOGS = [sys.stderr, open("/var/log/honeypot.log", "a")]
 
@@ -62,7 +69,7 @@ if os.getuid() == 0:
 # When an intruder tries to download file with CURL or WGET, will I download the file? And where?
 #
     DOWNLOAD_REAL_FILE = True
-    DOWNLOAD_REAL_DIR  = "/var/log/kojoney/"
+    DOWNLOAD_REAL_DIR  = "/opt/kojoney/download"
 
 #################################################################
 # END OF KOJONEY CONFIGURATION - RUNNING AS ROOT
@@ -89,7 +96,7 @@ else:
 #
 #  CONFIG_LOGS = [sys.stderr, open("/var/log/honeypot.log", "a"), open("/tmp/session.log", "w")]
 #       Append output to file /var/log/honeypot.log, output to stderr and stdout, and output to /tmp/session.log 
-#       overwritting any previous file contents.
+#       overwriting any previous file contents.
 #
     CONFIG_LOGS = [sys.stderr, open("/tmp/honeypot.log", "a")]
 
@@ -112,7 +119,7 @@ else:
 # When an intruder tries to download file with CURL or WGET, will I download the file? And where?
 #
     DOWNLOAD_REAL_FILE = True
-    DOWNLOAD_REAL_DIR  = "/var/log/kojoney/"
+    DOWNLOAD_REAL_DIR  = "/opt/kojoney/download"
 
 #################################################################
 # END OF KOJONEY CONFIGURATION - RUNNING AS A NORMAL USER

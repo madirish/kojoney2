@@ -1,25 +1,34 @@
-.TH "kip2country" "1" "0.0.2" "Jose Antonio Coret" "Tools"
+.TH "kip2country" "1" "0.0.3" "Justin C. Klein Keane" "Tools"
 .SH "NAME"
 .LP 
 kip2country \- Lookup Country by IP Address.
 .SH "SYNTAX"
 .LP 
-kip2country \fIip\fP [\fIip2\fP] [\fIip3\fP] ...
+kip2country \fIip\fP 
 .SH "DESCRIPTION"
 .LP 
-Lookup Country by IP Address.
+Lookup geographic information based on an IP address using the hostip.info API.  
+The single argument can be provided as a valid IPv4 address or a fully qualified domain name.  
+kip2country is implemented in Python and requires a valid Python interpreter along with the
+socket, regex (re), and urllib libraries installed and correctly configured.
 .SH "EXAMPLES"
 .LP 
-$ kip2country www.honeypot.co.uk 
-.LP 
-DE, Germany
+$ kip2country www.madirish.net
+.br 
+	Country: UNITED STATES (US)
+.br
+	City: (Unknown city)
 .LP 
 $ kip2country 66.35.250.150 
-.LP 
-US, United States
+.br 
+	Country: UNITED STATES (US)
+.br
+	City: San Jose, CA
 .SH "AUTHORS"
 .LP 
-Jose Antonio Coret <joxeankoret@yahoo.es>
+Justin C. Klien Keane <justin@madirish.net>
+.LP
+Originally by Jose Antonio Coret <joxeankoret@yahoo.es>
 .SH "SEE ALSO"
 .LP 
 kojreport(1) kojreport\-filter(1) kojhumans(1)

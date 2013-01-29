@@ -10,5 +10,5 @@
 EMAIL="root@localhost"
 
 KOJLOG=/var/log/honeypot.log-$(date +%Y%m%d)
-/usr/share/kojoney/kojreport $KOJLOG | mail -s "Kojoney2 Report" $EMAIL
+/opt/kojoney/kojreport $KOJLOG | mail -s "Kojoney2 Report" $EMAIL
 logger Kojoney2 report generated and sent.

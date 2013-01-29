@@ -1,11 +1,17 @@
-First, Create a MySQL user for kojoney, and create a database to use.
+This file is part of the Kojoney2 honeypot
 
-When this is done, modify the first line of create_tables.sql to use your
-database (default is kojoney) and run it.
+Main Developer - Justin C. Klein Keane <jukeane@sas.upenn.edu>
+Original Developer - Jose Antonio Coret <joxeankoret@yahoo.es>
+Last updated 28 January 2013
 
-Modify coret_config.py to contain any settings changes you may want, being
-sure to add your mysql user, password, host, and database name.
-
-If you want e-mail alerts, be sure to change the address in reports/mailalert.bash.
-
-Execute the script install.bash
+Kojoney2 - A honeypot that emulates a secure shell (SSH) server.
+-----------------------------------------------------------------
+1.  You should simply be able to run the install.bash script
+2.  If you want to install manually first create a MySQL user for kojoney, 
+    and create a database to use.
+3.  When this is done, modify the first line of create_tables.sql to use your
+    database (default is kojoney) and run it.
+4.  Modify coret_config.py to contain any settings changes you may want, being
+    sure to add your mysql user, password, host, and database name.
+5.  If you want e-mail alerts, be sure to change the address in 
+    /opt/kojoney/reports/mailalert.bash.

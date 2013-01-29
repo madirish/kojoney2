@@ -1,10 +1,9 @@
 
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<HTML><HEAD><TITLE>Man page of kip2country</TITLE>
+<HTML><HEAD><TITLE>Manpage of kip2country</TITLE>
 </HEAD><BODY>
 <H1>kip2country</H1>
-Section: Tools (1)<BR>Updated: 0.0.2<BR><A HREF="#index">Index</A>
-<A HREF="/cgi-bin/man/man2html">Return to Main Contents</A><HR>
+Section: Tools (1)<BR>Updated: 0.0.3<BR><A HREF="#index">Index</A>
+<A HREF="http://localhost/cgi-bin/man/man2html">Return to Main Contents</A><HR>
 
 <A NAME="lbAB">&nbsp;</A>
 <H2>NAME</H2>
@@ -17,40 +16,52 @@ kip2country - Lookup Country by IP Address.
 
 <P>
 
-kip2country <I>ip</I> [<I>ip2</I>] [<I>ip3</I>] ...
+kip2country <I>ip</I> 
 <A NAME="lbAD">&nbsp;</A>
 <H2>DESCRIPTION</H2>
 
 <P>
 
-Lookup Country by IP Address.
+Lookup geographic information based on an IP address using the hostip.info API.  
+The single argument can be provided as a valid IPv4 address or a fully qualified domain name.  
+kip2country is implemented in Python and requires a valid Python interpreter along with the
+socket, regex (re), and urllib libraries installed and correctly configured.
 <A NAME="lbAE">&nbsp;</A>
 <H2>EXAMPLES</H2>
 
 <P>
 
-$ kip2country <A HREF="http://www.honeypot.co.uk">www.honeypot.co.uk</A> 
-<P>
+$ kip2country <A HREF="http://www.madirish.net">www.madirish.net</A>
+<BR>
 
-DE, Germany
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TT>Country: UNITED STATES (US)<BR>
+<BR>
+
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TT>City: (Unknown city)<BR>
 <P>
 
 $ kip2country 66.35.250.150 
-<P>
+<BR>
 
-US, United States
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TT>Country: UNITED STATES (US)<BR>
+<BR>
+
+<TT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</TT>City: San Jose, CA<BR>
 <A NAME="lbAF">&nbsp;</A>
 <H2>AUTHORS</H2>
 
 <P>
 
-Jose Antonio Coret &lt;<A HREF="mailto:joxeankoret@yahoo.es">joxeankoret@yahoo.es</A>&gt;
+Justin C. Klien Keane &lt;<A HREF="mailto:justin@madirish.net">justin@madirish.net</A>&gt;
+<P>
+
+Originally by Jose Antonio Coret &lt;<A HREF="mailto:joxeankoret@yahoo.es">joxeankoret@yahoo.es</A>&gt;
 <A NAME="lbAG">&nbsp;</A>
 <H2>SEE ALSO</H2>
 
 <P>
 
-<A HREF="/cgi-bin/man/man2html?1+kojreport">kojreport</A>(1) <A HREF="/cgi-bin/man/man2html?1+kojreport-filter">kojreport-filter</A>(1) <A HREF="/cgi-bin/man/man2html?1+kojhumans">kojhumans</A>(1)
+<A HREF="http://localhost/cgi-bin/man/man2html?1+kojreport">kojreport</A>(1) <A HREF="http://localhost/cgi-bin/man/man2html?1+kojreport-filter">kojreport-filter</A>(1) <A HREF="http://localhost/cgi-bin/man/man2html?1+kojhumans">kojhumans</A>(1)
 <P>
 
 <HR>
@@ -65,8 +76,8 @@ Jose Antonio Coret &lt;<A HREF="mailto:joxeankoret@yahoo.es">joxeankoret@yahoo.e
 </DL>
 <HR>
 This document was created by
-<A HREF="/cgi-bin/man/man2html">man2html</A>,
+<A HREF="http://localhost/cgi-bin/man/man2html">man2html</A>,
 using the manual pages.<BR>
-Time: 20:33:45 GMT, August 11, 2005
+Time: 20:17:30 GMT, January 28, 2013
 </BODY>
 </HTML>

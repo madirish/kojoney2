@@ -1,9 +1,12 @@
 """
-    Modified by Justin C. Klein Keane <justin@madirish.net>
-    Last modified: January 18, 2013
-    
-    Kojoney - A honeypot that emules a secure shell (SSH) server.
-    Originally Copyright (C) 2005 Jose Antonio Coret
+    This file is part of the Kojoney2 honeypot
+
+    Main Developer - Justin C. Klein Keane <jukeane@sas.upenn.edu>
+    Original Developer - Jose Antonio Coret <joxeankoret@yahoo.es>
+    Last updated 28 January 2013
+
+    This file processes user supplied input, parsing the commands 
+    and then returning a "fake" response.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -292,22 +295,5 @@ def processCmd(data, transport, attacker_username, ip, fake_workingdir):
                 transport.write(FAKE_SHELL + ": " + data.split()[0] + ": command not found")
             else:
                 transport.write(FAKE_SHELL + ": " + data + ": command not found")
-                
-        
-        #result_data = ""
-        #try:
-        #    result_data = executeCommand(data.split())
-        #    
-        #    if type(result_data) is bool:
-        #        if not result_data:
-        #            transport.write(FAKE_SHELL + ":  command not found")
-        #except:
-        #    print "Internal error:", data, ":",str(sys.exc_info()[1])
-        #    transport.write(FAKE_SHELL + ": " + str(data.split()[0]) + ": command not found")
-        #
-        #data = ""
-
-        #if type(result_data) is not bool and result_data != "":
-        #    transport.write(result_data)
-            
+    # return some values so they remain dynamic        
     return (printlinebreak, fake_workingdir, attacker_username)

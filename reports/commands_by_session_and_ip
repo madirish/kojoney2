@@ -1,6 +1,9 @@
 #!/bin/bash
-
-# 8/13/2009 by henryblu
+# This file is part of the Kojoney2 honeypot
+#
+# Last updated 13 August 2009
+# by Henry Blum, University of Pennsylvania School of Arts & Sciences
+#
 # This script takes a file and a string from sessions_with_commands
 # that has the IP and session id of a session where commands were
 # executed. 

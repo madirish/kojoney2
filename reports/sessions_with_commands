@@ -1,6 +1,11 @@
 #!/bin/bash
-
-# 2009/08/13 by henryblu
+# This file is part of the Kojoney2 honeypot
+#
+# Main Developer - Justin C. Klein Keane <jukeane@sas.upenn.edu>
+# Original Developer - Jose Antonio Coret <joxeankoret@yahoo.es>
+# Last updated 13 August 2009
+# by Henry Blum, University of Pennsylvania School of Arts & Sciences
+#
 # This script locates the session id and IP combination of each session
 # during which commands were executed.
 # Then those identifiers are printed, line delimited.

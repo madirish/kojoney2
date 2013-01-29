@@ -1,3 +1,15 @@
+Version 2.0 - <jukeane@sas.upenn.edu>
+	* Changed the name to Kojoney2 to reflect massive changes including:
+	* Support for MySQL database back end added
+  * Support for dynamic directory creation and browsing
+  * Support for massive user login files
+  * Changed install directory
+  * New installer users RPM packages instead of stand alone libraries
+  * Moved all code into Python, getting rid of Perl source
+  * Expanded support for attacker commands
+  * Improved installer
+  * Dynamic SSH key generation to avoid fingerprinting by NMAP
+
 Version 0.0.4.1 - <joxeankoret@yahoo.es>
 
 	* Support to download files solicited by the attacker.

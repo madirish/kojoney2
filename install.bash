@@ -1,25 +1,29 @@
 #!/bin/bash
-# Kojoney install script
-# Modified by Justin C. Klein Keane <jukeane@sas.upenn.edu>
-# Last updated 16 January 2013
-# ToDo: Modify SSH keys to hide Kojoney from NMAP
-#				Check for logrotate and handle non-logrotate configurations
+# This file is part of the Kojoney2 honeypot
+#
+# Main Developer - Justin C. Klein Keane <jukeane@sas.upenn.edu>
+# Original Developer - Jose Antonio Coret <joxeankoret@yahoo.es>
+# Last updated 29 January 2013
+#
+# Kojoney2 install script
 
 function die
 {
 	echo Error at $1
-	echo Kojoney installation failed
+	echo Kojoney2 installation failed
 	exit 1
 }
 
-KOJONEY_PATH=/usr/share/kojoney
-INSTALLER_VERSION=0.4
+KOJONEY_PATH=/opt/kojoney
+INSTALLER_VERSION=2.0
 
 clear
 echo "******************************************"
-echo " Kojoney Honeypot Installer version $INSTALLER_VERSION "
+echo " Kojoneye Honeypot Installer version $INSTALLER_VERSION "
 echo "******************************************"
-echo
+echo by Justin C. Klein Keane
+echo based on Kojoney, by Jose Antonio Coret
+echo 
 echo Checking for prerequisite dependencies...
 
 # Do prerequisites for RedHat systems
@@ -60,23 +64,19 @@ if [ -e /etc/redhat-release ]; then
 fi
 
 echo 
-echo Kojoney Honeypot installer. 
+echo Kojoney2 Honeypot installer. 
 echo
 echo Kojoney is bound by a number of license agreements
 echo which are included in the install path.
 echo
-#echo "Press enter to view the license agreement(s) ..."
-#read
-#more LICENSE libs/license.zop libs/twisted.license 2>/dev/null || less LICENSE libs/license.zop libs/twisted.license 
-
-echo -e "Do you accept the ZPL, MIT and GPL license terms (yes/no) ?"
+echo -e "Do you accept the license terms (yes/no) ?"
 read license_accept
 
 if [ "$license_accept" = 'yes' ]; then
 	echo All licenses accepted
 	echo
 else
-	echo You need to accept ALL the licenses to install it.
+	echo You need to accept the licenses to install Kojoney2.
 	echo Exiting...
 	echo
 	exit
@@ -85,7 +85,7 @@ fi
 NEED_DATABASE="unspecified"
 while [ $NEED_DATABASE == 'unspecified' ]
 do
-	echo -e "Do you need to create a database for Kojoney? (yes/no)"
+	echo -e "Do you need to create a MySQL database for Kojoney? (yes/no)"
 	read create_db
 	if [[ $create_db == 'yes' || $create_db == 'no' ]]; then
 		NEED_DATABASE="specified"
@@ -93,7 +93,7 @@ do
 done
 
 if [ $create_db == 'yes' ]; then
-	echo We will now create the Kojoney database.  The credentials used to create the
+	echo We will now create the Kojoney2 database.  The credentials used to create the
 	echo database are stored in coret_config.py and can be changed at a later time if
 	echo necessary.  By default the database will be called kojoney.
 	echo
@@ -104,12 +104,13 @@ if [ $create_db == 'yes' ]; then
 	echo -e "Please enter the MySQL database server (i.e. localhost)"
 	read mysql_host
 	/usr/bin/mysql -u $mysql_user --password=$mysql_password -h $mysql_host < create_tables.sql
+	
+	echo Updating the config file...
+	# Replace tokens with user specified values
+	sed -i "s/db_user/$mysql_user/g" coret_config.py
+	sed -i "s/db_password/$mysql_password/g" coret_config.py
+	sed -i "s/db_host/$mysql_host/g" coret_config.py
 fi
-
-# Replace tokens with user specified values
-sed -i "s/db_user/$mysql_user/g" coret_config.py
-sed -i "s/db_password/$mysql_password/g" coret_config.py
-sed -i "s/db_host/$mysql_host/g" coret_config.py
 
 # Daily reports
 echo -e "Would you like daily reports e-mailed? (yes/no)"
@@ -128,9 +129,9 @@ echo "    daily" >> /etc/logrotate.d/kojoney
 echo "    endscript" >> /etc/logrotate.d/kojoney
 echo "}" >> /etc/logrotate.d/kojoney
 
-
-if ! cat /etc/crontab | grep kojreport ; then
-	echo "  59  23  *  *  * root /usr/share/kojoney/mailalert.bash > /dev/null" >> /etc/crontab
+echo Updating crontab
+if ! cat /etc/crontab | grep mailalert ; then
+	echo "  59  23  *  *  * root $KOJONEY_PATH/mailalert.bash > /dev/null" >> /etc/crontab
 fi
 
 # Customize honeypot
@@ -139,34 +140,40 @@ read user_fqdn
 sed -i "s/fqdn_placeholder/$user_fqdn/g" coret_fake.py
 
 if [ -d $KOJONEY_PATH ]; then
-	echo Directory exists. Uninstall it first.
+	echo Kojoney2 directory $KOJONEY_PATH already exists.
+	echo Please uninstall Kojoney2 with the uninstall.bash script, then try again.
 	echo Exiting...
 	exit
 else
 	mkdir $KOJONEY_PATH
 fi
 
-if [ -d /etc/kojoney ]; then
-	echo -e "WARNING! Directory /etc/kojoney exists!"
-else
-	mkdir /etc/kojoney
-fi
-
 echo "Step 1 - Copying files"
 cp *.py* $KOJONEY_PATH
-cp fake_users /etc/kojoney
+cp fake_users $KOJONEY_PATH/
+
 cp -f reports/* $KOJONEY_PATH 2>/dev/null
 echo "Step 2 - Passing a clock cycle..."
 echo "Step 3 - Installing documentation "
 echo " [+] Installing man pages"
 
 if [ -d /usr/share/man/man1 ]; then
-	cp docs/man/* /usr/share/man/man1/ || die "Step 3" 
+	cp docs/man/*.1 /usr/share/man/man1/ || die "Step 3 - copying man1 files" 
 else
 	echo " Man path not found in /usr/share/man/man1. Type the full man path: "
 	read MANPATH
 
-	cp docs/man/* $MANPATH/ || die "Step 3" 
+	cp docs/man/* $MANPATH/ || die "Step 3 - copying man1 files to user specified path" 
+	unset MANPATH
+fi
+	
+if [ -d /usr/share/man/man1 ]; then
+	cp docs/man/*.81 /usr/share/man/man8/ || die "Step 3 - copying man8 files" 
+else
+	echo " Man path not found in /usr/share/man/man8. Type the full man path: "
+	read MANPATH
+
+	cp docs/man/* $MANPATH/ || die "Step 3 - copying man8 files to user specified path" 
 	unset MANPATH
 fi
 
@@ -174,18 +181,22 @@ echo "Step 4 - Changing permissions and creating symbolic links"
 chmod u+x $KOJONEY_PATH/kojoney.py || die "Step 4" 
 
 echo " [+] Creating symlinks"
-ln -s $KOJONEY_PATH/kojoney.py /usr/bin/kojoneyd || die "Step 4" 
-ln -s $KOJONEY_PATH/kojreport /usr/bin/kojreport || die "Step 4" 
-ln -s $KOJONEY_PATH/kojreport-filter /usr/bin/kojreport-filter || die "Step 4" 
-ln -s $KOJONEY_PATH/kip2country /usr/bin/kip2country || die "Step 4" 
-ln -s $KOJONEY_PATH/kojhumans /usr/bin/kojhumans || die "Step 4" 
-ln -s $KOJONEY_PATH/kojsession /usr/bin/kojsession || die "Step 4" 
-ln -s $KOJONEY_PATH/sessions_with_commands /usr/bin/sessions_with_commands || die "Step 4"
-ln -s $KOJONEY_PATH/commands_by_session_and_ip /usr/bin/commands_by_session_and_ip || die "Step 4"
+ln -s $KOJONEY_PATH/kojoney.py /usr/bin/kojoneyd || die "Step 4 - symlink for kononey.py" 
+ln -s $KOJONEY_PATH/kojreport /usr/bin/kojreport || die "Step 4 - symlink for kojreport" 
+ln -s $KOJONEY_PATH/kojreport-filter /usr/bin/kojreport-filter || die "Step 4 - symlink for kojreport-filter" 
+ln -s $KOJONEY_PATH/kip2country.py /usr/bin/kip2country || die "Step 4 - symlink for kip2country.py" 
+ln -s $KOJONEY_PATH/kojhumans /usr/bin/kojhumans || die "Step 4 - symlink for kojhumans" 
+ln -s $KOJONEY_PATH/kojsession /usr/bin/kojsession || die "Step 4 - symlink for kojsession" 
+ln -s $KOJONEY_PATH/sessions_with_commands /usr/bin/sessions_with_commands || die "Step 4 - symlink for sessions_with_commands"
+ln -s $KOJONEY_PATH/commands_by_session_and_ip /usr/bin/commands_by_session_and_ip || die "Step 4 - symlink for commands_by_session_and_ip"
 echo
 
+echo " [+] Creating directory for Kojoney2 configuration files"
+mkdir $KOJONEY_PATH/etc
 echo " [+] Creating directory for url archives"
-mkdir /var/log/kojoney
+mkdir $KOJONEY_PATH/download
+echo " [+] Creating directory for application logs"
+mkdir $KOJONEY_PATH/log
 
 echo "Step 5 - Final questions and fun"
 echo
@@ -227,5 +238,5 @@ else
 fi
 
 echo
-echo "Kojoney installation finished."
+echo "Kojoney2 installation finished!  Happy hunting!"
 echo

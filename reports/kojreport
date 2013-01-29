@@ -5,7 +5,7 @@
 # Original Developer - Jose Antonio Coret <joxeankoret@yahoo.es>
 # Last updated 28 January, 2013
 #
-# Kojoney reporting script
+# Kojoney2 reporting script
 
 version=0.0.4
 tools_dir=`dirname $0`

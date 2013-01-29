@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 
 """
-    Modified by Justin C. Klein Keane <jukeane@sas.upenn.edu>
-    Last updated: January 16, 2013
+    This file is part of the Kojoney2 honeypot
 
-    Kojoney - A honeypot that emules a secure shell (SSH) server.
+    Main Developer - Justin C. Klein Keane <jukeane@sas.upenn.edu>
+    Original Developer - Jose Antonio Coret <joxeankoret@yahoo.es>
+    Last updated: January 28, 2013
+
+    Kojoney - A honeypot that emulates a secure shell (SSH) server.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

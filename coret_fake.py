@@ -1,5 +1,11 @@
-# Modified by Justin Klein Keane <justin@madirish.net>
-# Last modified: January 18, 2013
+# This file is part of the Kojoney2 honeypot
+#
+# Main Developer - Justin C. Klein Keane <jukeane@sas.upenn.edu>
+# Original Developer - Jose Antonio Coret <joxeankoret@yahoo.es>
+# Last updated 29 January 2013
+#
+# The configuration file for "fake" command responses
+#
 import time
 from datetime import datetime
 FAKE_USERNAME = ""
@@ -1105,7 +1111,7 @@ FAKE_PROMPT = FAKE_SHELL + str(FAKE_USER_CHAR) + " "
 
 FAKE_WGET = "--00:32:24--  http://../","           => `index.html'", "Resolving ..... Failed: unable to resolve domain name."
 FAKE_FTP = "ftp: ..: No address associated with name", "ftp> "
-FAKE_USERS_FILE = "/opt/kojoney/fake_users"
+FAKE_USERS_FILE = "/opt/kojoney/etc/fake_users"
 FAKE_RM = "rm: Permission denied"
 FAKE_TOUCH = "touch: Permission denied"
 FAKE_DENIED = " Permission denied"

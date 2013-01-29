@@ -1,4 +1,10 @@
-#! /bin/sh
+#!/bin/bash
+# This file is part of the Kojoney2 honeypot
+#
+# Main Developer - Justin C. Klein Keane <jukeane@sas.upenn.edu>
+# Original Developer - Jose Antonio Coret <joxeankoret@yahoo.es>
+# Last updated 28 January, 2013
+#
 set -e
 
 # /etc/init.d/ssh: start and stop the Koret honeypot for the "secure shell(tm)" protocol
@@ -7,24 +13,24 @@ test -x /usr/bin/kojoneyd || exit 0
 
 case "$1" in
   start)
-        echo -n "Starting Koret Honeypot: kojoney"
+        echo -n "Starting Kojoney2 Honeypot: kojoneyd"
 	/usr/bin/kojoneyd 2>&1 >/dev/null&
         echo "."
 	;;
   stop)
-        echo -n "Stopping Koret Honeypot: kojoney"
+        echo -n "Stopping Kojoney2 Honeypot: kojoneyd"
 	kill `ps aux | grep /usr/bin/kojoney | grep -v grep | awk '{ print $2 }'`
         echo "."
 	;;
 
   kill)
-        echo -n "Killing Koret Honeypot: kojoney"
+        echo -n "Killing Kojoney2 Honeypot: kojoneyd"
 	kill -9 `ps aux | grep /usr/bin/kojoneyd | grep -v grep | awk '{ print $2 }'`
         echo "."
 	;;
 
    restart)
-        echo -n "Restarting Koret Honeypot: kojoney"
+        echo -n "Restarting Kojoney2 Honeypot: kojoneyd"
         /etc/init.d/kojoney stop > /dev/null
         /etc/init.d/kojoney start > /dev/null
         echo "."

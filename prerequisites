@@ -1,6 +1,13 @@
-NOTE: All the packages mentioned above except Python are distributeds.
+This file is part of the Kojoney2 honeypot
 
-1.- Python 2.2, 2.3 or 2.4.
+Main Developer - Justin C. Klein Keane <jukeane@sas.upenn.edu>
+Last updated 28 January 2013
+
+Kojoney2 - A honeypot that emulates a secure shell (SSH) server.
+
+The following prerequisite software is required to run Kojoney2
+
+1.- Python 2
 2.- Twisted, Twisted Internet, Twisted Conch and Zope-Interfaces.
 3.- MySQL and MySQL-python 
 
