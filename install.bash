@@ -209,27 +209,27 @@ echo
 IS_CYGWIN=`uname -s | grep CYGWIN | grep -v grep | wc -l`
 
 if [ $IS_CYGWIN -eq 0 ]; then
-	echo "Do you want to run it automatically at boot time (yes/no)? "
+	echo -d "Do you want to run it automatically at boot time (yes/no)? "
 	read res_sysv
 
 	if [ $res_sysv != 'yes' ]; then
-		echo "Skipping System V script installation"
+		echo -e "Skipping System V script installation"
 	else
 		cp init.d/* /etc/init.d/ || die "Step 5" 
 		echo 
-		echo "***No run levels were assigned. You need to do this manually.***"
+		echo -e "***No run levels were assigned. You need to do this manually.***"
 		echo
 	fi
 else
 	res_sysv='no'
 fi
 
-echo "Do you want to run it now (yes/no)? "
+echo -e "Do you want to run it now (yes/no)? "
 read res
 
 if [ $res != 'yes' ]; then
 	echo
-	echo "Ok, you can run it by typing either '/usr/bin/kojoneyd' or '/etc/init.d/kojoney start'"
+	echo -e "Ok, you can run it by typing either '/usr/bin/kojoneyd' or '/etc/init.d/kojoney start'"
 	echo
 else
 	echo "Starting daemon"
@@ -243,5 +243,5 @@ else
 fi
 
 echo
-echo "Kojoney2 installation finished!  Happy hunting!"
+echo -e "Kojoney2 installation finished!  Happy hunting!"
 echo
