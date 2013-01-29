@@ -6,8 +6,13 @@
 # Last updated 28 January 2013
 #
 # Kojoney2 install script
-
-echo -e "Do you want to uninstall Kojoney (yes/no)? "
+echo "******************************************"
+echo " Kojoney2 Honeypot Uninstaller "
+echo "******************************************"
+echo "by Justin C. Klein Keane <justin@madirish.net>"
+echo based on Kojoney, by Jose Antonio Coret
+echo 
+echo -e "Do you want to uninstall Kojoney2 (yes/no)? "
 read res 
 
 if [ $res = 'yes' ]; then
@@ -47,7 +52,7 @@ if [ $res = 'yes' ]; then
 	echo " [-] Removing cron jobs"
 	sed -i '/kojoney/ d' /etc/crontab
 	echo " [-] Removing logrotate.d file"
-	rm /etc/logrotate.d/kojoney
+	rm -f /etc/logrotate.d/kojoney
 	
 	echo " [-] Kojoney2 uninstall finished."
 fi
