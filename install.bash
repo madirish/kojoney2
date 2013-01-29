@@ -164,7 +164,7 @@ echo
 echo "Step 8 of 11 - Copying files"
 cp *.py* $KOJONEY_PATH
 cp fake_users $KOJONEY_PATH/etc/
-cp -f reports/* $KOJONEY_PATH 2>/dev/null
+cp -f reports/* $KOJONEY_PATH 
 echo " [+] Kojoney files installed
 echo 
 echo "Step 9 of 11 - Installing documentation "
@@ -209,7 +209,7 @@ echo
 IS_CYGWIN=`uname -s | grep CYGWIN | grep -v grep | wc -l`
 
 if [ $IS_CYGWIN -eq 0 ]; then
-	echo -e "Do you want to run it automatically at boot time \(yes/no\)?"
+	echo -e "Do you want to run it automatically at boot time? (yes/no)"
 	read res_sysv
 
 	if [ $res_sysv != 'yes' ]; then
@@ -224,7 +224,7 @@ else
 	res_sysv='no'
 fi
 
-echo -e "Do you want to run it now (yes/no)? "
+echo -e "Do you want to run it now? (yes/no)"
 read res
 
 if [ $res != 'yes' ]; then
