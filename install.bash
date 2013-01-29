@@ -130,6 +130,7 @@ if [ $create_db == 'yes' ]; then
 	sed -i "s/db_password/$mysql_password/g" coret_config.py
 	sed -i "s/db_host/$mysql_host/g" coret_config.py
 fi
+echo 
 echo "Step 5 of 11 - Email reporting configuration"
 # Daily reports
 echo -e "Would you like daily reports e-mailed? (yes/no)"
@@ -143,6 +144,7 @@ if [ $want_reports == 'yes' ]; then
 		echo " [+] Cron for report e-mail scheduled in /etc/crontab"
 	fi
 fi
+echo 
 echo "Step 6 of 11 - Housekeeping configuration"
 # Assume logrotate is installed
 touch /etc/logrotate.d/kojoney
@@ -152,19 +154,19 @@ echo "    daily" >> /etc/logrotate.d/kojoney
 echo "    endscript" >> /etc/logrotate.d/kojoney
 echo "}" >> /etc/logrotate.d/kojoney
 echo " [+] Logrotate scheduled"
-
+echo 
 echo "Step 7 of 11 - Honeypot customization"
 # Customize honeypot
 echo Please enter the fully qualified hostname for your honeypot:
 read user_fqdn
 sed -i "s/fqdn_placeholder/$user_fqdn/g" coret_fake.py
-
+echo 
 echo "Step 8 of 11 - Copying files"
 cp *.py* $KOJONEY_PATH
 cp fake_users $KOJONEY_PATH/etc/
 cp -f reports/* $KOJONEY_PATH 2>/dev/null
 echo " [+] Kojoney files installed
-
+echo 
 echo "Step 9 of 11 - Installing documentation "
 echo " [+] Installing man pages"
 
@@ -187,7 +189,7 @@ else
 	cp docs/man/* $MANPATH/ || die "Step 3 - copying man8 files to user specified path" 
 	unset MANPATH
 fi
-
+echo 
 echo "Step 10 of 11 - Changing permissions and creating symbolic links"
 chmod u+x $KOJONEY_PATH/kojoney.py || die "Step 4" 
 
@@ -201,8 +203,6 @@ ln -s $KOJONEY_PATH/kojsession /usr/bin/kojsession || die "Step 4 - symlink for 
 ln -s $KOJONEY_PATH/sessions_with_commands /usr/bin/sessions_with_commands || die "Step 4 - symlink for sessions_with_commands"
 ln -s $KOJONEY_PATH/commands_by_session_and_ip /usr/bin/commands_by_session_and_ip || die "Step 4 - symlink for commands_by_session_and_ip"
 echo
-
-
 echo "Step 11 of 11 - Final questions and fun"
 echo
 
