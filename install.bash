@@ -15,13 +15,12 @@ function die
 }
 
 KOJONEY_PATH=/opt/kojoney
-INSTALLER_VERSION=2.0
 
 clear
 echo "******************************************"
-echo " Kojoneye Honeypot Installer version $INSTALLER_VERSION "
+echo " Kojoney2 Honeypot Installer "
 echo "******************************************"
-echo by Justin C. Klein Keane
+echo "by Justin C. Klein Keane <justin@madirish.net>"
 echo based on Kojoney, by Jose Antonio Coret
 echo 
 echo Checking for prerequisite dependencies...
@@ -63,13 +62,10 @@ if [ -e /etc/redhat-release ]; then
 	fi
 fi
 
-echo 
-echo Kojoney2 Honeypot installer. 
-echo
-echo Kojoney is bound by a number of license agreements
+echo Kojoney2 is bound by a number of license agreements
 echo which are included in the install path.
 echo
-echo -e "Do you accept the license terms (yes/no) ?"
+echo -e "Do you accept the GPL license terms (yes/no) ?"
 read license_accept
 
 if [ "$license_accept" = 'yes' ]; then
