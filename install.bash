@@ -80,7 +80,27 @@ else
 	exit
 fi
 
-echo "Step 3 of 11 - Database configuration"
+echo 
+echo "Step 3 of 11 - Creating directory structure"
+if [ -d $KOJONEY_PATH ]; then
+	echo " [-] Kojoney2 directory $KOJONEY_PATH already exists."
+	echo " [-] Please uninstall Kojoney2 with the uninstall.bash script, then try again."
+	echo " [-] Exiting..."
+	exit
+else
+	mkdir $KOJONEY_PATH || die "Step 3 - couldn't create directory $KOJONEY_PATH" 
+fi
+
+echo " [+] Creating directory for Kojoney2 configuration files"
+mkdir $KOJONEY_PATH/etc || die "Step 3 - couldn't create directory $KOJONEY_PATH/etc" 
+echo " [+] Creating directory for url archives"
+mkdir $KOJONEY_PATH/download || die "Step 3 - couldn't create directory $KOJONEY_PATH/download" 
+echo " [+] Creating directory for application logs"
+mkdir $KOJONEY_PATH/log || die "Step 3 - couldn't create directory $KOJONEY_PATH/log" 
+
+echo " [+] Installed at $KOJONEY_PATH"
+echo 
+echo "Step 4 of 11 - Database configuration"
 NEED_DATABASE="unspecified"
 while [ $NEED_DATABASE == 'unspecified' ]
 do
@@ -110,12 +130,12 @@ if [ $create_db == 'yes' ]; then
 	sed -i "s/db_password/$mysql_password/g" coret_config.py
 	sed -i "s/db_host/$mysql_host/g" coret_config.py
 fi
-echo "Step 4 of 11 - Email reporting configuration"
+echo "Step 5 of 11 - Email reporting configuration"
 # Daily reports
 echo -e "Would you like daily reports e-mailed? (yes/no)"
 read want_reports
 if [ $want_reports == 'yes' ]; then
-	echo Please enter e-mail of desired recipient:
+	echo -e "Please enter e-mail of desired recipient:"
 	read email_to
 	sed -i "s/root\@localhost/$email_to/g" reports/mailalert.bash
 	if ! cat /etc/crontab | grep mailalert ; then
@@ -123,7 +143,7 @@ if [ $want_reports == 'yes' ]; then
 		echo " [+] Cron for report e-mail scheduled in /etc/crontab"
 	fi
 fi
-echo "Step 5 of 11 - Housekeeping configuration"
+echo "Step 6 of 11 - Housekeeping configuration"
 # Assume logrotate is installed
 touch /etc/logrotate.d/kojoney
 echo "/var/log/honeypot.log {" > /etc/logrotate.d/kojoney
@@ -133,30 +153,11 @@ echo "    endscript" >> /etc/logrotate.d/kojoney
 echo "}" >> /etc/logrotate.d/kojoney
 echo " [+] Logrotate scheduled"
 
-echo "Step 6 of 11 - Honeypot customization"
+echo "Step 7 of 11 - Honeypot customization"
 # Customize honeypot
 echo Please enter the fully qualified hostname for your honeypot:
 read user_fqdn
 sed -i "s/fqdn_placeholder/$user_fqdn/g" coret_fake.py
-
-echo "Step 7 of 11 - Creating directory structure"
-if [ -d $KOJONEY_PATH ]; then
-	echo " [-] Kojoney2 directory $KOJONEY_PATH already exists."
-	echo " [-] Please uninstall Kojoney2 with the uninstall.bash script, then try again."
-	echo " [-] Exiting..."
-	exit
-else
-	mkdir $KOJONEY_PATH
-fi
-
-echo " [+] Creating directory for Kojoney2 configuration files"
-mkdir $KOJONEY_PATH/etc
-echo " [+] Creating directory for url archives"
-mkdir $KOJONEY_PATH/download
-echo " [+] Creating directory for application logs"
-mkdir $KOJONEY_PATH/log
-
-echo " [+] Installed at $KOJONEY_PATH"
 
 echo "Step 8 of 11 - Copying files"
 cp *.py* $KOJONEY_PATH
