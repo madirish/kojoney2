@@ -44,5 +44,10 @@ if [ $res = 'yes' ]; then
 	rm -f /usr/share/man/man1/kojhumans.1
 	rm -f /usr/share/man/man1/kojreport-filter.1
 	rm -f /usr/share/man/man1/kojreport.1
+	echo " [-] Removing cron jobs"
+	sed -i '/kojoney/ d' /etc/crontab
+	echo " [-] Removing logrotate.d file"
+	rm /etc/logrotate.d/kojoney
+	
 	echo " [-] Kojoney2 uninstall finished."
 fi
