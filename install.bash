@@ -23,29 +23,29 @@ echo "******************************************"
 echo "by Justin C. Klein Keane <justin@madirish.net>"
 echo based on Kojoney, by Jose Antonio Coret
 echo 
-echo Checking for prerequisite dependencies...
+echo Step 1 of 11 - Checking for prerequisite dependencies...
 
 # Do prerequisites for RedHat systems
 if [ -e /etc/redhat-release ]; then
 	if rpm -q python-devel | grep not ; then
-	  echo Python development libraries and C headers are not installed!
-	  yum install python-devel
+		echo " [+] Python development libraries and C headers are not installed!"
+		yum install python-devel
 	fi
 	if [ ! -e /usr/bin/gcc ]; then
-		echo GNU C compiler is not installed!
+		echo " [+] GNU C compiler is not installed!"
 		yum install gcc
 	fi
 	if rpm -q mysql-devel | grep not ; then
-	  echo MySQL development libraries and C headers are not installed!
+	  echo " [+] MySQL development libraries and C headers are not installed!"
 	  yum install mysql-devel
 	fi
 	if rpm -q logrotate | grep not ; then
-	  echo Logrotate not installed!
+	  echo " [+] Logrotate not installed!"
 	  yum install logrotate
 	fi
 	# Install the Python libraries
 	if rpm -q MySQL-python | grep not ; then
-		echo Python MySQL library not installed!
+		echo " [+] Python MySQL library not installed!"
 		yum install MySQL-python
 	fi
 	if rpm -q python-crypto | grep not ; then
@@ -53,15 +53,17 @@ if [ -e /etc/redhat-release ]; then
 	  yum install python-crypt
 	fi
 	if rpm -q python-twisted-conch | grep not ; then
-	  echo Python Twisted Conch library not installed!
+	  echo " [+] Python Twisted Conch library not installed!"
 	  yum install python-twisted-conch
 	fi
 	if rpm -q python-zope-interface | grep not ; then
-	  echo Zope library not installed!
+	  echo " [+] Zope library not installed!"
 	  yum install python-zope-interface
 	fi
 fi
-
+echo " [+] Dependency check complete."
+echo 
+echo Step 2 of 11 - Licenses
 echo Kojoney2 is bound by a number of license agreements
 echo which are included in the install path.
 echo
@@ -78,6 +80,7 @@ else
 	exit
 fi
 
+echo "Step 3 of 11 - Database configuration"
 NEED_DATABASE="unspecified"
 while [ $NEED_DATABASE == 'unspecified' ]
 do
@@ -107,7 +110,7 @@ if [ $create_db == 'yes' ]; then
 	sed -i "s/db_password/$mysql_password/g" coret_config.py
 	sed -i "s/db_host/$mysql_host/g" coret_config.py
 fi
-
+echo "Step 4 of 11 - Email reporting configuration"
 # Daily reports
 echo -e "Would you like daily reports e-mailed? (yes/no)"
 read want_reports
@@ -115,8 +118,12 @@ if [ $want_reports == 'yes' ]; then
 	echo Please enter e-mail of desired recipient:
 	read email_to
 	sed -i "s/root\@localhost/$email_to/g" reports/mailalert.bash
+	if ! cat /etc/crontab | grep mailalert ; then
+		echo "  59  23  *  *  * root $KOJONEY_PATH/mailalert.bash > /dev/null" >> /etc/crontab
+		echo " [+] Cron for report e-mail scheduled in /etc/crontab"
+	fi
 fi
-
+echo "Step 5 of 11 - Housekeeping configuration"
 # Assume logrotate is installed
 touch /etc/logrotate.d/kojoney
 echo "/var/log/honeypot.log {" > /etc/logrotate.d/kojoney
@@ -124,33 +131,40 @@ echo "    sharedscripts" >> /etc/logrotate.d/kojoney
 echo "    daily" >> /etc/logrotate.d/kojoney
 echo "    endscript" >> /etc/logrotate.d/kojoney
 echo "}" >> /etc/logrotate.d/kojoney
+echo " [+] Logrotate scheduled"
 
-echo Updating crontab
-if ! cat /etc/crontab | grep mailalert ; then
-	echo "  59  23  *  *  * root $KOJONEY_PATH/mailalert.bash > /dev/null" >> /etc/crontab
-fi
-
+echo "Step 6 of 11 - Honeypot customization"
 # Customize honeypot
 echo Please enter the fully qualified hostname for your honeypot:
 read user_fqdn
 sed -i "s/fqdn_placeholder/$user_fqdn/g" coret_fake.py
 
+echo "Step 7 of 11 - Creating directory structure"
 if [ -d $KOJONEY_PATH ]; then
-	echo Kojoney2 directory $KOJONEY_PATH already exists.
-	echo Please uninstall Kojoney2 with the uninstall.bash script, then try again.
-	echo Exiting...
+	echo " [-] Kojoney2 directory $KOJONEY_PATH already exists."
+	echo " [-] Please uninstall Kojoney2 with the uninstall.bash script, then try again."
+	echo " [-] Exiting..."
 	exit
 else
 	mkdir $KOJONEY_PATH
 fi
 
-echo "Step 1 - Copying files"
-cp *.py* $KOJONEY_PATH
-cp fake_users $KOJONEY_PATH/
+echo " [+] Creating directory for Kojoney2 configuration files"
+mkdir $KOJONEY_PATH/etc
+echo " [+] Creating directory for url archives"
+mkdir $KOJONEY_PATH/download
+echo " [+] Creating directory for application logs"
+mkdir $KOJONEY_PATH/log
 
+echo " [+] Installed at $KOJONEY_PATH"
+
+echo "Step 8 of 11 - Copying files"
+cp *.py* $KOJONEY_PATH
+cp fake_users $KOJONEY_PATH/etc/
 cp -f reports/* $KOJONEY_PATH 2>/dev/null
-echo "Step 2 - Passing a clock cycle..."
-echo "Step 3 - Installing documentation "
+echo " [+] Kojoney files installed
+
+echo "Step 9 of 11 - Installing documentation "
 echo " [+] Installing man pages"
 
 if [ -d /usr/share/man/man1 ]; then
@@ -163,8 +177,8 @@ else
 	unset MANPATH
 fi
 	
-if [ -d /usr/share/man/man1 ]; then
-	cp docs/man/*.81 /usr/share/man/man8/ || die "Step 3 - copying man8 files" 
+if [ -d /usr/share/man/man8 ]; then
+	cp docs/man/*.8 /usr/share/man/man8/ || die "Step 3 - copying man8 files" 
 else
 	echo " Man path not found in /usr/share/man/man8. Type the full man path: "
 	read MANPATH
@@ -173,7 +187,7 @@ else
 	unset MANPATH
 fi
 
-echo "Step 4 - Changing permissions and creating symbolic links"
+echo "Step 10 of 11 - Changing permissions and creating symbolic links"
 chmod u+x $KOJONEY_PATH/kojoney.py || die "Step 4" 
 
 echo " [+] Creating symlinks"
@@ -187,14 +201,8 @@ ln -s $KOJONEY_PATH/sessions_with_commands /usr/bin/sessions_with_commands || di
 ln -s $KOJONEY_PATH/commands_by_session_and_ip /usr/bin/commands_by_session_and_ip || die "Step 4 - symlink for commands_by_session_and_ip"
 echo
 
-echo " [+] Creating directory for Kojoney2 configuration files"
-mkdir $KOJONEY_PATH/etc
-echo " [+] Creating directory for url archives"
-mkdir $KOJONEY_PATH/download
-echo " [+] Creating directory for application logs"
-mkdir $KOJONEY_PATH/log
 
-echo "Step 5 - Final questions and fun"
+echo "Step 11 of 11 - Final questions and fun"
 echo
 
 IS_CYGWIN=`uname -s | grep CYGWIN | grep -v grep | wc -l`
