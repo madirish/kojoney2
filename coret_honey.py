@@ -43,8 +43,9 @@ denied_re = re.compile("""
 
 def processCmd(data, transport, attacker_username, ip, fake_workingdir):
     global FAKE_SHELL, con, FAKE_USERNAME
-    
+
     printlinebreak = 0
+    data = data.strip()
     print "COMMAND IS : " + data
     transport.write('\r\n')
 
@@ -93,7 +94,7 @@ def processCmd(data, transport, attacker_username, ip, fake_workingdir):
             transport.write(line + '\r\n')
     #curl
     elif re.match('curl', data):
-        result_data = executeCommand(data.split())
+        result_data = executeCommand(data.split(), ip)
         if type(result_data) is not bool and result_data != "":
             printlinebreak = 1
             transport.write(result_data)
@@ -270,7 +271,7 @@ def processCmd(data, transport, attacker_username, ip, fake_workingdir):
         transport.write(attacker_username + '\tpts/1\t'+ip+'\t09:05\t0.00s\t0.04s\t0.00s\tw')
     #wget
     elif re.match('wget', data):
-        result_data = executeCommand(data.split())
+        result_data = executeCommand(data.split(), ip)
         if type(result_data) is not bool and result_data != "":
             printlinebreak = 1
             transport.write(result_data)
