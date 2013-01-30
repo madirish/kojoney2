@@ -97,9 +97,13 @@ echo " [+] Creating directory for url archives"
 mkdir $KOJONEY_PATH/download || die "Step 3 - couldn't create directory $KOJONEY_PATH/download" 
 echo " [+] Creating directory for application logs"
 mkdir $KOJONEY_PATH/log || die "Step 3 - couldn't create directory $KOJONEY_PATH/log" 
-
-echo " [+] Installed at $KOJONEY_PATH"
+cp *.py* $KOJONEY_PATH
+cp fake_users $KOJONEY_PATH/etc/
+cp -f reports/* $KOJONEY_PATH 
+echo " [+] Kojoney files installed"
 echo 
+echo " [+] Installed at $KOJONEY_PATH"
+echo
 echo "Step 4 of 11 - Database configuration"
 NEED_DATABASE="unspecified"
 while [ $NEED_DATABASE == 'unspecified' ]
@@ -126,9 +130,9 @@ if [ $create_db == 'yes' ]; then
 	
 	echo Updating the config file...
 	# Replace tokens with user specified values
-	sed -i "s/db_user/$mysql_user/g" coret_config.py
-	sed -i "s/db_password/$mysql_password/g" coret_config.py
-	sed -i "s/db_host/$mysql_host/g" coret_config.py
+	sed -i "s/db_user/$mysql_user/g" $KOJONEY_PATH/coret_config.py
+	sed -i "s/db_password/$mysql_password/g" $KOJONEY_PATH/coret_config.py
+	sed -i "s/db_host/$mysql_host/g" $KOJONEY_PATH/coret_config.py
 fi
 echo 
 echo "Step 5 of 11 - Email reporting configuration"
@@ -138,7 +142,7 @@ read want_reports
 if [ $want_reports == 'yes' ]; then
 	echo -e "Please enter e-mail of desired recipient:"
 	read email_to
-	sed -i "s/root\@localhost/$email_to/g" reports/mailalert.bash
+	sed -i "s/root\@localhost/$email_to/g" $KOJONEY_PATH/mailalert.bash
 	if ! cat /etc/crontab | grep mailalert ; then
 		echo "  59  23  *  *  * root $KOJONEY_PATH/mailalert.bash > /dev/null" >> /etc/crontab
 		echo " [+] Cron for report e-mail scheduled in /etc/crontab"
@@ -159,13 +163,7 @@ echo "Step 7 of 11 - Honeypot customization"
 # Customize honeypot
 echo Please enter the fully qualified hostname for your honeypot:
 read user_fqdn
-sed -i "s/fqdn_placeholder/$user_fqdn/g" coret_fake.py
-echo 
-echo "Step 8 of 11 - Copying files"
-cp *.py* $KOJONEY_PATH
-cp fake_users $KOJONEY_PATH/etc/
-cp -f reports/* $KOJONEY_PATH 
-echo " [+] Kojoney files installed"
+sed -i "s/fqdn_placeholder/$user_fqdn/g" $KOJONEY_PATH/coret_fake.py
 echo 
 echo "Step 9 of 11 - Installing documentation "
 echo " [+] Installing man pages"
