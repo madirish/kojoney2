@@ -50,7 +50,7 @@ if [ $res = 'yes' ]; then
 	rm -f /usr/share/man/man1/kojreport-filter.1
 	rm -f /usr/share/man/man1/kojreport.1
 	echo " [-] Removing cron jobs"
-	sed -i '/kojoney/ d' /etc/crontab
+	sed -i '/\/opt\/kojoney/ d' /etc/crontab
 	echo " [-] Removing logrotate.d file"
 	rm -f /etc/logrotate.d/kojoney
 	
