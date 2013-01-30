@@ -23,13 +23,13 @@
 """
 import coret_std_unix
 
-def executeCommand(cmdLine):
+def executeCommand(cmdLine, ip):
 
     command = cmdLine[0]
 
     if command == "wget":
-        return coret_std_unix.wget(cmdLine)
+        return coret_std_unix.wget(cmdLine, ip)
     elif command == "curl":
-        return coret_std_unix.curl(cmdLine)
+        return coret_std_unix.curl(cmdLine, ip)
     else:
         return False
