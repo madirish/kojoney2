@@ -1,48 +1,51 @@
-.TH "kojoney2" "1" "0.0.1" "Justin C. Klein Keane" "Reports"
+.TH "kojoney2" "1" "0.0.1" "Justin C. Klein Keane" "Kojoney2 SSH Honeypot"
 .SH "NAME"
 .LP 
 kojoneyd \- Kojoney2 Honeypot
-.SH "SYNTAX"
-.LP 
-kojreport <\fIlog file\fP> <\fItraceroute\fP> <\fInmap\fP> <\fIcountry\fP>
-.br 
 .SH "DESCRIPTION"
 .LP 
-Kojreport is a shell script to generate plain text reports from the Kojoney Honeypot log files. The generated reports includes statistics about successfull and unsuccessfull logons logons with null passwords X11 forward requests, commands executeds when connected to the fake shell, intruder's ip addresses and country, etc... 
+Kojoney2 is a medium interaction SSH honeypot written in Python using the Twisted Conch libraries.  As a medium interaction honeypot, Kojoney2 simulates a real SSH environment.  As with sshd(8), Kojoney2 will listen on port 22 for connections from ssh(1) clients.  Once a connection attempt is made, Kojoney2 will authenticate users by comparing usernames and passwords provided to an internal list of fake users.  Most credentials will be accepted, granting attackers access to a simulated shell, where they can issue commands.  Kojoney2 simulates responding to many legitimate shell commands in order to trick attackers.
+.LP  
+.B "MEDIUM INTERACTION HONEYPOT"
+.LP
+As opposed to a low interaction honeypot, Kojoney2 will actually download files requested by the attacker using wget or curl commands using Python's native URL retrieval libraries.  These files are sandboxed in the download directory for analysis, but they do not appear in Kojoney2's simulated shell.  Downloaded files are checksummed using md5sum(1) against existing files to prevent duplicates (and denial-of-service via file system resource exhaustion).
+.LP  
+.B "PURPOSE"
+.LP
+The purpose of Kojoney2 is to fingerprint attacker behavior and tools as well as to identify bad actors.  Kojoney2 can be deployed on an internal or external facing network.  On an internal network, Kojoney2 can serve as a "canary" by alerting operators to malicious behavior inside the perimeter.  Exposed to the external network, Kojoney2 can identify the source of malicious attacks as well as fingerprint post-compromise behavior.  By observing attacker commands after they have accessed Kojoney2 it is possible to derive indicators of compromise to use in investigations and defense of legitimate ssh servers.
+.LP
+Kojoney2 is also designed to trap malware samples.  Files downloaded by attackers are stored outside of the Kojoney2 simulated shell for analysis.  A superficial analysis is performed when files are downloaded by running them through the file(1) command.  Further analysis may require unpacking or unzipping samples, and the use of the strings(1), clamscan(1), or code level analysis of captures.
+.LP  
+.B "FURTHER READING"
 .LP 
-Report is printed to STDOUT.
-.SH "OPTIONS"
+For more information about Kojoney2 refer to documentation online at http://www.madirish.net/212
 .LP 
-.TP 
-\fBtraceroute\fR
-Print the route packets take to network host. Possible values are 0 (disabled) and 1 (enabled).
-.TP 
-\fBnmap\fR
-Print nmap output take to network host. Possible values are 0 (disable) and 1 (enabled).
-.TP 
-\fBcountry\fR
-Resolve intruder's country using kip2country tool. Possible values are 0 (disable) and 1 (enabled).
-.SH "EXAMPLES"
-.LP 
-The following are examples of how is the correct way to run the tool:
-.LP 
-# kojreport /var/log/honeypot.log
-.IP 
-Generates a \fBnormal\fR report without traceroute and nmap output and without ip address to host resolution.
-.LP 
-# kojreport /var/log/honeypot.log 0 0 1
-.IP 
-Generates a \fBnormal\fR report without traceroute and nmap output but with ip address to host resolution.
-.LP 
-# kojreport /var/log/honeypot.log 1 0 1
-.IP 
-Generates a report with traceroute output, without nmap output and with ip address to host resolution.
+.SH "HISTORY"
+Kojoney2 was developed after a several year long deployment of the original Kojoney honeypot by Jose Antonio Coret.  Over time the codebase was refined, expanded, and adjusted in response to attacker behavior observed via the honeypot.  Over that time, Kippo, another Python based SSH honeypot was released and Kojoney was adjusted to incorporate many of the most attractive features of Kippo, while still retaining its Kojoney core.  As time progressed the code base became less like the original and more like a new product, and thus Kojoney2 was branded and distributed.
+.SH "RESOURCES"
+Kojoney2 is written in Python and requires the Python MySQL, Zope, and Twisted extensions.  Kojoney2 also utilizes several BASH shell scripts for housekeeping.
 .SH "FILES"
-.LP 
-\fI/var/log/honeypot.log\fP \- Common path to the Koret Honeypot log file.
+.HP 
+/etc/rc.d/init.d/kojoney
+.br
+Init script to start, stop, and restart Kojoney
+.HP 
+/opt/kojoney/kojoney.py
+.br
+The Kojoney2 program
+.HP 
+/opt/kojoney/etc/fake_users
+.br
+The flat file containing usernames and password that are allowed to log into the honeypot.
+.HP 
+/var/log/honeypot.log
+.br
+Common path to the Kojoney2 honeypot log file.
 .SH "AUTHORS"
 .LP 
-Jose Antonio Coret <joxeankoret@yahoo.es>
+Justin C. Klein Keane <justin@madirish.net>
+.br
+Original code base by Jose Antonio Coret <joxeankoret@yahoo.es>
 .SH "SEE ALSO"
 .LP 
-kip2country(1), kojreport\-filter(1), traceroute(8), nmap(1).
+clamscan(1), file(1), kip2country(1), kojreport(1), kojreport\-filter(1), md5sum(1), sshd(8), ssh(1), strings(1).
