@@ -91,6 +91,12 @@ def processCmd(data, transport, attacker_username, ip, fake_workingdir):
     elif data == "cat /proc/cpuinfo":
         for line in FAKE_CPUINFO:
             transport.write(line + '\r\n')
+    #curl
+    elif re.match('curl', data):
+        result_data = executeCommand(data.split())
+        if type(result_data) is not bool and result_data != "":
+            printlinebreak = 1
+            transport.write(result_data)
     #date
     elif re.match('^date', data):
         transport.write(TIMESTAMP)
