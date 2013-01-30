@@ -69,7 +69,7 @@ if os.getuid() == 0:
 # When an intruder tries to download file with CURL or WGET, will I download the file? And where?
 #
     DOWNLOAD_REAL_FILE = True
-    DOWNLOAD_REAL_DIR  = "/opt/kojoney/download"
+    DOWNLOAD_REAL_DIR  = "/opt/kojoney/download/"
 
 #################################################################
 # END OF KOJONEY CONFIGURATION - RUNNING AS ROOT
@@ -119,7 +119,7 @@ else:
 # When an intruder tries to download file with CURL or WGET, will I download the file? And where?
 #
     DOWNLOAD_REAL_FILE = True
-    DOWNLOAD_REAL_DIR  = "/opt/kojoney/download"
+    DOWNLOAD_REAL_DIR  = "/opt/kojoney/download/"
 
 #################################################################
 # END OF KOJONEY CONFIGURATION - RUNNING AS A NORMAL USER
