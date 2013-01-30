@@ -165,43 +165,43 @@ echo "Step 8 of 11 - Copying files"
 cp *.py* $KOJONEY_PATH
 cp fake_users $KOJONEY_PATH/etc/
 cp -f reports/* $KOJONEY_PATH 
-echo " [+] Kojoney files installed
+echo " [+] Kojoney files installed"
 echo 
 echo "Step 9 of 11 - Installing documentation "
 echo " [+] Installing man pages"
 
 if [ -d /usr/share/man/man1 ]; then
-	cp docs/man/*.1 /usr/share/man/man1/ || die "Step 3 - copying man1 files" 
+	cp docs/man/*.1 /usr/share/man/man1/ || die "Step 9 - copying man1 files" 
 else
 	echo " Man path not found in /usr/share/man/man1. Type the full man path: "
 	read MANPATH
 
-	cp docs/man/* $MANPATH/ || die "Step 3 - copying man1 files to user specified path" 
+	cp docs/man/* $MANPATH/ || die "Step 9 - copying man1 files to user specified path" 
 	unset MANPATH
 fi
 	
 if [ -d /usr/share/man/man8 ]; then
-	cp docs/man/*.8 /usr/share/man/man8/ || die "Step 3 - copying man8 files" 
+	cp docs/man/*.8 /usr/share/man/man8/ || die "Step 9 - copying man8 files" 
 else
 	echo " Man path not found in /usr/share/man/man8. Type the full man path: "
 	read MANPATH
 
-	cp docs/man/* $MANPATH/ || die "Step 3 - copying man8 files to user specified path" 
+	cp docs/man/* $MANPATH/ || die "Step 9 - copying man8 files to user specified path" 
 	unset MANPATH
 fi
 echo 
 echo "Step 10 of 11 - Changing permissions and creating symbolic links"
-chmod u+x $KOJONEY_PATH/kojoney.py || die "Step 4" 
+chmod u+x $KOJONEY_PATH/kojoney.py || die "Step 10" 
 
 echo " [+] Creating symlinks"
-ln -s $KOJONEY_PATH/kojoney.py /usr/bin/kojoneyd || die "Step 4 - symlink for kononey.py" 
-ln -s $KOJONEY_PATH/kojreport /usr/bin/kojreport || die "Step 4 - symlink for kojreport" 
-ln -s $KOJONEY_PATH/kojreport-filter /usr/bin/kojreport-filter || die "Step 4 - symlink for kojreport-filter" 
-ln -s $KOJONEY_PATH/kip2country.py /usr/bin/kip2country || die "Step 4 - symlink for kip2country.py" 
-ln -s $KOJONEY_PATH/kojhumans /usr/bin/kojhumans || die "Step 4 - symlink for kojhumans" 
-ln -s $KOJONEY_PATH/kojsession /usr/bin/kojsession || die "Step 4 - symlink for kojsession" 
-ln -s $KOJONEY_PATH/sessions_with_commands /usr/bin/sessions_with_commands || die "Step 4 - symlink for sessions_with_commands"
-ln -s $KOJONEY_PATH/commands_by_session_and_ip /usr/bin/commands_by_session_and_ip || die "Step 4 - symlink for commands_by_session_and_ip"
+ln -s $KOJONEY_PATH/kojoney.py /usr/bin/kojoneyd || die "Step 10 - symlink for kononey.py" 
+ln -s $KOJONEY_PATH/kojreport /usr/bin/kojreport || die "Step 10 - symlink for kojreport" 
+ln -s $KOJONEY_PATH/kojreport-filter /usr/bin/kojreport-filter || die "Step 10 - symlink for kojreport-filter" 
+ln -s $KOJONEY_PATH/kip2country.py /usr/bin/kip2country || die "Step 10 - symlink for kip2country.py" 
+ln -s $KOJONEY_PATH/kojhumans /usr/bin/kojhumans || die "Step 10 - symlink for kojhumans" 
+ln -s $KOJONEY_PATH/kojsession /usr/bin/kojsession || die "Step 10 - symlink for kojsession" 
+ln -s $KOJONEY_PATH/sessions_with_commands /usr/bin/sessions_with_commands || die "Step 10 - symlink for sessions_with_commands"
+ln -s $KOJONEY_PATH/commands_by_session_and_ip /usr/bin/commands_by_session_and_ip || die "Step 10 - symlink for commands_by_session_and_ip"
 echo
 echo "Step 11 of 11 - Final questions and fun"
 echo
@@ -215,7 +215,7 @@ if [ $IS_CYGWIN -eq 0 ]; then
 	if [ $res_sysv != 'yes' ]; then
 		echo -e "Skipping System V script installation"
 	else
-		cp init.d/* /etc/init.d/ || die "Step 5" 
+		cp init.d/* /etc/init.d/ || die "Step 11 - Init script installation failed" 
 		echo 
 		echo -e "***No run levels were assigned. You need to do this manually.***"
 		echo
