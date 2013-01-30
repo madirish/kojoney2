@@ -42,6 +42,7 @@ from coret_config import *
 from coret_fake import *
 from coret_log import *
 
+
 #
 # First of all. Start logging now()!
 #
@@ -62,21 +63,12 @@ class CoretAvatar(avatar.ConchUser):
         self.username = username
         FAKE_USERNAME = username
         self.channelLookup.update({'session':session.SSHSession})
-        #self.channelLookup.update({'session': CoretSession})
 
 class CoretRealm:
     try:
         implements(portal.IRealm)
     except:
-        print "BUG #1255822: " + str(sys.exc_info()[1])
-        print ""
-        print "For more details see https://sourceforge.net/tracker/index.php?func=detail&aid=1255822&group_id=143961&atid=758336"
-        print "If you are using standard Ubuntu Hoary packages I recommend you to download and compile the source code of Zope Interfaces as well as Twisted libraries."
-        print ""
-        print "NOTE: If you known how to solve this problem, please, contact me at joxeankoret@yahoo.es"
-        print ""
-        print "Sorry for the inconvenience"
-        print ""
+        print "Unexpected error attempting to implement CoretRealm"
 
     def requestAvatar(self, avatarId, mind, *interfaces):
         return interfaces[0], CoretAvatar(avatarId), lambda: None
@@ -109,17 +101,41 @@ class CoretProtocol(protocol.Protocol):
         if data == '\r':
             self.lastCmd = string.replace(self.lastCmd, '\r', '')
             self.lastCmd = string.replace(self.lastCmd, '\n', '')
-            connection = MySQLdb.connect(host=DATABASE_HOST, user=DATABASE_USER, passwd=DATABASE_PASS, db=DATABASE_NAME)
-            cursor = connection.cursor()
-            escaped_command = connection.escape_string(self.lastCmd)
-            escaped_ip = connection.escape_string(self.transport.session.conn.transport.transport.getPeer()[1])
-            cursor.execute("INSERT INTO executed_commands SET command='%s', ip='%s'" % (escaped_command, escaped_ip)) 
-            retvalue = processCmd(self.lastCmd, self.transport, FAKE_USERNAME, escaped_ip, self.fake_workingdir)
+            try:
+                connection = MySQLdb.connect(host=DATABASE_HOST, 
+                                             user=DATABASE_USER, 
+                                             passwd=DATABASE_PASS, 
+                                             db=DATABASE_NAME)
+                cursor = connection.cursor()
+                ip = self.transport.session.conn.transport.transport.getPeer()[1]
+                sql = "INSERT INTO executed_commands SET "
+                sql += "command='%s', ip='%s', ip_numeric=INET_ATON('%s')"
+                cursor.execute(sql % (self.lastCmd, ip, ip))
+                connection.commit() 
+                connection.close()
+            except Exception as inst:
+                print "Error inserting command data to the database.  ", inst
+                
+            # "Execute" the command(s)
+            # handle multiple commands delimited by semi-colons
+            if (len(self.lastCmd.split(';')) > 1):
+                print "Handling semi-colon delimited commands"
+                for command in self.lastCmd.split(';'):
+                    retvalue = processCmd(command, 
+                                          self.transport, 
+                                          FAKE_USERNAME, 
+                                          ip,  
+                                          self.fake_workingdir)
+                    (printlinebreak, self.fake_workingdir, FAKE_USERNAME) = retvalue
+            else:
+                retvalue = processCmd(self.lastCmd, 
+                                      self.transport, 
+                                      FAKE_USERNAME, 
+                                      ip, 
+                                      self.fake_workingdir)
+                (printlinebreak, self.fake_workingdir, FAKE_USERNAME) = retvalue
+                
             self.lastCmd = ""
-            
-            (printlinebreak, ret_workingdir, ret_username) = retvalue
-            self.fake_workingdir = ret_workingdir
-            FAKE_USERNAME = ret_username
             if FAKE_USERNAME == 'root':
                 FAKE_PROMPT = string.replace(FAKE_PROMPT, '$', '#')
             else:
@@ -203,7 +219,8 @@ class HoneyPotSSHUserAuthServer(userauth.SSHUserAuthServer):
     def sendBanner(self):
         if self.bannerSent:
             return
-        self.transport.sendPacket(userauth.MSG_USERAUTH_BANNER, NS(FAKE_SSH_SERVER_VERSION+'\r\n') + NS('en'))
+        self.transport.sendPacket(userauth.MSG_USERAUTH_BANNER, 
+                                  NS(FAKE_SSH_SERVER_VERSION+'\r\n') + NS('en'))
         self.bannerSent = True
 
     def ssh_USERAUTH_REQUEST(self, packet):
@@ -253,6 +270,24 @@ class HoneypotPasswordChecker:
         return defer.fail(error.UnauthorizedLogin())
 
     def checkUserPass(self, username, password):
+        # Log the connection attempt
+        try:
+            connection = MySQLdb.connect(host=DATABASE_HOST, 
+                                         user=DATABASE_USER, 
+                                         passwd=DATABASE_PASS, 
+                                         db=DATABASE_NAME)
+            cursor = connection.cursor()
+            sql = "INSERT INTO login_attempts SET "
+            sql += " time=CURRENT_TIMESTAMP(), "
+            sql += " username='%s', "
+            sql += " password='%s'"
+            cursor.execute(sql % (username, password))
+            connection.commit() 
+            connection.close()
+        except Exception as msg:
+            print "Error inserting login data to the database.  ", msg
+            
+        # Determine success or failure
         if username in self.authorizedCredentials:
             passwords = self.authorizedCredentials[username].split(',')
             if passwords.count(password) > 0:
@@ -314,3 +349,4 @@ for port_num in port_nums:
     reactor.listenTCP(int(port_num), CoretFactory())
 
 reactor.run()
+
