@@ -262,6 +262,12 @@ def processCmd(data, transport, attacker_username, ip, fake_workingdir):
         printlinebreak = 1
         transport.write('USER\tTTY\tFROM\tLOGIN@\t\tIDLE\tJCPU\tPCPU\tWHAT\r\n')
         transport.write(attacker_username + '\tpts/1\t'+ip+'\t09:05\t0.00s\t0.04s\t0.00s\tw')
+    #wget
+    elif re.match('wget', data):
+        result_data = executeCommand(data.split())
+        if type(result_data) is not bool and result_data != "":
+            printlinebreak = 1
+            transport.write(result_data)
     #who
     elif data == "who":
         transport.write(attacker_username + '\tpts/1')
