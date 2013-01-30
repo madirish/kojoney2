@@ -101,13 +101,13 @@ class CoretProtocol(protocol.Protocol):
         if data == '\r':
             self.lastCmd = string.replace(self.lastCmd, '\r', '')
             self.lastCmd = string.replace(self.lastCmd, '\n', '')
+            ip = self.transport.session.conn.transport.transport.getPeer()[1]
             try:
                 connection = MySQLdb.connect(host=DATABASE_HOST, 
                                              user=DATABASE_USER, 
                                              passwd=DATABASE_PASS, 
                                              db=DATABASE_NAME)
                 cursor = connection.cursor()
-                ip = self.transport.session.conn.transport.transport.getPeer()[1]
                 sql = "INSERT INTO executed_commands SET "
                 sql += "command='%s', ip='%s', ip_numeric=INET_ATON('%s')"
                 cursor.execute(sql % (self.lastCmd, ip, ip))
