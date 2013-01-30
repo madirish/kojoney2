@@ -24,6 +24,7 @@
 import sys
 import urllib
 import random
+import hashlib
 
 from coret_config import DOWNLOAD_REAL_FILE, DOWNLOAD_REAL_DIR
 
@@ -50,9 +51,20 @@ def downloadFileTo(url, directory):
         
         filename = getGoodFilename(url)
         
+        
         f = open(directory + filename, "wb")
         f.write(data)
         f.close()
+        
+        # Check the MD5sum against the database
+        checksum = hashlib.md5()
+        checksum.update(data)
+        filemd5 = checksum.digest()
+        print "The file md5 is " + filemd5
+        
+        # Delete duplicate files or ClamAV new ones
+        
+        # Record the download in the database
 
         print "Saved the file",directory + filename,"requested by the attacker."
     except:
