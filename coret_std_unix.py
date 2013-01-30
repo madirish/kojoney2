@@ -25,6 +25,7 @@ import sys
 import urllib
 import random
 import hashlib
+import MySQLdb
 
 from coret_config import DOWNLOAD_REAL_FILE, DOWNLOAD_REAL_DIR
 
@@ -59,7 +60,7 @@ def downloadFileTo(url, directory):
         # Check the MD5sum against the database
         checksum = hashlib.md5()
         checksum.update(data)
-        filemd5 = checksum.digest()
+        filemd5 = checksum.hexdigest()
         print "The file md5 is " + filemd5
         
         # Delete duplicate files or ClamAV new ones
