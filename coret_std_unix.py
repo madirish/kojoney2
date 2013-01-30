@@ -22,12 +22,15 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 import sys
+import os
+import subprocess
 import urllib
 import random
 import hashlib
 import MySQLdb
 
 from coret_config import DOWNLOAD_REAL_FILE, DOWNLOAD_REAL_DIR
+from coret_config import DATABASE_HOST, DATABASE_USER, DATABASE_PASS, DATABASE_NAME
 
 def getGoodFilename(filename):
     
@@ -41,7 +44,7 @@ def getGoodFilename(filename):
     
     return(buf + str(random.randint(0, 999)))
 
-def downloadFileTo(url, directory):
+def downloadFileTo(url, directory, ip):
     try:
         
         if url.find("://") == -1:
@@ -52,26 +55,66 @@ def downloadFileTo(url, directory):
         
         filename = getGoodFilename(url)
         
-        
         f = open(directory + filename, "wb")
         f.write(data)
         f.close()
+        
+        # Determine the filetype
+        try:
+            output = subprocess.Popen(['/usr/bin/file', directory + filename],
+                                      stdout=subprocess.PIPE).communicate()[0]
+            filetype = output.split(': ')[1]
+        except:
+            filetype = "Error retrieving filetype"
         
         # Check the MD5sum against the database
         checksum = hashlib.md5()
         checksum.update(data)
         filemd5 = checksum.hexdigest()
-        print "The file md5 is " + filemd5
         
-        # Delete duplicate files or ClamAV new ones
-        
+        # Determine if file is a duplicate
+        connection = MySQLdb.connect(host=DATABASE_HOST, 
+                                     user=DATABASE_USER, 
+                                     passwd=DATABASE_PASS, 
+                                     db=DATABASE_NAME)
+        try:
+            cursor = connection.cursor()
+            sql = "SELECT COUNT(id) AS sums FROM downloads WHERE md5sum = '%s'"
+            cursor.execute(sql % (filemd5)) 
+            duplicate = False if int(cursor.fetchone()[0]) < 1 else True
+            cursor.close()
+        except:
+            print "Error selecting md5sums from the database."
+            
         # Record the download in the database
-
-        print "Saved the file",directory + filename,"requested by the attacker."
+        sql = "INSERT INTO downloads SET "
+        sql += " time=CURRENT_TIMESTAMP(), "
+        sql += " ip='%s', "
+        sql += " ip_numeric=INET_ATON('%s'), "
+        sql += " url='%s', "
+        sql += " md5sum='%s', "
+        sql += " filetype='%s'"
+        try:
+            cursor = connection.cursor()
+            cursor.execute(sql % (ip, ip, url, filemd5, filetype))
+            cursor.close()
+        except Exception as inst:
+            print "Error inserting file download data to the database.  ", inst
+        
+        # Close the MySQL connection 
+        connection.commit()
+        connection.close()
+        print "Downloaded the file",directory + filename,"requested by the attacker."
+        if duplicate:
+            print "The file is a duplicate, deleting."
+            try:
+                os.remove(directory + filename)
+            except:
+                print "Error removing file " + directory + filename
     except:
-        print "Error downloading file",url,"request by attacker.",sys.exc_info()[1]
+        print "Error downloading file",url,"request by attacker: ",sys.exc_info()[1]
 
-def wget(params):
+def wget(params, ip):
 
     i = 0
 
@@ -94,14 +137,14 @@ def wget(params):
         if not param.startswith("-"):
             
             if DOWNLOAD_REAL_FILE:
-                downloadFileTo(param, DOWNLOAD_REAL_DIR)
+                downloadFileTo(param, DOWNLOAD_REAL_DIR, ip)
             
-            data = "Downloading URL ", str(param)
-            return "wget: Unknown error"
+            data = "Downloading URL " + str(param)
+            return data + "\r\nwget: Unknown error"
 
     return data
 
-def curl(params):
+def curl(params, ip):
 
     i = 0
 
@@ -120,9 +163,9 @@ def curl(params):
         if not param.startswith("-"):
             
             if DOWNLOAD_REAL_FILE:
-                downloadFileTo(param, DOWNLOAD_REAL_DIR)
+                downloadFileTo(param, DOWNLOAD_REAL_DIR, ip)
 
-            data = "Downloading URL ", str(param)
-            return "curl: Unknown error"
+            data = "Downloading URL " + str(param)
+            return data + "curl: Unknown error"
 
     return data
