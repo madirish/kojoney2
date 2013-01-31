@@ -270,36 +270,53 @@ class HoneypotPasswordChecker:
         return defer.fail(error.UnauthorizedLogin())
 
     def checkUserPass(self, username, password):
-        # Log the connection attempt
-        try:
-            connection = MySQLdb.connect(host=DATABASE_HOST, 
-                                         user=DATABASE_USER, 
-                                         passwd=DATABASE_PASS, 
-                                         db=DATABASE_NAME)
-            cursor = connection.cursor()
-            sql = "INSERT INTO login_attempts SET "
-            sql += " time=CURRENT_TIMESTAMP(), "
-            sql += " username='%s', "
-            sql += " password='%s'"
-            cursor.execute(sql % (username, password))
-            connection.commit() 
-            connection.close()
-        except Exception as msg:
-            print "Error inserting login data to the database.  ", msg
-            
         # Determine success or failure
         if username in self.authorizedCredentials:
             passwords = self.authorizedCredentials[username].split(',')
             if passwords.count(password) > 0:
                 print '%s authenticated with password' % (username)
-                print 'login attempt [%s/%s] succeeded' % (username, password)
+                log.msg('login attempt [%s %s] succeeded' % (username, password))
+                self.checkLog()
                 return True
             else:
-                print 'login attempt [%s/%s] failed' % (username, password)
+                print 'login attempt [%s %s] failed' % (username, password)
                 return False
         else:
-            print 'login attempt [%s/%s] failed' % (username, password)
+            print 'login attempt [%s %s] failed' % (username, password)
             return False
+    def checkLog(self):
+        # Sloppy way to watch for logins
+        filename = '/var/log/honeypot.log'
+        file = open(filename,'r')
+        line = file.readlines()[-1]
+        if not line:
+            return
+        else:
+            if re.match('.*login attempt.*', line):
+                ip = line.split(',')[2].split(']')[0]
+                creds = line.split('[')[2].split(']')[0]
+                username = creds.split(' ')[0]
+                password = string.join(creds.split(' ')[1:], " ")
+                # Log the connection attempt
+                try:
+                    connection = MySQLdb.connect(host=DATABASE_HOST, 
+                                                 user=DATABASE_USER, 
+                                                 passwd=DATABASE_PASS, 
+                                                 db=DATABASE_NAME)
+                    cursor = connection.cursor()
+                    sql = "INSERT INTO login_attempts SET "
+                    sql += " time=CURRENT_TIMESTAMP(), "
+                    sql += " ip='%s', "
+                    sql += " ip_numeric=INET_ATON('%s'),"
+                    sql += " username='%s', "
+                    sql += " password='%s'"
+                    cursor.execute(sql % (ip, ip, username, password))
+                    connection.commit() 
+                    connection.close()
+                except Exception as msg:
+                    print "Error inserting login data to the database.  ", msg
+                    print "Query was: " 
+                    print sql % (ip, username, password)
 
 
 class CoretFactory(factory.SSHFactory):
@@ -349,4 +366,3 @@ for port_num in port_nums:
     reactor.listenTCP(int(port_num), CoretFactory())
 
 reactor.run()
-
