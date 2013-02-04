@@ -12,16 +12,20 @@ tools_dir=`dirname $0`
 
 function show_authenticated
 {
-	cat $1 | grep "$2" | awk '{ print $7 }' | sort | uniq -c | sort -r -g
+	#cat $1 | grep "$2" | awk '{ print $7 }' | sort | uniq -c | sort -r -g
+	cat $1 | grep "$2" | grep "succeeded" | awk '{ print $9 }' | sort | uniq -c | sort -r -g
 	echo
-	echo Total `cat $1 | grep "$2" | awk '{ print $7 }' | wc -l`
+	#echo Total `cat $1 | grep "$2" | awk '{ print $7 }' | wc -l`
+	echo Total `cat $1 | grep "$2" | grep "succeeded" | awk '{ print $9 }' | wc -l`
 }
 
 function show_unauthenticated
 {
-	cat $1 | grep "$2" | awk '{ print $4 }' | sort | uniq -c | sort -r -g
+	#cat $1 | grep "$2" | awk '{ print $4 }' | sort | uniq -c | sort -r -g
+	cat $1 | grep "$2" | grep "failed" | awk '{ print $9 }' | sort | uniq -c | sort -r -g
 	echo
-	echo Total `cat $1 | grep "$2" | awk '{ print $4 }' | wc -l`
+	#echo Total `cat $1 | grep "$2" | awk '{ print $4 }' | wc -l`
+	echo Total `cat $1 | grep "$2" | grep "failed" | awk '{ print $9 }' | wc -l`
 }
 
 function show_total
@@ -123,13 +127,15 @@ echo
 echo Authenticated users. Successful logons
 echo ---------------------------------------
 echo
-show_authenticated $1 'authenticated with password'
+#show_authenticated $1 'authenticated with password'
+show_authenticated $1 'login attempt'
 echo
 
 echo Unauthenticated users. Failed logons
 echo ------------------------------------
 echo
-show_unauthenticated $1 'failed auth password'
+#show_unauthenticated $1 'failed auth password'
+show_unauthenticated $1 'login attempt'
 echo
 
 #echo Users successfully authenticated with publickey
