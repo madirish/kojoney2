@@ -29,7 +29,8 @@ import sys
 import string
 import MySQLdb
 
-from twisted.cred import portal, checkers, credentials, error
+from twisted.cred import portal, checkers, credentials
+from twisted.cred import error as TCerror
 from twisted.conch import error, avatar, interfaces as conchinterfaces
 from twisted.conch.checkers import SSHPublicKeyDatabase
 from twisted.conch.ssh import factory, userauth, connection, keys, session, transport
@@ -253,7 +254,7 @@ class HoneypotPasswordChecker:
             if self.checkUserPass(credentials.username, credentials.password):
                 return defer.succeed(credentials.username)
             else:
-                return defer.fail(error.UnauthorizedLogin())
+                return defer.fail(TCerror.UnauthorizedLogin())
         elif hasattr(credentials, 'pamConversion'):
             return self.checkPamUser(credentials.username,
                 credentials.pamConversion)
@@ -267,7 +268,7 @@ class HoneypotPasswordChecker:
         for response, zero in responses:
             if self.checkUserPass(username, response):
                 return defer.succeed(username)
-        return defer.fail(error.UnauthorizedLogin())
+        return defer.fail(TCerror.UnauthorizedLogin())
 
     def checkUserPass(self, username, password):
         # Determine success or failure
