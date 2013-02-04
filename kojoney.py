@@ -274,7 +274,6 @@ class HoneypotPasswordChecker:
         if username in self.authorizedCredentials:
             passwords = self.authorizedCredentials[username].split(',')
             if passwords.count(password) > 0:
-                print '%s authenticated with password' % (username)
                 log.msg('login attempt [%s %s] succeeded' % (username, password))
                 self.checkLog()
                 return True
