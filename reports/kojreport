@@ -13,19 +13,19 @@ tools_dir=`dirname $0`
 function show_authenticated
 {
 	#cat $1 | grep "$2" | awk '{ print $7 }' | sort | uniq -c | sort -r -g
-	cat $1 | grep "$2" | grep "succeeded" | awk '{ print $9 }' | sort | uniq -c | sort -r -g
+	cat $1 | grep "$2" | grep "succeeded" | awk '{ print $9,$10 }' | sort | uniq -c | sort -r -g
 	echo
 	#echo Total `cat $1 | grep "$2" | awk '{ print $7 }' | wc -l`
-	echo Total `cat $1 | grep "$2" | grep "succeeded" | awk '{ print $9 }' | wc -l`
+	echo Total `cat $1 | grep "$2" | grep "succeeded" | awk '{ print $9,$10 }' | wc -l`
 }
 
 function show_unauthenticated
 {
 	#cat $1 | grep "$2" | awk '{ print $4 }' | sort | uniq -c | sort -r -g
-	cat $1 | grep "$2" | grep "failed" | awk '{ print $9 }' | sort | uniq -c | sort -r -g
+	cat $1 | grep "$2" | grep "failed" | awk '{ print $9, $10 }' | sort | uniq -c | sort -r -g
 	echo
 	#echo Total `cat $1 | grep "$2" | awk '{ print $4 }' | wc -l`
-	echo Total `cat $1 | grep "$2" | grep "failed" | awk '{ print $9 }' | wc -l`
+	echo Total `cat $1 | grep "$2" | grep "failed" | awk '{ print $9,$10 }' | wc -l`
 }
 
 function show_total
