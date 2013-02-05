@@ -276,7 +276,7 @@ class HoneypotPasswordChecker:
             passwords = self.authorizedCredentials[username].split(',')
             if passwords.count(password) > 0:
                 log.msg('login attempt [%s %s] succeeded' % (username, password))
-                self.checkLog()
+                self.checkLog(username, password)
                 return True
             else:
                 print 'login attempt [%s %s] failed' % (username, password)
@@ -284,39 +284,47 @@ class HoneypotPasswordChecker:
         else:
             print 'login attempt [%s %s] failed' % (username, password)
             return False
-    def checkLog(self):
+    def checkLog(self, username, password):
         # Sloppy way to watch for logins
         filename = '/var/log/honeypot.log'
-        file = open(filename,'r')
-        line = file.readlines()[-1]
-        if not line:
+        try: 
+            file = open(filename,'r')
+        except: 
+            print "Couldn't open logfile " + filename + " to search for login."
+        # File.readlines loads the whole thing into memory, don't want that
+        # loop over the file and find the last login with supplied creds
+        matchline = ""
+        for line in file:
+            matchstring = '.*login attempt \[%s %s\] succeeded.*' % (username, password)
+            if re.match(matchstring, line):
+                matchline = line
+        if matchline == "":
             return
         else:
-            if re.match('.*login attempt.*', line):
-                ip = line.split(',')[2].split(']')[0]
-                creds = line.split('[')[2].split(']')[0]
-                username = creds.split(' ')[0]
-                password = string.join(creds.split(' ')[1:], " ")
-                # Log the connection attempt
-                try:
-                    connection = MySQLdb.connect(host=DATABASE_HOST, 
-                                                 user=DATABASE_USER, 
-                                                 passwd=DATABASE_PASS, 
-                                                 db=DATABASE_NAME)
-                    cursor = connection.cursor()
-                    sql = "INSERT INTO login_attempts SET "
-                    sql += " time=CURRENT_TIMESTAMP(), "
-                    sql += " ip='%s', "
-                    sql += " ip_numeric=INET_ATON('%s'),"
-                    sql += " username='%s', "
-                    sql += " password='%s'"
-                    cursor.execute(sql % (ip, ip, username, password))
-                    connection.commit() 
-                    connection.close()
-                except Exception as msg:
-                    print "Error inserting login data to the database.  ", msg
-                    print "Query was: " 
-                    print sql % (ip, username, password)
+            ip = matchline.split(',')[2].split(']')[0]
+            creds = matchline.split('[')[2].split(']')[0]
+            username = creds.split(' ')[0]
+            password = string.join(creds.split(' ')[1:], " ")
+            # Log the connection attempt
+            try:
+                connection = MySQLdb.connect(host=DATABASE_HOST, 
+                                             user=DATABASE_USER, 
+                                             passwd=DATABASE_PASS, 
+                                             db=DATABASE_NAME)
+                cursor = connection.cursor()
+                sql = "INSERT INTO login_attempts SET "
+                sql += " time=CURRENT_TIMESTAMP(), "
+                sql += " ip='%s', "
+                sql += " ip_numeric=INET_ATON('%s'),"
+                sql += " username='%s', "
+                sql += " password='%s'"
+                cursor.execute(sql % (ip, ip, username, password))
+                connection.commit() 
+                connection.close()
+            except Exception as msg:
+                print "Error inserting login data to the database.  ", msg
+                print "Query was: " 
+                print sql % (ip, username, password)
 
 
 class CoretFactory(factory.SSHFactory):
