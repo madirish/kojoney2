@@ -48,10 +48,9 @@ def start_logging():
         log.addObserver(koj_watcher)
     
 def koj_watcher(eventDict):
-  """Custom emit for FileLogObserver"""
-  text = log.textFromEventDict(eventDict)
-  if text is None:
-    return
-  fmtDict = {'text': text.replace("\n", "\n\t")}
-  msgStr = log._safeFormat("%(text)s\n", fmtDict)
-
+    """Custom emit for FileLogObserver"""
+    text = log.textFromEventDict(eventDict)
+    if text is None:
+        return
+    fmtDict = {'text': text.replace("\n", "\n\t")}
+    msgStr = log._safeFormat("%(text)s\n", fmtDict)
