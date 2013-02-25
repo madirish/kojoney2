@@ -19,7 +19,7 @@ class Report:
     try:
       cursor = self.conn.cursor()
       sql = 'select count(distinct(ip)) as session from koj_executed_commands '
-      sql += 'where time > date_sub(curdate(), interval 2 day) order by time desc '
+      sql += 'where time > date_sub(curdate(), interval 1 day) order by time desc '
       cursor.execute(sql)
       retval = cursor.fetchone()[0]
       cursor.close()
@@ -33,7 +33,7 @@ class Report:
     try:
       cursor = self.conn.cursor()
       sql = 'select distinct(ip) as session from koj_executed_commands '
-      sql += 'where time > date_sub(curdate(), interval 2 day) order by time desc '
+      sql += 'where time > date_sub(curdate(), interval 1 day) order by time desc '
       cursor.execute(sql)
       retval = cursor.fetchall()
       cursor.close()
@@ -47,7 +47,7 @@ class Report:
     try:
       cursor = self.conn.cursor()
       sql = 'select time, command, ip from koj_executed_commands '
-      sql += 'where time > date_sub(curdate(), interval 2 day) '
+      sql += 'where time > date_sub(curdate(), interval 1 day) '
       sql += ' and ip = %s order by time asc '
       cursor.execute(sql, ip)
       retval = cursor.fetchall()
@@ -76,7 +76,7 @@ class Report:
     try:
       cursor = self.conn.cursor()
       sql = 'select time, ip, url, md5sum, filetype from koj_downloads '
-      sql += ' where time > date_sub(curdate(), interval 2 day) order by ip, time desc '
+      sql += ' where time > date_sub(curdate(), interval 1 day) order by ip, time desc '
       cursor.execute(sql)
       retval = cursor.fetchall()
       cursor.close()
@@ -93,6 +93,8 @@ import re
 from coret_config import *
       
 report = Report(DATABASE_HOST, DATABASE_USER, DATABASE_PASS, DATABASE_NAME)
+print 'Kojoney2 activity in the last 24 hours.'
+print
 print 'Number of times a remote shell was opened:'
 print '------------------------------------------'
 print report.count_connects()
