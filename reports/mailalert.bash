@@ -8,7 +8,5 @@
 # This script will send a honeypot report to the configured email address
 #
 EMAIL="root@localhost"
-
-KOJLOG=/var/log/honeypot.log-$(date +%Y%m%d)
-/opt/kojoney/kojreport $KOJLOG | mail -s "Kojoney2 Report" $EMAIL
+/usr/bin/python /opt/kojoney/kojreport.py | mail -s "Kojoney2 Report" $EMAIL
 logger Kojoney2 report generated and sent.
