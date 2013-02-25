@@ -17,7 +17,6 @@ read res
 
 if [ $res = 'yes' ]; then
 	echo " [-] Uninstalling ..."
-	echo
 
 	daemon_alive=`ps aux | grep /usr/bin/kojoneyd | grep -v grep | wc -l `
 
@@ -32,6 +31,11 @@ if [ $res = 'yes' ]; then
 		fi
 		echo " [-] Waiting for a while"
 		sleep 3
+	fi
+
+	echo " [-] Backing up downloads (you can manually delete them)"
+	if [ -d /opt/kojoney/download ]; then
+		mv /opt/kojoney/download /opt/kojoney_dls_bak
 	fi
 
 	echo " [-] Removing main directory"
@@ -55,4 +59,6 @@ if [ $res = 'yes' ]; then
 	rm -f /etc/logrotate.d/kojoney
 	
 	echo " [-] Kojoney2 uninstall finished."
+	echo
+	echo "     NB: Any Kojoney2 databases are unaffected by this script."
 fi
