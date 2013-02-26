@@ -1,0 +1,96 @@
+Kojoney2
+--------
+
+Kojoney2 is a medium interaction SSH honeypot written in
+Python using the Twisted Conch libraries. As a medium
+interaction honeypot, Kojoney2 simulates a real SSH
+environment. As with sshd(8), Kojoney2 will listen on port
+22 for connections from ssh(1) clients. Once a connection
+attempt is made, Kojoney2 will authenticate users by
+comparing usernames and passwords provided to an internal
+list of fake users. Most credentials will be accepted,
+granting attackers access to a simulated shell, where they
+can issue commands. Kojoney2 simulates responding to many
+legitimate shell commands in order to trick attackers.
+
+MEDIUM INTERACTION HONEYPOT
+---------------------------
+As opposed to a low interaction honeypot, Kojoney2 will
+actually download files requested by the attacker using wget
+or curl commands using Python&rsquo;s native URL retrieval
+libraries. These files are sandboxed in the download
+directory for analysis, but they do not appear in
+Kojoney2&rsquo;s simulated shell. Downloaded files are
+checksummed using md5sum(1) against existing files to
+prevent duplicates (and denial-of-service via file system
+resource exhaustion).
+
+PURPOSE
+-------
+The purpose of Kojoney2 is to fingerprint attacker
+behavior and tools as well as to identify bad actors.
+Kojoney2 can be deployed on an internal or external facing
+network. On an internal network, Kojoney2 can serve as a
+&quot;canary&quot; by alerting operators to malicious
+behavior inside the perimeter. Exposed to the external
+network, Kojoney2 can identify the source of malicious
+attacks as well as fingerprint post-compromise behavior. By
+observing attacker commands after they have accessed
+Kojoney2 it is possible to derive indicators of compromise
+to use in investigations and defense of legitimate ssh
+servers.
+
+Kojoney2 is also designed to trap malware samples. Files
+downloaded by attackers are stored outside of the Kojoney2
+simulated shell for analysis. A superficial analysis is
+performed when files are downloaded by running them through
+the file(1) command. Further analysis may require unpacking
+or unzipping samples, and the use of the strings(1),
+clamscan(1), or code level analysis of captures.
+
+FURTHER READING
+---------------
+For more information about Kojoney2 refer to
+documentation online at http://www.madirish.net/212
+
+HISTORY
+-------
+Kojoney2 was developed by the University of Pennsylvania's 
+School of Arts & Sciences (http://www.sas.upenn.edu) after a 
+several year long deployment of the original Kojoney honeypot 
+by Jose Antonio Coret. Over time the codebase was refined, 
+expanded, and adjusted in response to attacker behavior observed 
+via the honeypot. Over that time, Kippo, another Python based 
+SSH honeypot was released and Kojoney was adjusted to
+incorporate many of the most attractive features of Kippo,
+while still retaining its Kojoney core. As time progressed
+the code base became less like the original and more like a
+new product, and thus Kojoney2 was branded and distributed.
+
+
+RESOURCES
+---------
+Kojoney2 is written in Python and requires the Python
+MySQL, Zope, and Twisted extensions. Kojoney2 also utilizes
+several BASH shell scripts for housekeeping.
+
+FILES
+-----
+/etc/rc.d/init.d/kojoney
+	Init script to start, stop, and restart Kojoney</p>
+
+/opt/kojoney/kojoney.py
+	The Kojoney2 program
+
+/opt/kojoney/etc/fake_users
+	The flat file containing usernames and password that are
+	allowed to log into the honeypot.
+
+/var/log/honeypot.log
+	Common path to the Kojoney2 honeypot log file.
+
+AUTHORS
+-------
+Justin C. Klein Keane - http://www.MadIrish.net
+Original code base by Jose Antonio Coret <joxeankoret@yahoo.es>
+
