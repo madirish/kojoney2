@@ -29,7 +29,7 @@ import random
 import hashlib
 import MySQLdb
 
-from coret_config import DOWNLOAD_REAL_FILE, DOWNLOAD_REAL_DIR
+from coret_config import DOWNLOAD_REAL_FILE, DOWNLOAD_REAL_DIR, SENSOR_ID
 from coret_config import DATABASE_HOST, DATABASE_USER, DATABASE_PASS, DATABASE_NAME
 
 def getGoodFilename(filename):
@@ -93,10 +93,16 @@ def downloadFileTo(url, directory, ip):
         sql += " ip_numeric=INET_ATON('%s'), "
         sql += " url='%s', "
         sql += " md5sum='%s', "
+        sql += " sensor_id='%s', "
         sql += " filetype='%s'"
+        if not duplicate:
+          sql += ", file='%s'"
         try:
             cursor = connection.cursor()
-            cursor.execute(sql % (ip, ip, url, filemd5, filetype))
+            if duplicate:
+              cursor.execute(sql % (ip, ip, url, filemd5, SENSOR_ID, filetype))
+            else:
+              cursor.execute(sql % (ip, ip, url, filemd5, SENSOR_ID, filetype, data))
             cursor.close()
         except Exception as inst:
             print "Error inserting file download data to the database.  ", inst
