@@ -110,8 +110,8 @@ class CoretProtocol(protocol.Protocol):
                                              db=DATABASE_NAME)
                 cursor = connection.cursor()
                 sql = "INSERT INTO executed_commands SET "
-                sql += "command='%s', ip='%s', ip_numeric=INET_ATON('%s')"
-                cursor.execute(sql % (self.lastCmd, ip, ip))
+                sql += "command='%s', ip='%s', ip_numeric=INET_ATON('%s'), sensor_id='%s'"
+                cursor.execute(sql % (self.lastCmd, ip, ip, SENSOR_ID))
                 connection.commit() 
                 connection.close()
             except Exception as inst:
@@ -317,8 +317,9 @@ class HoneypotPasswordChecker:
                 sql += " ip='%s', "
                 sql += " ip_numeric=INET_ATON('%s'),"
                 sql += " username='%s', "
-                sql += " password='%s'"
-                cursor.execute(sql % (ip, ip, username, password))
+                sql += " password='%s', "
+                sql += " sensor_id='%s'"
+                cursor.execute(sql % (ip, ip, username, password, SENSOR_ID))
                 connection.commit() 
                 connection.close()
             except Exception as msg:

@@ -23,6 +23,8 @@ DATABASE_PASS = 'db_password'
 DATABASE_HOST = 'db_host'
 DATABASE_NAME = 'kojoney'
 
+SENSOR_ID = 1
+
 if os.getuid() == 0:
 #################################################################
 # START OF KOJONEY CONFIGURATION - RUNNING AS ROOT
