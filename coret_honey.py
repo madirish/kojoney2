@@ -235,7 +235,13 @@ def processCmd(data, transport, attacker_username, ip, fake_workingdir):
                 transport.write(servicecmd[1] + ': unrecognized service')
         else:
             transport.write('Usage: service < option > | --status-all | [ service_name [ command | --full-restart ] ]')
-        
+    #strings
+    elif data == "strings -a /usr/sbin/sshd | grep %s:%s -A2 -B2":
+        transport.write('port %d\r\n')
+        transport.write('listenaddress [%s]:%s\r\n')
+        transport.write('listenaddress %s:%s\r\n')
+        transport.write('subsystem %s %s\r\n')
+        transport.write('maxstartups %d:%d:%d\r\n')
     #su and sudo
     elif re.match("su(\ )*.*", data):
         if data == "sudo su" or data == "su":
