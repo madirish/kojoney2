@@ -111,7 +111,7 @@ class CoretProtocol(protocol.Protocol):
                 cursor = connection.cursor()
                 sql = "INSERT INTO executed_commands SET "
                 sql += "command='%s', ip='%s', ip_numeric=INET_ATON('%s'), sensor_id='%s'"
-                safe_command = MYSQLdb.escape(self.lastCmd)
+                safe_command = MySQLdb.escape(self.lastCmd)
                 cursor.execute(sql , (safe_command, ip, ip, SENSOR_ID))
                 connection.commit() 
                 connection.close()
@@ -313,8 +313,8 @@ class HoneypotPasswordChecker:
                                              passwd=DATABASE_PASS, 
                                              db=DATABASE_NAME)
                 cursor = connection.cursor()
-                safe_username = MYSQLdb.escape(username)
-                safe_password = MYSQLdb.escape(password)
+                safe_username = MySQLdb.escape(username)
+                safe_password = MySQLdb.escape(password)
                 sql = "INSERT INTO login_attempts SET "
                 sql += " time=CURRENT_TIMESTAMP(), "
                 sql += " ip='%s', "
@@ -327,8 +327,6 @@ class HoneypotPasswordChecker:
                 connection.close()
             except Exception as msg:
                 print "Error inserting login data to the database.  ", msg
-                print "Query was: " 
-                print sql , (ip, username, password)
 
 
 class CoretFactory(factory.SSHFactory):

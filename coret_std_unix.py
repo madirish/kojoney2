@@ -98,11 +98,11 @@ def downloadFileTo(url, directory, ip):
         if not duplicate:
           sql += ", file='%s'"
         try:
-            safe_ip = MYSQLdb.escape(ip)
-            safe_url = MYSQLdb.escape(url)
-            safe_filemd5 = MYSQLdb.escape(filemd5)
-            safe_filetype = MYSQLdb.escape(filetype)
-            safe_data = MYSQLdb.escape(data)
+            safe_ip = MySQLdb.escape(ip)
+            safe_url = MySQLdb.escape(url)
+            safe_filemd5 = MySQLdb.escape(filemd5)
+            safe_filetype = MySQLdb.escape(filetype)
+            safe_data = MySQLdb.escape(data)
             cursor = connection.cursor()
             if duplicate:
               cursor.execute(sql , (safe_ip, safe_ip, safe_url, safe_filemd5, SENSOR_ID, safe_filetype))
