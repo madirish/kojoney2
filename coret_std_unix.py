@@ -98,25 +98,19 @@ def downloadFileTo(url, directory, ip):
         if not duplicate:
           sql += ", file='%s'"
         try:
+            safe_ip = MYSQLdb.escape(ip)
+            safe_url = MYSQLdb.escape(url)
+            safe_filemd5 = MYSQLdb.escape(filemd5)
+            safe_filetype = MYSQLdb.escape(filetype)
+            safe_data = MYSQLdb.escape(data)
             cursor = connection.cursor()
             if duplicate:
-              cursor.execute(sql % (ip, ip, url, filemd5, SENSOR_ID, filetype))
+              cursor.execute(sql , (safe_ip, safe_ip, safe_url, safe_filemd5, SENSOR_ID, safe_filetype))
             else:
-              cursor.execute(sql % (ip, ip, url, filemd5, SENSOR_ID, filetype, data))
+              cursor.execute(sql , (safe_ip, safe_ip, safe_url, safe_filemd5, SENSOR_ID, safe_filetype, safe_data))
             cursor.close()
         except Exception as inst:
             print "Error inserting file download data to the database.  ", inst
-        
-        # Close the MySQL connection 
-        connection.commit()
-        connection.close()
-        print "Downloaded the file",directory + filename,"requested by the attacker."
-        if duplicate:
-            print "The file is a duplicate, deleting."
-            try:
-                os.remove(directory + filename)
-            except:
-                print "Error removing file " + directory + filename
     except:
         print "Error downloading file",url,"request by attacker: ",sys.exc_info()[1]
 
