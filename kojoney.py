@@ -110,9 +110,8 @@ class CoretProtocol(protocol.Protocol):
                                              db=DATABASE_NAME)
                 cursor = connection.cursor()
                 sql = "INSERT INTO executed_commands SET "
-                sql += "command='%s', ip='%s', ip_numeric=INET_ATON('%s'), sensor_id='%s'"
-                safe_command = MySQLdb.escape(self.lastCmd)
-                cursor.execute(sql , (safe_command, ip, ip, SENSOR_ID))
+                sql += "command=%s, ip=%s, ip_numeric=INET_ATON(%s), sensor_id=%s"
+                cursor.execute(sql , (self.lastCmd, ip, ip, SENSOR_ID))
                 connection.commit() 
                 connection.close()
             except Exception as inst:
@@ -313,16 +312,14 @@ class HoneypotPasswordChecker:
                                              passwd=DATABASE_PASS, 
                                              db=DATABASE_NAME)
                 cursor = connection.cursor()
-                safe_username = MySQLdb.escape(username)
-                safe_password = MySQLdb.escape(password)
                 sql = "INSERT INTO login_attempts SET "
                 sql += " time=CURRENT_TIMESTAMP(), "
-                sql += " ip='%s', "
-                sql += " ip_numeric=INET_ATON('%s'),"
-                sql += " username='%s', "
-                sql += " password='%s', "
-                sql += " sensor_id='%s'"
-                cursor.execute(sql , (ip, ip, safe_username, safe_password, SENSOR_ID))
+                sql += " ip=%s, "
+                sql += " ip_numeric=INET_ATON(%s),"
+                sql += " username=%s, "
+                sql += " password=%s, "
+                sql += " sensor_id=%s"
+                cursor.execute(sql , (ip, ip, username, password, SENSOR_ID))
                 connection.commit() 
                 connection.close()
             except Exception as msg:

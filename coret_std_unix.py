@@ -79,8 +79,8 @@ def downloadFileTo(url, directory, ip):
                                      db=DATABASE_NAME)
         try:
             cursor = connection.cursor()
-            sql = "SELECT COUNT(id) AS sums FROM downloads WHERE md5sum = '%s'"
-            cursor.execute(sql % (filemd5)) 
+            sql = "SELECT COUNT(id) AS sums FROM downloads WHERE md5sum = %s"
+            cursor.execute(sql , (filemd5)) 
             duplicate = False if int(cursor.fetchone()[0]) < 1 else True
             cursor.close()
         except:
@@ -89,25 +89,20 @@ def downloadFileTo(url, directory, ip):
         # Record the download in the database
         sql = "INSERT INTO downloads SET "
         sql += " time=CURRENT_TIMESTAMP(), "
-        sql += " ip='%s', "
-        sql += " ip_numeric=INET_ATON('%s'), "
-        sql += " url='%s', "
-        sql += " md5sum='%s', "
-        sql += " sensor_id='%s', "
-        sql += " filetype='%s'"
+        sql += " ip=%s, "
+        sql += " ip_numeric=INET_ATON(%s), "
+        sql += " url=%s, "
+        sql += " md5sum=%s, "
+        sql += " sensor_id=%s, "
+        sql += " filetype=%s"
         if not duplicate:
-          sql += ", file='%s'"
+          sql += ", file=%s"
         try:
-            safe_ip = MySQLdb.escape(ip)
-            safe_url = MySQLdb.escape(url)
-            safe_filemd5 = MySQLdb.escape(filemd5)
-            safe_filetype = MySQLdb.escape(filetype)
-            safe_data = MySQLdb.escape(data)
             cursor = connection.cursor()
             if duplicate:
-              cursor.execute(sql , (safe_ip, safe_ip, safe_url, safe_filemd5, SENSOR_ID, safe_filetype))
+              cursor.execute(sql , (ip, ip, url, filemd5, SENSOR_ID, filetype))
             else:
-              cursor.execute(sql , (safe_ip, safe_ip, safe_url, safe_filemd5, SENSOR_ID, safe_filetype, safe_data))
+              cursor.execute(sql , (ip, ip, url, filemd5, SENSOR_ID, filetype, data))
             cursor.close()
         except Exception as inst:
             print "Error inserting file download data to the database.  ", inst
