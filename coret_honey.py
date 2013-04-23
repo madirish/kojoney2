@@ -33,7 +33,8 @@ import coret_std_unix
 
 # Koret Honey ;)
 
-
+#denied_re is possibly unused
+#a process_denied method should be added
 denied_re = re.compile("""
 (cat(\ )*.*)|(chgrp(\ )*.*)|(chmod(\ )*.*)|(chown(\ )*.*)|(cp(\ )*.*)|(cpio(\ )*.*)|(csh(\ )*.*)|(date(\ )*.*)|
 (dd(\ )*.*)|(df(\ )*.*)|(ed(\ )*.*)|(echo(\ )*.*)|(grep(\ )*.*)|(false(\ )*.*)|(kill(\ )*.*)|(ln(\ )*.*)|
@@ -41,278 +42,335 @@ denied_re = re.compile("""
 (mv(\ )*.*)|(ping(\ )*.*)|(rmdir(\ )*.*)|(sed(\ )*.*)|(sh(\ )*.*)|(bash(\ )*.*)|(su(\ )*.*)|(true(\ )*.*)|
 (umount(\ )*.*)|(useradd(\ )*.*)|(grpadd(\ )*.*)""", re.VERBOSE)
 
-def processCmd(data, transport, attacker_username, ip, fake_workingdir):
-    global FAKE_SHELL, con, FAKE_USERNAME
-
-    printlinebreak = 0
-    data = data.strip()
-    print "COMMAND IS : " + data
-    transport.write('\r\n')
-
-    #directory changing
-    if re.match('^cd',data):
-        directory = data.split()
-        if len(directory) == 1:
-            if attacker_username in FAKE_HOMEDIRS:
-                fake_workingdir = FAKE_HOMEDIRS[attacker_username]
-            else:
-                fake_workingdir = "/"
+#ProcessCmd class created by Josh Bauer
+class ProcessCmd:
+    def __init__(self, cmd, params, transport, attacker_username, ip, fake_workingdir):
+        #init local vars
+        self.cmd = cmd
+        self.params = params
+        self.transport = transport
+        self.attacker_username = attacker_username
+        self.ip = ip
+        self.fake_workingdir = fake_workingdir
+        #choose command processor
+        
+        if cmd =='apachectl':
+            self.process_apachectl()
+        elif cmd == 'cd':
+            self.process_cd()
+        elif cmd == 'cat':
+            self.process_cat()
+        elif cmd =='curl':
+            self.process_curl()
+        elif cmd =='date':
+            self.process_date()
+        elif cmd =='exit':
+            self.process_exit()
+        elif cmd =='export':
+            self.process_export()
+        elif cmd =='gcc':
+            self.process_gcc()
+        elif cmd =='history':
+            self.process_history()
+        elif cmd =='hostname':
+            self.process_hostname()
+        elif cmd =='id':
+            self.process_id()
+        elif cmd =='ifconfig':
+            self.process_ifconfig()
+        elif cmd == 'logout':
+            self.process_logout()
+        elif cmd == 'ls':
+            self.process_ls()
+        elif cmd == 'make':
+            self.process_make()
+        elif cmd == 'mkdir':
+            self.process_mkdir()
+        elif cmd == 'netstat':
+            self.process_netstat()
+        elif cmd == 'passwd':
+            self.process_passwd()
+        elif cmd == 'perl':
+            self.process_perl()
+        elif cmd == 'ps':
+            self.process_ps()
+        elif cmd =='pwd':
+            self.process_pwd()
+        elif cmd == 'rpm':
+            self.process_rpm()
+        elif cmd == 'service' or cmd == '/sbin/service':
+            self.process_service()
+        elif cmd == 'strings':
+            self.process_strings()
+        elif cmd == 'su'or cmd == 'sudo':
+            self.process_su()
+        elif cmd == 'tar':
+            self.process_tar()
+        elif cmd == 'uname':
+            self.process_uname()
+        elif cmd == 'unset':
+            self.process_unset()
+        elif cmd == 'uptime':
+            self.process_uptime()
+        elif cmd == 'w':
+            self.process_w()
+        elif cmd == 'wget':
+            self.process_wget()
+        elif cmd == 'who':
+            self.process_who()
+        elif cmd == 'whoami':
+            self.process_whoami()
+        elif cmd == 'yum':
+            self.process_yum()
         else:
-            if directory[1] == "/root": 
-                if attacker_username != "root":
-                    transport.write('-bash: cd: /root: Permission denied')
-                    fake_workingdir = "/"
-            elif len(directory) > 1:
-                # Descending (cd foo) or absolute (cd /foo)
-                old_dir = fake_workingdir
-                if directory[1][0:1] == '/':
-                    fake_workingdir = directory[1]
-                else:
-                    fake_workingdir += '/' + directory[1]
-                if fake_workingdir not in FAKE_DIR_STRUCT:
-                    transport.write('-bash: cd: ' + directory[1] + ': No such file or directory')
-                    fake_workingdir = old_dir
+            self.process_undef()
+       
+    def get_values(self):
+        return (self.fake_workingdir,self.attacker_username)    
+    def process_apachectl(self):
+        if len(self.params)>0 and self.params[0]=='status':
+            self.transport.write('Not Found\r\n\r\n')
+            self.transport.write('The requested URL /server-status was not found on this server.\r\n\r\n')
+            self.transport.write(' --------------------------------------------------------------------------\r\n\r\n')
+            self.transport.write('Apache/2.2.15 (CentOS) Server at localhost Port 80\r\n')
+        else:
+            self.process_undef()
+    def process_cd(self):
+        if self.params == '':
+            if self.attacker_username in FAKE_HOMEDIRS:
+                self.fake_workingdir = FAKE_HOMEDIRS[self.attacker_username]
             else:
-                fake_workingdir = "/"
-    #apachectl
-    elif data == "apachectl status":
-        transport.write('Not Found\r\n\r\n')
-        transport.write('The requested URL /server-status was not found on this server.\r\n\r\n')
-        transport.write(' --------------------------------------------------------------------------\r\n\r\n')
-        transport.write('Apache/2.2.15 (CentOS) Server at localhost Port 80\r\n')
-    #cat /etc/passwd
-    elif data == "cat /etc/passwd":
-        for line in FAKE_CAT_PASSWD:
-            transport.write(line + '\r\n')
-    #cat /etc/issue
-    elif data == "cat /etc/issue":
-        for line in FAKE_ETC_ISSUE:
-            transport.write(line + '\r\n')
-    #cat /proc/cpuinfo
-    elif data == "cat /proc/cpuinfo":
-        for line in FAKE_CPUINFO:
-            transport.write(line + '\r\n')
-    #curl
-    elif re.match('curl', data):
-        result_data = executeCommand(data.split(), ip)
+                self.fake_workingdir = "/"
+        else:
+            old_dir = self.fake_workingdir
+            if self.params[0][0:1] == '/':
+                self.fake_workingdir = self.params[0]
+            else:
+                self.fake_workingdir = self.fake_workingdir.rstrip('/')
+                self.fake_workingdir += '/' + self.params[0]
+            if self.fake_workingdir == "/root": 
+                if self.attacker_username != "root":
+                    self.transport.write('-bash: cd: /root: Permission denied\r\n')
+                    self.fake_workingdir = old_dir
+            elif self.fake_workingdir not in FAKE_DIR_STRUCT:
+                self.transport.write('-bash: cd: ' + self.params[0] + ': No such file or directory\r\n')
+                self.fake_workingdir = old_dir
+    def process_cat(self):
+        if len(self.params)>0:
+            #cat /etc/passwd
+            if self.params[0]=="/etc/passwd":
+                for line in FAKE_CAT_PASSWD:
+                    self.transport.write(line + '\r\n')
+            #cat /etc/issue
+            elif self.params[0] == "/etc/issue":
+                for line in FAKE_ETC_ISSUE:
+                    self.transport.write(line + '\r\n')
+            #cat /proc/cpuinfo
+            elif self.params[0] == "/proc/cpuinfo":
+                for line in FAKE_CPUINFO:
+                    self.transport.write(line + '\r\n')
+            else:
+                self.transport.write('-bash: cat: ' + self.params[0] + ': No such file or directory\r\n')
+    def process_curl(self):
+        line=[self.cmd,]
+        if len(self.params)>0:
+            line.extend(self.params)
+        result_data = executeCommand(line, self.ip)
         if type(result_data) is not bool and result_data != "":
-            printlinebreak = 1
-            transport.write(result_data)
-    #date
-    elif re.match('^date', data):
-        transport.write(TIMESTAMP)
-        printlinebreak = 1
-    #exit
-    elif data == "exit":
-        transport.loseConnection()
-    #export
-    elif re.match('^export', data):
-            pass
-    #gcc
-    elif re.match('^gcc', data):
-            transport.write('gcc: no input files\r\n')
-    #history
-    elif re.match('^history', data):
-            pass
-    #hostname
-    elif re.match('^hostname', data):
-        transport.write(FQDN)
-    #id
-    elif data == "id":
-        printlinebreak = 1
-        if attacker_username == "root":
-            transport.write('uid=0(root) gid=0(root) groups=0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel)')
+            self.transport.write(result_data+'\r\n')
+    def process_date(self):
+        self.transport.write(TIMESTAMP+'\r\n')
+    def process_exit(self):
+        self.transport.loseConnection()
+    def process_export(self):
+        pass
+    def process_gcc(self):
+        self.transport.write('gcc: no input files\r\n')
+    def process_history(self):
+        pass
+    def process_hostname(self):
+        self.transport.write(FQDN+'\r\n')
+    def process_id(self):
+        if self.attacker_username == "root":
+            self.transport.write('uid=0(root) gid=0(root) groups=0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel)\r\n')
         else:
-            transport.write('uid=501('+attacker_username+') gid=502('+attacker_username+') groups=100(users)')
-    #ifconfig
-    elif re.match('^ifconfig', data):
+            self.transport.write('uid=501('+self.attacker_username+') gid=502('+self.attacker_username+') groups=100(users)\r\n')
+    def process_ifconfig(self):
         for line in FAKE_IFCONFIG:
-            transport.write(line + '\r\n')
-    #logout - Added by Martin Barbella
-    elif data == "logout":
-        transport.loseConnection()
-    #ls
-    elif re.match("ls(\ )*.*", data):
-        printlinebreak = 1
-        if len(data.split()) > 1:
-            input = data.split()
-            dir_to_ls = input[1]
+            self.transport.write(line + '\r\n')
+    def process_logout(self):
+        self.transport.loseConnection()
+    def process_ls(self):
+        if len(self.params) > 0:
+            dir_to_ls = self.params[0]
             #Fix for "cannot access [parameters]"
             #Added by Martin Barbella
             if(dir_to_ls[0] == '-'):
-                if(len(input) > 2):
-                    dir_to_ls = input[2]
+                if(len(self.params) > 1):
+                    dir_to_ls = self.params[1]
                 else:
-                    dir_to_ls = fake_workingdir
+                    dir_to_ls = self.fake_workingdir
             if (dir_to_ls in FAKE_DIR_STRUCT):
                 for line in FAKE_DIR_STRUCT[dir_to_ls]:
                     if (line == FAKE_DIR_STRUCT[dir_to_ls][-1]):
-                        transport.write(line)
+                        self.transport.write(line)
                     else:
-                        transport.write(line + '\r\n')
+                        self.transport.write(line + '\r\n')
+                self.transport.write('\r\n')
             else:
-                 transport.write('ls: cannot access ' + dir_to_ls + ': No such file or directory')
-        elif (fake_workingdir in FAKE_DIR_STRUCT):
-            for line in FAKE_DIR_STRUCT[fake_workingdir]:
-                if (line == FAKE_DIR_STRUCT[fake_workingdir][-1]):
-                    transport.write(line)
+                 self.transport.write('ls: cannot access ' + dir_to_ls + ': No such file or directory\r\n')
+        elif (self.fake_workingdir in FAKE_DIR_STRUCT):
+            for line in FAKE_DIR_STRUCT[self.fake_workingdir]:
+                if (line == FAKE_DIR_STRUCT[self.fake_workingdir][-1]):
+                    self.transport.write(line)
                 else:
-                    transport.write(line + '\r\n')
+                    self.transport.write(line + '\r\n')
+            self.transport.write('\r\n')
         else:
-            transport.write('ls: Error.\r\n')
-    #make
-    elif re.match('^make', data):
-            transport.write('make: *** No targets specified and no makefile found.  Stop.\r\n')
-    #mkdir
-    elif re.match('^mkdir',data):
-        directory = data.split()
-        if len(directory) == 1:
-            transport.write("mkdir: missing operand\r\nTry `mkdir --help' for more information.")
+            self.transport.write('ls: Error.\r\n')
+    def process_make(self):
+        self.transport.write('make: *** No targets specified and no makefile found.  Stop.\r\n')
+    def process_mkdir(self):
+        if len(self.params) == 0:
+            self.transport.write("mkdir: missing operand\r\nTry `mkdir --help' for more information.\r\n")
         else:
-            print 'Appending directory ' + directory[1]
+            print 'Appending directory ' + self.params[0]
             #format the new entry
-            newdirectory = 'drwx--x--x 70 ' + attacker_username + '     users 4.0K ' + datetime.now().strftime("%Y-%m-%d %H:%M ") + directory[1] + '/'
-            FAKE_DIR_STRUCT[fake_workingdir].append(newdirectory)
-            FAKE_DIR_STRUCT[fake_workingdir + '/' + directory[1]] = ""
-    #netstat
-    elif re.match('^netstat', data):
+            newdirectory = 'drwx--x--x 70 ' + self.attacker_username + '     users 4.0K ' + datetime.now().strftime("%Y-%m-%d %H:%M ") + self.params[0] + '/'
+            FAKE_DIR_STRUCT[self.fake_workingdir].append(newdirectory)
+            FAKE_DIR_STRUCT[self.fake_workingdir + '/' + self.params[0]] = ""
+    def process_netstat(self):
         for line in FAKE_NETSTAT:
-            transport.write(line + '\r\n')
-    #passwd
-    elif re.match('^passwd', data):
-            printlinebreak = 1
-            transport.write('Changing password for user.\r\n')
-            transport.write('New password: ')
-    #perl
-    elif re.match('^perl', data):
-            transport.write('This is perl 5, version 12, subversion 4 (v5.12.4) ')
-            transport.write('built for i386-linux-thread-multi\r\n\r\n')
-            transport.write('Copyright 1987-2010, Larry Wall\r\n\r\n')
-            transport.write('Perl may be copied only under the terms of either the')
-            transport.write('Artistic License or the\r\nGNU General Public License, ')
-            transport.write('which may be found in the Perl 5 source kit.\r\n\r\n')
-            transport.write('Complete documentation for Perl, including FAQ lists, ')
-            transport.write('should be found on\r\nthis system using "man perl" or ')
-            transport.write('"perldoc perl".  If you have access to the\r\nInternet, ')
-            transport.write( 'point your browser at http://www.perl.org/, the Perl Home Page.\r\n')
-    #ps
-    elif re.match('^ps ', data):
+            self.transport.write(line + '\r\n')
+    def process_passwd(self):
+        self.transport.write('Changing password for user.\r\n')
+        self.transport.write('New password: \r\n')
+    def process_perl(self):
+        self.transport.write('This is perl 5, version 12, subversion 4 (v5.12.4) ')
+        self.transport.write('built for i386-linux-thread-multi\r\n\r\n')
+        self.transport.write('Copyright 1987-2010, Larry Wall\r\n\r\n')
+        self.transport.write('Perl may be copied only under the terms of either the')
+        self.transport.write('Artistic License or the\r\nGNU General Public License, ')
+        self.transport.write('which may be found in the Perl 5 source kit.\r\n\r\n')
+        self.transport.write('Complete documentation for Perl, including FAQ lists, ')
+        self.transport.write('should be found on\r\nthis system using "man perl" or ')
+        self.transport.write('"perldoc perl".  If you have access to the\r\nInternet, ')
+        self.transport.write( 'point your browser at http://www.perl.org/, the Perl Home Page.\r\n')
+    def process_ps(self):
         for line in FAKE_PS:
-            transport.write(line + '\r\n')
-    #pwd
-    elif data == "pwd":
-        transport.write(fake_workingdir + '\r\n')
-    #rpm
-    elif re.match("rpm(\ )*.*", data):
-        transport.write('RPM version 4.8.0\r\n')
-        transport.write('Copyright (C) 1998-2002 - Red Hat, Inc.\r\n')
-        transport.write('This program may be freely redistributed under the terms of the GNU GPL\r\n')
-    #service
-    elif re.match("^(/sbin/)service", data):
-        servicecmd = data.split(" ")
-        printlinebreak = 1
-        if (len(servicecmd)) == 3:
-            if servicecmd[1] in FAKE_SERVICES:
-                if servicecmd[2] == "start":
-                    transport.write('Starting ' + servicecmd[1] + ":")
-                elif servicecmd[2] == "stop":
-                    transport.write('Stopping ' + servicecmd[1] + ":")
-                elif servicecmd[2] == "restart":
-                    transport.write('Restarting ' + servicecmd[1] + ":")
-                elif servicecmd[2] == "status":
-                    transport.write(servicecmd[1] + " dead but subsys locked")
+            self.transport.write(line + '\r\n')
+    def process_pwd(self):
+        self.transport.write(self.fake_workingdir + '\r\n')
+    def process_rpm(self):
+        self.transport.write('RPM version 4.8.0\r\n')
+        self.transport.write('Copyright (C) 1998-2002 - Red Hat, Inc.\r\n')
+        self.transport.write('This program may be freely redistributed under the terms of the GNU GPL\r\n')
+    def process_service(self):
+        if (len(self.params)) == 2:
+            if self.params[0] in FAKE_SERVICES:
+                if self.params[1] == "start":
+                    self.transport.write('Starting ' + self.params[0] + ":\r\n")
+                elif self.params[1] == "stop":
+                    self.transport.write('Stopping ' + self.params[0] + ":\r\n")
+                elif self.params[1] == "restart":
+                    self.transport.write('Restarting ' + self.params[0] + ":\r\n")
+                elif self.params[1] == "status":
+                    self.transport.write(self.params[0] + " dead but subsys locked\r\n")
                 else:
-                    transport.write(FAKE_SERVICE_USAGE.format(servicecmd[1]))
+                    self.transport.write(FAKE_SERVICE_USAGE.format(self.params[0]))
             else:
-                transport.write(servicecmd[1] + ': unrecognized service')
-        elif (len(servicecmd)) == 2:
-            if servicecmd[1] == "--status-all":
+                self.transport.write(self.params[0] + ': unrecognized service\r\n')
+        elif (len(self.params)) == 1:
+            if self.params[0] == "--status-all":
                 for line in FAKE_SERVICE_ALL:
-                    transport.write(line + '\r\n')
-            elif servicecmd[1] in FAKE_SERVICES:
-                transport.write('Usage: ' + servicecmd[1] + ': {start|stop|restart}')
+                    self.transport.write(line + '\r\n')
+            elif self.params[0] in FAKE_SERVICES:
+                self.transport.write('Usage: ' + self.params[0] + ': {start|stop|restart}\r\n')
             else:
-                transport.write(servicecmd[1] + ': unrecognized service')
+                self.transport.write(self.params[0] + ': unrecognized service\r\n')
         else:
-            transport.write('Usage: service < option > | --status-all | [ service_name [ command | --full-restart ] ]')
-    #strings
-    elif data == "strings -a /usr/sbin/sshd | grep %s:%s -A2 -B2":
-        transport.write('port %d\r\n')
-        transport.write('listenaddress [%s]:%s\r\n')
-        transport.write('listenaddress %s:%s\r\n')
-        transport.write('subsystem %s %s\r\n')
-        transport.write('maxstartups %d:%d:%d\r\n')
-    #su and sudo
-    elif re.match("su(\ )*.*", data):
-        if data == "sudo su" or data == "su":
-            attacker_username = 'root'
+            self.transport.write('Usage: service < option > | --status-all | [ service_name [ command | --full-restart ] ]\r\n')
+    def process_strings(self):
+        #accepts strings -a /usr/sbin/sshd | grep %s:%s -A2 -B2
+        if len(self.params)>1 and self.params== ['-a','/usr/sbin/sshd','|','grep','%s:%s','-A2','-B2']:
+            self.transport.write('port %d\r\n')
+            self.transport.write('listenaddress [%s]:%s\r\n')
+            self.transport.write('listenaddress %s:%s\r\n')
+            self.transport.write('subsystem %s %s\r\n')
+            self.transport.write('maxstartups %d:%d:%d\r\n')
         else:
-            switchtouser = data.split()[1]
-            print "Attempting to su to " + switchtouser
-            if switchtouser in FAKE_HOMEDIRS:
-                attacker_username = switchtouser
-                print 'Changing FAKE_USERNAME to ' + switchtouser
+            self.process_undef()
+    def process_su(self):
+        if self.cmd=='sudo':
+            if len(self.params)>0 and self.params[0]=='su':
+                self.attacker_username = 'root'
             else:
-                printlinebreak = 1
-                transport.write('Unknown user: ' + switchtouser)
-    #tar
-    elif re.match('^tar', data):
-            transport.write("tar: You must specify one of the `-Acdtrux' or `--test-label'  options\r\n")
-            transport.write("Try `tar --help' or `tar --usage' for more information.\r\n")
-    #uname
-    elif re.match("uname(\ )*.*", data):
-        printlinebreak = 1
-        transport.write(FAKE_OS)
-    #unset
-    elif re.match('^unset ', data):
-        pass
-    #uptime
-    elif data == "uptime":
-        transport.write(FAKE_UPTIME)
-        printlinebreak = 1
-    #w
-    elif data == "w":
-        printlinebreak = 1
-        transport.write('USER\tTTY\tFROM\tLOGIN@\t\tIDLE\tJCPU\tPCPU\tWHAT\r\n')
-        transport.write(attacker_username + '\tpts/1\t'+ip+'\t09:05\t0.00s\t0.04s\t0.00s\tw')
-    #wget
-    elif re.match('wget', data):
-        result_data = executeCommand(data.split(), ip)
-        if type(result_data) is not bool and result_data != "":
-            printlinebreak = 1
-            transport.write(result_data)
-    #who
-    elif data == "who":
-        transport.write(attacker_username + '\tpts/1')
-        printlinebreak = 1
-    #whoami
-    elif re.match('^whoami', data):
-        transport.write(attacker_username)
-        printlinebreak = 1
-    #yum
-    elif re.match('^yum(\ )*.*', data):
-        if re.match('^yum install', data):
-            transport.write('Another app is currently holding the yum lock; waiting for it to exit...\r\n')
-        else:
-            transport.write('Loaded plugins: fastestmirror\r\n')
-            transport.write('You need to give some command\r\n')
-            transport.write('Usage: yum [options] COMMAND\r\n')
-    # Fall through to anything else we haven't predefined
-    elif denied_re.match(data):
-        #
-        # Patch from Nicolas Surribas to fix bug 1463713
-        #
-        transport.write(FAKE_SHELL+ data.split(" ")[0] + ": " + FAKE_DENIED)
-        printlinebreak = 1
-    else:
+                self.process_undef()
+        else:#cmd = 'su'
+            if len(self.params)==0:
+                self.attacker_username = 'root'
+            else:
+                switchtouser = self.params[0]
+                print "Attempting to su to " + switchtouser
+                if switchtouser in FAKE_HOMEDIRS:
+                    self.attacker_username = switchtouser
+                    print 'Changing FAKE_USERNAME to ' + switchtouser
+                else:
+                    self.transport.write('Unknown user: ' + switchtouser + '\r\n')
+    def process_tar(self):
+        self.transport.write("tar: You must specify one of the `-Acdtrux' or `--test-label'  options\r\n")
+        self.transport.write("Try `tar --help' or `tar --usage' for more information.\r\n")
+    def process_uname(self):
+        self.transport.write(FAKE_OS+'\r\n')
+    def process_undef(self):
         print "Potentially unknown command"
-        if data == "":
+        if self.cmd == "":
             pass
         else:
-            printlinebreak = 1
-            if len(data.split()) > 1:
-                transport.write(FAKE_SHELL + ": " + data.split()[0] + ": command not found")
-            else:
-                transport.write(FAKE_SHELL + ": " + data + ": command not found")
+            self.transport.write(FAKE_SHELL + ": " + self.cmd + ": command not found\r\n")
+    def process_unset(self):  
+        pass
+    def process_uptime(self):
+        self.transport.write(FAKE_UPTIME+'\r\n')
+    def process_w(self):
+        self.transport.write('USER\tTTY\tFROM\tLOGIN@\t\tIDLE\tJCPU\tPCPU\tWHAT\r\n')
+        self.transport.write(self.attacker_username + '\tpts/1\t'+self.ip+'\t09:05\t0.00s\t0.04s\t0.00s\tw\r\n')
+    def process_wget(self):
+        line=[self.cmd,]
+        if len(self.params)>0:
+            line.extend(self.params)
+        result_data = executeCommand(line, self.ip)
+        if type(result_data) is not bool and result_data != "":
+            self.transport.write(result_data+'\r\n')
+    def process_who(self):
+        self.transport.write(self.attacker_username + '\tpts/1\r\n')
+    def process_whoami(self):
+        self.transport.write(self.attacker_username+'\r\n')
+    def process_yum(self):
+        if len(self.params)>0 and (self.params[0] == 'install' or self.params[0] == 'update'):
+            self.transport.write('Another app is currently holding the yum lock; waiting for it to exit...\r\n')
+        else:
+            self.transport.write('Loaded plugins: fastestmirror\r\n')
+            self.transport.write('You need to give some command\r\n')
+            self.transport.write('Usage: yum [options] COMMAND\r\n')
+
+        
+def processCmd(data, transport, attacker_username, ip, fake_workingdir):
+    global FAKE_SHELL, con, FAKE_USERNAME
+    #each command proccessor function takes care of printing its own ending linebreaks
+    #printlinebreak is not used in ProcessCmd
+    printlinebreak = 0 
+    data = data.strip()
+    print "COMMAND IS : " + data
+    transport.write('\r\n')
+    data=data.split()
+    cmd=''
+    if len(data)>0:
+        cmd = data[0]
+    params=''
+    if len(data)>1:
+        params=data[1:len(data)]
+    cmd_processor=ProcessCmd(cmd, params, transport, attacker_username, ip, fake_workingdir)
+    (fake_workingdir,attacker_username)=cmd_processor.get_values()
     # return some values so they remain dynamic        
     return (printlinebreak, fake_workingdir, attacker_username)

@@ -161,6 +161,6 @@ def curl(params, ip):
                 downloadFileTo(param, DOWNLOAD_REAL_DIR, ip)
 
             data = "Downloading URL " + str(param)
-            return data + "curl: Unknown error"
+            return data + "\r\ncurl: Unknown error"
 
     return data
