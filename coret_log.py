@@ -45,7 +45,7 @@ def start_logging():
     for log_file in log_file_list:
         print "Ok, starting log to "  + str(log_file)
         log.startLogging(log_file)
-        log.addObserver(koj_watcher)
+        #log.addObserver(koj_watcher)
     
 def koj_watcher(eventDict):
     """Custom emit for FileLogObserver"""
