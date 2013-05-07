@@ -285,16 +285,13 @@ class HoneypotPasswordChecker:
             print 'login attempt [%s %s] failed' % (username, password)
             return False
     def checkLog(self, username, password):
-        # Sloppy way to watch for logins
-        filename = '/var/log/honeypot.log'
-        try: 
-            file = open(filename,'r')
-        except: 
-            print "Couldn't open logfile " + filename + " to search for login."
-        # File.readlines loads the whole thing into memory, don't want that
-        # loop over the file and find the last login with supplied creds
+        # Sloppy way to watch for logins (depends on tail)
+        stdin, stdout = os.popen2("tail -n5 /var/log/honeypot.log")
+        stdin.close();         
+        filelines = stdout.readlines()
+        stdout.close()
         matchline = ""
-        for line in file:
+        for line in filelines:
             matchstring = '.*login attempt \[%s %s\] succeeded.*' % (username, password)
             if re.match(matchstring, line):
                 matchline = line
