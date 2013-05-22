@@ -42,8 +42,39 @@ from coret_honey import *
 from coret_config import *
 from coret_fake import *
 from coret_log import *
+from twisted.python.log import addObserver, textFromEventDict
 
+#logs successful login attempts into the database
+#added by Josh Bauer
+def login_logger(eventDict):
+    msg=textFromEventDict(eventDict)
+    matchstring = 'login attempt \[(\w+) (\w+)\] succeeded'
+    msg =re.search(matchstring, msg)
+    if msg:
+        ip=eventDict['system'].split(',')[-1]
+        username=msg.group(1)
+        password=msg.group(2)
+        # Log the connection attempt
+        try:
+            connection = MySQLdb.connect(host=DATABASE_HOST, 
+                                         user=DATABASE_USER, 
+                                         passwd=DATABASE_PASS, 
+                                         db=DATABASE_NAME)
+            cursor = connection.cursor()
+            sql = "INSERT INTO login_attempts SET "
+            sql += " time=CURRENT_TIMESTAMP(), "
+            sql += " ip=%s, "
+            sql += " ip_numeric=INET_ATON(%s),"
+            sql += " username=%s, "
+            sql += " password=%s, "
+            sql += " sensor_id=%s"
+            cursor.execute(sql , (ip, ip, username, password, SENSOR_ID))
+            connection.commit() 
+            connection.close()
+        except Exception as msg:
+            print "Error inserting login data to the database.  ", msg
 
+addObserver(login_logger)
 #
 # First of all. Start logging now()!
 #
@@ -276,7 +307,6 @@ class HoneypotPasswordChecker:
             passwords = self.authorizedCredentials[username].split(',')
             if passwords.count(password) > 0:
                 log.msg('login attempt [%s %s] succeeded' % (username, password))
-                self.checkLog(username, password)
                 return True
             else:
                 print 'login attempt [%s %s] failed' % (username, password)
@@ -284,44 +314,6 @@ class HoneypotPasswordChecker:
         else:
             print 'login attempt [%s %s] failed' % (username, password)
             return False
-    def checkLog(self, username, password):
-        # Sloppy way to watch for logins (depends on tail)
-        stdin, stdout = os.popen2("tail -n5 /var/log/honeypot.log")
-        stdin.close();         
-        filelines = stdout.readlines()
-        stdout.close()
-        matchline = ""
-        for line in filelines:
-            matchstring = '.*login attempt \[%s %s\] succeeded.*' % (username, password)
-            if re.match(matchstring, line):
-                matchline = line
-        if matchline == "":
-            return
-        else:
-            ip = matchline.split(',')[2].split(']')[0]
-            creds = matchline.split('[')[2].split(']')[0]
-            username = creds.split(' ')[0]
-            password = string.join(creds.split(' ')[1:], " ")
-            # Log the connection attempt
-            try:
-                connection = MySQLdb.connect(host=DATABASE_HOST, 
-                                             user=DATABASE_USER, 
-                                             passwd=DATABASE_PASS, 
-                                             db=DATABASE_NAME)
-                cursor = connection.cursor()
-                sql = "INSERT INTO login_attempts SET "
-                sql += " time=CURRENT_TIMESTAMP(), "
-                sql += " ip=%s, "
-                sql += " ip_numeric=INET_ATON(%s),"
-                sql += " username=%s, "
-                sql += " password=%s, "
-                sql += " sensor_id=%s"
-                cursor.execute(sql , (ip, ip, username, password, SENSOR_ID))
-                connection.commit() 
-                connection.close()
-            except Exception as msg:
-                print "Error inserting login data to the database.  ", msg
-
 
 class CoretFactory(factory.SSHFactory):
     publicKeys = {'ssh-rsa': keys.getPublicKeyString(data=publicKey)}
