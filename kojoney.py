@@ -42,39 +42,7 @@ from coret_honey import *
 from coret_config import *
 from coret_fake import *
 from coret_log import *
-from twisted.python.log import addObserver, textFromEventDict
 
-#logs successful login attempts into the database
-#added by Josh Bauer
-def login_logger(eventDict):
-    msg=textFromEventDict(eventDict)
-    matchstring = 'login attempt \[(\w+) (\w+)\] succeeded'
-    msg =re.search(matchstring, msg)
-    if msg:
-        ip=eventDict['system'].split(',')[-1]
-        username=msg.group(1)
-        password=msg.group(2)
-        # Log the connection attempt
-        try:
-            connection = MySQLdb.connect(host=DATABASE_HOST, 
-                                         user=DATABASE_USER, 
-                                         passwd=DATABASE_PASS, 
-                                         db=DATABASE_NAME)
-            cursor = connection.cursor()
-            sql = "INSERT INTO login_attempts SET "
-            sql += " time=CURRENT_TIMESTAMP(), "
-            sql += " ip=%s, "
-            sql += " ip_numeric=INET_ATON(%s),"
-            sql += " username=%s, "
-            sql += " password=%s, "
-            sql += " sensor_id=%s"
-            cursor.execute(sql , (ip, ip, username, password, SENSOR_ID))
-            connection.commit() 
-            connection.close()
-        except Exception as msg:
-            print "Error inserting login data to the database.  ", msg
-
-addObserver(login_logger)
 #
 # First of all. Start logging now()!
 #

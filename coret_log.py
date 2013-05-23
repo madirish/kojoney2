@@ -23,6 +23,9 @@
 """
 import os
 import sys
+import string
+import re
+import MySQLdb
 
 from coret_config import *
 
@@ -37,6 +40,7 @@ def log_cmd_session(session, data):
     pass
 
 def start_logging():
+    log.addObserver(login_logger)
     if os.getuid() == 0:
         log_file_list = ROOT_CONFIG_LOGS
     else:
@@ -45,12 +49,33 @@ def start_logging():
     for log_file in log_file_list:
         print "Ok, starting log to "  + str(log_file)
         log.startLogging(log_file)
-        #log.addObserver(koj_watcher)
-    
-def koj_watcher(eventDict):
-    """Custom emit for FileLogObserver"""
-    text = log.textFromEventDict(eventDict)
-    if text is None:
-        return
-    fmtDict = {'text': text.replace("\n", "\n\t")}
-    msgStr = log._safeFormat("%(text)s\n", fmtDict)
+        
+#enters successful login attempts into the database
+#added by Josh Bauer <joshbauer3@gmail.com>
+def login_logger(eventDict):
+    msg=log.textFromEventDict(eventDict)
+    matchstring = 'login attempt \[(\w+) (\w+)\] succeeded'
+    msg =re.search(matchstring, msg)
+    if msg:
+        ip=eventDict['system'].split(',')[-1]
+        username=msg.group(1)
+        password=msg.group(2)
+        # Log the connection attempt
+        try:
+            connection = MySQLdb.connect(host=DATABASE_HOST, 
+                                         user=DATABASE_USER, 
+                                         passwd=DATABASE_PASS, 
+                                         db=DATABASE_NAME)
+            cursor = connection.cursor()
+            sql = "INSERT INTO login_attempts SET "
+            sql += " time=CURRENT_TIMESTAMP(), "
+            sql += " ip=%s, "
+            sql += " ip_numeric=INET_ATON(%s),"
+            sql += " username=%s, "
+            sql += " password=%s, "
+            sql += " sensor_id=%s"
+            cursor.execute(sql , (ip, ip, username, password, SENSOR_ID))
+            connection.commit() 
+            connection.close()
+        except Exception as msg:
+            print "Error inserting login data to the database.  ", msg

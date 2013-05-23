@@ -91,8 +91,60 @@ class Report:
       errorstring = "Kojoney2: kojreport - Transaction error in get_file_downloads " , err
       syslog.syslog(syslog.LOG_ERR, str(errorstring))
       return False
-    
-
+  
+  def count_attempts(self):
+    'Show the number of successful login attempts since yesterday at midnight'
+    try:
+      cursor = self.conn.cursor()
+      sql = 'select count(id) from login_attempts '
+      sql += 'where time > date_sub(curdate(), interval 1 day)'
+      cursor.execute(sql)
+      retval = cursor.fetchone()[0]
+      cursor.close()
+      return retval
+    except Exception as err:
+      errorstring = "Kojoney2: kojreport - Transaction error in count_attempts " , err
+      syslog.syslog(syslog.LOG_ERR, str(errorstring))
+      return False
+  
+  def attempts_from(self):
+    'Show the ip addresses of successful login attempts since yesterday at midnight'
+    try:
+      cursor = self.conn.cursor()
+      sql = 'select distinct(ip) from login_attempts '
+      sql += 'where time > date_sub(curdate(), interval 1 day)'
+      cursor.execute(sql)
+      retval = cursor.fetchall()
+      cursor.close()
+      return retval
+    except Exception as err:
+      errorstring = "Kojoney2: kojreport - Transaction error in attempts_from " , err
+      syslog.syslog(syslog.LOG_ERR, str(errorstring))
+      return False
+  
+  def get_attempts(self, ip):
+    'Show the successful login attempts by the ip address issued since yesterday at midnight'
+    try:
+      #total succeful attempts by ip
+      cursor = self.conn.cursor()
+      sql = 'select count(id) from login_attempts '
+      sql += 'where time > date_sub(curdate(), interval 1 day) '
+      sql += ' and ip = %s order by time asc '
+      cursor.execute(sql, ip)
+      total = cursor.fetchone()
+      #succesful attemps with unique username by ip
+      sql = 'select count(distinct(username)) from login_attempts '
+      sql += 'where time > date_sub(curdate(), interval 1 day) '
+      sql += ' and ip = %s order by time asc '
+      cursor.execute(sql, ip)
+      unique=cursor.fetchone()
+      cursor.close()
+      return (total[0], unique[0])
+    except Exception as err:
+      errorstring = "Kojoney2: kojreport - Transaction error in get_attempts " , err
+      syslog.syslog(syslog.LOG_ERR, str(errorstring))
+      return False
+  
 import urllib
 import sys
 import socket
@@ -151,3 +203,27 @@ if downloads is not False:
     print '\tURL:  ' + url
     print '\tMD5:  ' + md5sum
     print '\tType: ' + filetype
+print
+print 'Number of successful login attempts:'
+print '------------------------------------'
+print report.count_attempts()
+print
+print 'IP addresses of successful login attempts'
+print '-----------------------------------------'
+ips = report.attempts_from()
+if ips is not False:
+  for addr in ips:
+    print addr[0]
+    ip = socket.gethostbyname(addr[0])
+    response = urllib.urlopen('http://api.hostip.info/get_html.php?ip=' + ip + '&position=true').read()
+    lines = response.split('\n')
+    print '\t\t' + lines[0]
+    print '\t\t' + lines[1]
+print
+print 'Attempts by IP address:'
+print '--------------------------------'
+if ips is not False:
+  for addr in ips:
+    print addr[0]
+    total, unique = report.get_attempts(addr[0])
+    print '\t' + str(total) + ' logins with ' +str(unique)+' unique usernames'
