@@ -60,22 +60,26 @@ def login_logger(eventDict):
         ip=eventDict['system'].split(',')[-1]
         username=msg.group(1)
         password=msg.group(2)
-        # Log the connection attempt
-        try:
-            connection = MySQLdb.connect(host=DATABASE_HOST, 
-                                         user=DATABASE_USER, 
-                                         passwd=DATABASE_PASS, 
-                                         db=DATABASE_NAME)
-            cursor = connection.cursor()
-            sql = "INSERT INTO login_attempts SET "
-            sql += " time=CURRENT_TIMESTAMP(), "
-            sql += " ip=%s, "
-            sql += " ip_numeric=INET_ATON(%s),"
-            sql += " username=%s, "
-            sql += " password=%s, "
-            sql += " sensor_id=%s"
-            cursor.execute(sql , (ip, ip, username, password, SENSOR_ID))
-            connection.commit() 
-            connection.close()
-        except Exception as msg:
-            print "Error inserting login data to the database.  ", msg
+        
+        #whitelist functionality added by Josh Bauer <joshbauer3@gmail.com>
+        if ip in WHITELIST:
+            print 'login database entry skipped due to whitelisted ip: '+ip
+        else:
+            try:
+                connection = MySQLdb.connect(host=DATABASE_HOST, 
+                                             user=DATABASE_USER, 
+                                             passwd=DATABASE_PASS, 
+                                             db=DATABASE_NAME)
+                cursor = connection.cursor()
+                sql = "INSERT INTO login_attempts SET "
+                sql += " time=CURRENT_TIMESTAMP(), "
+                sql += " ip=%s, "
+                sql += " ip_numeric=INET_ATON(%s),"
+                sql += " username=%s, "
+                sql += " password=%s, "
+                sql += " sensor_id=%s"
+                cursor.execute(sql , (ip, ip, username, password, SENSOR_ID))
+                connection.commit() 
+                connection.close()
+            except Exception as msg:
+                print "Error inserting login data to the database.  ", msg

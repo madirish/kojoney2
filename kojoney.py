@@ -102,19 +102,24 @@ class CoretProtocol(protocol.Protocol):
             self.lastCmd = string.replace(self.lastCmd, '\r', '')
             self.lastCmd = string.replace(self.lastCmd, '\n', '')
             ip = self.transport.session.conn.transport.transport.getPeer()[1]
-            try:
-                connection = MySQLdb.connect(host=DATABASE_HOST, 
-                                             user=DATABASE_USER, 
-                                             passwd=DATABASE_PASS, 
-                                             db=DATABASE_NAME)
-                cursor = connection.cursor()
-                sql = "INSERT INTO executed_commands SET "
-                sql += "command=%s, ip=%s, ip_numeric=INET_ATON(%s), sensor_id=%s"
-                cursor.execute(sql , (self.lastCmd, ip, ip, SENSOR_ID))
-                connection.commit() 
-                connection.close()
-            except Exception as inst:
-                print "Error inserting command data to the database.  ", inst
+            
+            #whitelist functionality added by Josh Bauer <joshbauer3@gmail.com>
+            if ip in WHITELIST:
+                print 'command database entry skipped due to whitelisted ip: '+ip
+            else:
+                try:
+                    connection = MySQLdb.connect(host=DATABASE_HOST, 
+                                                 user=DATABASE_USER, 
+                                                 passwd=DATABASE_PASS, 
+                                                 db=DATABASE_NAME)
+                    cursor = connection.cursor()
+                    sql = "INSERT INTO executed_commands SET "
+                    sql += "command=%s, ip=%s, ip_numeric=INET_ATON(%s), sensor_id=%s"
+                    cursor.execute(sql , (self.lastCmd, ip, ip, SENSOR_ID))
+                    connection.commit() 
+                    connection.close()
+                except Exception as inst:
+                    print "Error inserting command data to the database.  ", inst
                 
             # "Execute" the command(s)
             # handle multiple commands delimited by semi-colons

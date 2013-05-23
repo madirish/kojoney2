@@ -30,7 +30,7 @@ import hashlib
 import MySQLdb
 
 from coret_config import DOWNLOAD_REAL_FILE, DOWNLOAD_REAL_DIR, SENSOR_ID
-from coret_config import DATABASE_HOST, DATABASE_USER, DATABASE_PASS, DATABASE_NAME
+from coret_config import DATABASE_HOST, DATABASE_USER, DATABASE_PASS, DATABASE_NAME, WHITELIST
 
 def getGoodFilename(filename):
     
@@ -85,27 +85,32 @@ def downloadFileTo(url, directory, ip):
             cursor.close()
         except:
             print "Error selecting md5sums from the database."
-            
-        # Record the download in the database
-        sql = "INSERT INTO downloads SET "
-        sql += " time=CURRENT_TIMESTAMP(), "
-        sql += " ip=%s, "
-        sql += " ip_numeric=INET_ATON(%s), "
-        sql += " url=%s, "
-        sql += " md5sum=%s, "
-        sql += " sensor_id=%s, "
-        sql += " filetype=%s"
-        if not duplicate:
-          sql += ", file=%s"
-        try:
-            cursor = connection.cursor()
-            if duplicate:
-              cursor.execute(sql , (ip, ip, url, filemd5, SENSOR_ID, filetype))
-            else:
-              cursor.execute(sql , (ip, ip, url, filemd5, SENSOR_ID, filetype, data))
-            cursor.close()
-        except Exception as inst:
-            print "Error inserting file download data to the database.  ", inst
+        
+        #whitelist functionality added by Josh Bauer <joshbauer3@gmail.com> 
+        if ip in WHITELIST:
+            print 'download database entry skipped due to whitelisted ip: '+ip
+        else:   
+            # Record the download in the database
+            sql = "INSERT INTO downloads SET "
+            sql += " time=CURRENT_TIMESTAMP(), "
+            sql += " ip=%s, "
+            sql += " ip_numeric=INET_ATON(%s), "
+            sql += " url=%s, "
+            sql += " md5sum=%s, "
+            sql += " sensor_id=%s, "
+            sql += " filetype=%s"
+            if not duplicate:
+              sql += ", file=%s"
+            try:
+                cursor = connection.cursor()
+                if duplicate:
+                  cursor.execute(sql , (ip, ip, url, filemd5, SENSOR_ID, filetype))
+                else:
+                  cursor.execute(sql , (ip, ip, url, filemd5, SENSOR_ID, filetype, data))
+                connection.commit()
+                cursor.close()
+            except Exception as inst:
+                print "Error inserting file download data to the database.  ", inst
     except:
         print "Error downloading file",url,"request by attacker: ",sys.exc_info()[1]
 

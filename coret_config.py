@@ -18,10 +18,14 @@
 import os
 import sys
 
-DATABASE_USER = 'db_user'
-DATABASE_PASS = 'db_password'
-DATABASE_HOST = 'db_host'
+DATABASE_USER = 'root'
+DATABASE_PASS = 'password'
+DATABASE_HOST = 'localhost'
 DATABASE_NAME = 'kojoney'
+
+#list of ip addresses to exclude from database entries
+#whitelist functionality added by Josh Bauer <joshbauer3@gmail.com>
+WHITELIST = []
 
 SENSOR_ID = 1
 
