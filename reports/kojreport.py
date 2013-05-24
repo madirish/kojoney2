@@ -226,4 +226,13 @@ if ips is not False:
   for addr in ips:
     print addr[0]
     total, unique = report.get_attempts(addr[0])
-    print '\t' + str(total) + ' logins with ' +str(unique)+' unique usernames'
+    output =''
+    if total==1:
+        output += '\t' + str(total)+' login with '
+    else:
+        output += '\t' + str(total)+' logins with '
+    if unique ==1:
+        output += str(unique)+' unique username'
+    else:
+        output += str(unique)+' unique usernames'
+    print output
