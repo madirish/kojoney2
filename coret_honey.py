@@ -33,98 +33,29 @@ import coret_std_unix
 
 # Koret Honey ;)
 
-#denied_re is possibly unused
-#a process_denied method should be added
-denied_re = re.compile("""
-(cat(\ )*.*)|(chgrp(\ )*.*)|(chmod(\ )*.*)|(chown(\ )*.*)|(cp(\ )*.*)|(cpio(\ )*.*)|(csh(\ )*.*)|(date(\ )*.*)|
-(dd(\ )*.*)|(df(\ )*.*)|(ed(\ )*.*)|(echo(\ )*.*)|(grep(\ )*.*)|(false(\ )*.*)|(kill(\ )*.*)|(ln(\ )*.*)|
-(login(\ )*.*)|(mknod(\ )*.*)|(mktemp(\ )*.*)|(more(\ )*.*)|(mount(\ )*.*)|(more(\ )*.*)|
-(mv(\ )*.*)|(ping(\ )*.*)|(rmdir(\ )*.*)|(sed(\ )*.*)|(sh(\ )*.*)|(bash(\ )*.*)|(su(\ )*.*)|(true(\ )*.*)|
-(umount(\ )*.*)|(useradd(\ )*.*)|(grpadd(\ )*.*)""", re.VERBOSE)
-
-#ProcessCmd class created by Josh Bauer
 class ProcessCmd:
+    """ 
+    Class for processing any and all supported fake commands.
+    by Josh Bauer (jobauer@sas.upenn.edu)
+    """
+    
     def __init__(self, cmd, params, transport, attacker_username, ip, fake_workingdir):
-        #init local vars
+        """
+        Set up internal variables then run a generic factory eval to execute command.
+        """
         self.cmd = cmd
         self.params = params
         self.transport = transport
         self.attacker_username = attacker_username
         self.ip = ip
         self.fake_workingdir = fake_workingdir
-        #choose command processor
-        
-        if cmd =='apachectl':
-            self.process_apachectl()
-        elif cmd == 'cd':
-            self.process_cd()
-        elif cmd == 'cat':
-            self.process_cat()
-        elif cmd =='curl':
-            self.process_curl()
-        elif cmd =='date':
-            self.process_date()
-        elif cmd =='exit':
-            self.process_exit()
-        elif cmd =='export':
-            self.process_export()
-        elif cmd =='gcc':
-            self.process_gcc()
-        elif cmd =='history':
-            self.process_history()
-        elif cmd =='hostname':
-            self.process_hostname()
-        elif cmd =='id':
-            self.process_id()
-        elif cmd =='ifconfig':
-            self.process_ifconfig()
-        elif cmd == 'logout':
-            self.process_logout()
-        elif cmd == 'ls':
-            self.process_ls()
-        elif cmd == 'make':
-            self.process_make()
-        elif cmd == 'mkdir':
-            self.process_mkdir()
-        elif cmd == 'netstat':
-            self.process_netstat()
-        elif cmd == 'passwd':
-            self.process_passwd()
-        elif cmd == 'perl':
-            self.process_perl()
-        elif cmd == 'ps':
-            self.process_ps()
-        elif cmd =='pwd':
-            self.process_pwd()
-        elif cmd == 'rpm':
-            self.process_rpm()
-        elif cmd == 'service' or cmd == '/sbin/service':
-            self.process_service()
-        elif cmd == 'strings':
-            self.process_strings()
-        elif cmd == 'su'or cmd == 'sudo':
-            self.process_su()
-        elif cmd == 'tar':
-            self.process_tar()
-        elif cmd == 'uname':
-            self.process_uname()
-        elif cmd == 'unset':
-            self.process_unset()
-        elif cmd == 'uptime':
-            self.process_uptime()
-        elif cmd == 'w':
-            self.process_w()
-        elif cmd == 'wget':
-            self.process_wget()
-        elif cmd == 'who':
-            self.process_who()
-        elif cmd == 'whoami':
-            self.process_whoami()
-        elif cmd == 'yum':
-            self.process_yum()
-        else:
+
+        self.process_cmd = 'self.process_' + self.cmd + '()'
+        try:
+            eval(self.process_cmd)
+        except:
             self.process_undef()
-       
+        
     def get_values(self):
         return (self.fake_workingdir,self.attacker_username)    
     def process_apachectl(self):
