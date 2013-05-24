@@ -2,21 +2,48 @@
 #
 # Main Developer - Justin C. Klein Keane <jukeane@sas.upenn.edu>
 # Original Developer - Jose Antonio Coret <joxeankoret@yahoo.es>
-# Last updated 29 January 2013
-#
-# The configuration file for "fake" command responses
+# Last updated 24 May 2013
 #
 import time
 from datetime import datetime
-FAKE_USERNAME = ""
-TIMESTAMP = datetime.now().strftime("%b %d %H:%M:%S %Z %Y")
-FAKEYEAR = datetime.now().strftime("%Y")
+
+# Kojoney config variables
+FAKE_USERS_FILE = "/opt/kojoney/etc/fake_users"
+
+# Dynamic date determination for realistic output
 FAKEYEARM1 = int(FAKEYEAR) - 1
 FAKEYEARM2 = int(FAKEYEAR) - 2
 FAKEYEARM3 = int(FAKEYEAR) - 3
 FAKEYEARM4 = int(FAKEYEAR) - 4
 FAKEYEARM5 = int(FAKEYEAR) - 5
-FQDN = "fqdn_placeholder" #www.example.com
+TIMESTAMP = datetime.now().strftime("%b %d %H:%M:%S %Z %Y")
+FAKEYEAR = datetime.now().strftime("%Y")
+
+# Server variables
+FAKE_SSH_SERVER_VERSION = "SSH-2.0-OpenSSH_5.1p1 CentOS release 6.3 (Final)"
+FAKE_SSH_KEY = 'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAGEArzJx8OYOnJmzf4tfBEvLi8DVPrJ3/c9k2I/Az64fxjHf9imyRJbixtQhlH9lfNjUIx+4LmrJH5QNRsFporcHDKOTwTTYLh5KmRpslkYHRivcJSkbh/C+BR3utDS555mV'
+FAKE_SSH_PRIVKEY = """-----BEGIN RSA PRIVATE KEY-----
+MIIByAIBAAJhAK8ycfDmDpyZs3+LXwRLy4vA1T6yd/3PZNiPwM+uH8Yx3/YpskSW
+4sbUIZR/ZXzY1CMfuC5qyR+UDUbBaaK3Bwyjk8E02C4eSpkabJZGB0Yr3CUpG4fw
+vgUd7rQ0ueeZlQIBIwJgbh+1VZfr7WftK5lu7MHtqE1S1vPWZQYE3+VUn8yJADyb
+Z4fsZaCrzW9lkIqXkE3GIY+ojdhZhkO1gbG0118sIgphwSWKRxK0mvh6ERxKqIt1
+xJEJO74EykXZV4oNJ8sjAjEA3J9r2ZghVhGN6V8DnQrTk24Td0E8hU8AcP0FVP+8
+PQm/g/aXf2QQkQT+omdHVEJrAjEAy0pL0EBH6EVS98evDCBtQw22OZT52qXlAwZ2
+gyTriKFVoqjeEjt3SZKKqXHSApP/AjBLpF99zcJJZRq2abgYlf9lv1chkrWqDHUu
+DZttmYJeEfiFBBavVYIF1dOlZT0G8jMCMBc7sOSZodFnAiryP+Qg9otSBjJ3bQML
+pSTqy7c3a2AScC/YyOwkDaICHnnD3XyjMwIxALRzl0tQEKMXs6hH8ToUdlLROCrP
+EhQ0wahUTCk1gKA4uPD6TMTChavbh4K63OvbKg==
+-----END RSA PRIVATE KEY-----"""
+
+# Global variables for sessions
+FQDN = "fqdn_placeholder" # www.example.com, installer should replace this
+FAKE_USERNAME = ""
+FAKE_USER_CHAR = "$"
+FAKE_OS = "Linux " + FQDN + " 2.6.9-5.ELsmp #1 SMP " + TIMESTAMP + " i386 GNU/Linux"
+FAKE_SHELL = "bash-2.0"
+FAKE_PROMPT = FAKE_SHELL + str(FAKE_USER_CHAR) + " "
+
+# Structures for fake filesystem
 FAKE_HOMEDIRS = {
 	'backup':	"/",
 	'bob':	"/home/bob",
@@ -25,7 +52,6 @@ FAKE_HOMEDIRS = {
 	'oracle':	"/oracle",
 	'william':	"/home/william",
 }
-
 FAKE_DIR_STRUCT = {
 	'/':		["drwxr-xr-x    2 root root   4096 " + str(FAKEYEARM2) + "-06-06 07:00 bin/",
 				"drwxr-xr-x    3 root root   4096 " + str(FAKEYEARM2) + "-06-25 16:13 boot/",
@@ -1328,49 +1354,7 @@ FAKE_DIR_STRUCT = {
 	'/var/www/html': 	["-rwxr-xr-x.  2 root root  112 Jan 20 04:42 index.htm",],
 }
 
-FAKE_SSH_SERVER_VERSION = "SSH-2.0-OpenSSH_5.1p1 CentOS release 6.3 (Final)"
-FAKE_SSH_KEY = 'ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAGEArzJx8OYOnJmzf4tfBEvLi8DVPrJ3/c9k2I/Az64fxjHf9imyRJbixtQhlH9lfNjUIx+4LmrJH5QNRsFporcHDKOTwTTYLh5KmRpslkYHRivcJSkbh/C+BR3utDS555mV'
-FAKE_SSH_PRIVKEY = """-----BEGIN RSA PRIVATE KEY-----
-MIIByAIBAAJhAK8ycfDmDpyZs3+LXwRLy4vA1T6yd/3PZNiPwM+uH8Yx3/YpskSW
-4sbUIZR/ZXzY1CMfuC5qyR+UDUbBaaK3Bwyjk8E02C4eSpkabJZGB0Yr3CUpG4fw
-vgUd7rQ0ueeZlQIBIwJgbh+1VZfr7WftK5lu7MHtqE1S1vPWZQYE3+VUn8yJADyb
-Z4fsZaCrzW9lkIqXkE3GIY+ojdhZhkO1gbG0118sIgphwSWKRxK0mvh6ERxKqIt1
-xJEJO74EykXZV4oNJ8sjAjEA3J9r2ZghVhGN6V8DnQrTk24Td0E8hU8AcP0FVP+8
-PQm/g/aXf2QQkQT+omdHVEJrAjEAy0pL0EBH6EVS98evDCBtQw22OZT52qXlAwZ2
-gyTriKFVoqjeEjt3SZKKqXHSApP/AjBLpF99zcJJZRq2abgYlf9lv1chkrWqDHUu
-DZttmYJeEfiFBBavVYIF1dOlZT0G8jMCMBc7sOSZodFnAiryP+Qg9otSBjJ3bQML
-pSTqy7c3a2AScC/YyOwkDaICHnnD3XyjMwIxALRzl0tQEKMXs6hH8ToUdlLROCrP
-EhQ0wahUTCk1gKA4uPD6TMTChavbh4K63OvbKg==
------END RSA PRIVATE KEY-----"""
-
-#
-# Use the '#' if you want to emulate root
-#
-FAKE_USER_CHAR = "$"
-
-#FAKE_OS = "OpenBSD bigturd 2.5 GENERIC#172 sparc"
-#FAKE_OS = "FreeBSD myname.my.domain 3.3-STABLE FreeBSD 3.3-STABLE #8: Fri Dec 17"
-#FAKE_OS =  NetBSD pc164 1.4P NetBSD 1.4P (PC164.v6-intl) #5: Sat Nov 27 18:31:37 CET 1999 root@pc164:/usr/src/sys/arch/alpha/compile/PC164.v6-intl alpha"
-#FAKE_OS = "OpenBSD 2.1 (TWP) #3: Sat Jul 19 18:37:43 CDT 1997
-#FAKE_OS = "Linux isus01.sas.upenn.edu 2.6.9-5.ELsmp #1 SMP Wed Jan 5 19:30:39 EST 2005 i686 i686 i386 GNU/Linux"
-FAKE_OS = "Linux " + FQDN + " 2.6.9-5.ELsmp #1 SMP " + TIMESTAMP + " i386 GNU/Linux"
-
-FAKE_SHELL = "bash-2.0"
-FAKE_PROMPT = FAKE_SHELL + str(FAKE_USER_CHAR) + " "
-
-FAKE_WGET = "--00:32:24--  http://../","           => `index.html'", "Resolving ..... Failed: unable to resolve domain name."
-FAKE_FTP = "ftp: ..: No address associated with name", "ftp> "
-FAKE_USERS_FILE = "/opt/kojoney/etc/fake_users"
-FAKE_RM = "rm: Permission denied"
-FAKE_TOUCH = "touch: Permission denied"
-FAKE_DENIED = " Permission denied"
-
-# Added by Justin Klein Keane <justin@madirish.net>
-FAKE_PLAIN_PS = ("  PID TTY          TIME CMD",
-"25304 pts/1    00:00:00 bash",
-"28018 pts/1    00:00:00 ps"
-)
-
+# Strings for fake command responses
 FAKE_CAT_PASSWD = ("root:x:0:0:root:/root:/bin/bash",
 "bin:x:1:1:bin:/bin:/bin/sh",
 "daemon:x:2:2:daemon:/sbin:/bin/sh",
@@ -1409,7 +1393,66 @@ FAKE_CAT_PASSWD = ("root:x:0:0:root:/root:/bin/bash",
 "smmsp:x:78:78:system user for sendmail:/var/spool/mqueue:/dev/null",
 "named:x:80:423:system user for bind:/var/lib/named:/bin/false"
 )
-
+FAKE_CPUINFO = ("processor       : 0",
+"vendor_id       : GenuineIntel",
+"cpu family      : 15",
+"model           : 4",
+"model name      : Intel(R) Pentium(R) 4 CPU 3.40GHz",
+"stepping        : 1",
+"cpu MHz         : 3400.000",
+"cache size      : 1024 KB",
+"physical id     : 0",
+"siblings        : 1",
+"core id         : 0",
+"cpu cores       : 1",
+"fdiv_bug        : no",
+"hlt_bug         : no",
+"f00f_bug        : no",
+"coma_bug        : no",
+"fpu             : yes",
+"fpu_exception   : yes",
+"cpuid level     : 3",
+"wp              : yes",
+"flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe nx constant_tsc up pni monitor ds_cpl cid xtpr",
+"bogomips        : 6787.60",
+"clflush size    : 64"
+)
+FAKE_DENIED = " Permission denied"
+FAKE_ETC_ISSUE = ("CentOS release 6.3 (Final)",
+"Kernel \r on an \m (\l)"
+)
+FAKE_FTP = "ftp: ..: No address associated with name", "ftp> "
+FAKE_IFCONFIG = ("lo        Link encap:Local Loopback  ",  
+"          inet addr:127.0.0.1  Mask:255.0.0.0",  
+"          inet6 addr: ::1/128 Scope:Host",  
+"          UP LOOPBACK RUNNING  MTU:16436  Metric:1",  
+"          RX packets:590 errors:0 dropped:0 overruns:0 frame:0",  
+"          TX packets:590 errors:0 dropped:0 overruns:0 carrier:0",  
+"          collisions:0 txqueuelen:0 ",  
+"          RX bytes:176413 (172.2 KiB)  TX bytes:176413 (172.2 KiB)",  
+"eth0  Link encap:Ethernet  HWaddr 0A:00:27:00:00:00  ",  
+"          inet addr:10.10.0.45  Bcast:10.10.0.255  Mask:255.255.255.0",  
+"          inet6 addr: fe80::800:27ff:fe00:0/64 Scope:Link",  
+"          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1",  
+"          RX packets:0 errors:0 dropped:0 overruns:0 frame:0",  
+"          TX packets:215 errors:0 dropped:0 overruns:0 carrier:0",  
+"          collisions:0 txqueuelen:1000 ",  
+"          RX bytes:0 (0.0 b)  TX bytes:19754 (19.2 KiB)"
+)
+FAKE_NETSTAT = ("Active Internet connections (w/o servers)",
+"Proto Recv-Q Send-Q Local Address               Foreign Address             State  ",    
+"tcp        0      0 localhost.localdomain:54953 r-199-59-150-41.twttr:https ESTABLISHED ",
+"tcp        0      0 localhost.localdomain:50563 10.10.0.101:ssh             TIME_WAIT  ", 
+"tcp        0      0 localhost:58140             localhost:34113             ESTABLISHED ",
+"tcp        0      0 localhost.localdomain:51047 10.10.0.101:lmtp            ESTABLISHED ",
+"tcp        0      0 localhost:47716             localhost:54369             ESTABLISHED ",
+"tcp        0      0 localhost:34113             localhost:58140             ESTABLISHED ",
+"tcp        0      0 localhost:54369             localhost:47716             ESTABLISHED ",
+)
+FAKE_PLAIN_PS = ("  PID TTY          TIME CMD",
+"25304 pts/1    00:00:00 bash",
+"28018 pts/1    00:00:00 ps"
+)
 FAKE_PS = ("  PID TTY      STAT   TIME COMMAND",
 "    1 ?        Ss     0:06 init [5]",
 "    2 ?        S<     0:00 [kthreadd]",
@@ -1547,67 +1590,8 @@ FAKE_PS = ("  PID TTY      STAT   TIME COMMAND",
 "27736 ?        SNl    0:14 slideshow",
 "27852 pts/1    R+     0:00 ps"
 )
-
-FAKE_UPTIME = " 11:05:27 up 15 days, 7 min,  4 users,  load average: 0.07, 0.06, 0.04"
-FAKE_UNAME = "Linux " + FQDN + " 2.6.9-5.ELsmp #1 SMP Mon May 5 20:55:05 EDT " + str(FAKEYEARM2) + " i686 Intel(R) Pentium(R) 4 CPU 3.40GHz GNU/Linux"
-FAKE_CPUINFO = ("processor       : 0",
-"vendor_id       : GenuineIntel",
-"cpu family      : 15",
-"model           : 4",
-"model name      : Intel(R) Pentium(R) 4 CPU 3.40GHz",
-"stepping        : 1",
-"cpu MHz         : 3400.000",
-"cache size      : 1024 KB",
-"physical id     : 0",
-"siblings        : 1",
-"core id         : 0",
-"cpu cores       : 1",
-"fdiv_bug        : no",
-"hlt_bug         : no",
-"f00f_bug        : no",
-"coma_bug        : no",
-"fpu             : yes",
-"fpu_exception   : yes",
-"cpuid level     : 3",
-"wp              : yes",
-"flags           : fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe nx constant_tsc up pni monitor ds_cpl cid xtpr",
-"bogomips        : 6787.60",
-"clflush size    : 64"
-)
-FAKE_ETC_ISSUE = ("CentOS release 6.3 (Final)",
-"Kernel \r on an \m (\l)"
-)
-FAKE_NETSTAT = ("Active Internet connections (w/o servers)",
-"Proto Recv-Q Send-Q Local Address               Foreign Address             State  ",    
-"tcp        0      0 localhost.localdomain:54953 r-199-59-150-41.twttr:https ESTABLISHED ",
-"tcp        0      0 localhost.localdomain:50563 10.10.0.101:ssh             TIME_WAIT  ", 
-"tcp        0      0 localhost:58140             localhost:34113             ESTABLISHED ",
-"tcp        0      0 localhost.localdomain:51047 10.10.0.101:lmtp            ESTABLISHED ",
-"tcp        0      0 localhost:47716             localhost:54369             ESTABLISHED ",
-"tcp        0      0 localhost:34113             localhost:58140             ESTABLISHED ",
-"tcp        0      0 localhost:54369             localhost:47716             ESTABLISHED ",
-)
-FAKE_IFCONFIG = ("lo        Link encap:Local Loopback  ",  
-"          inet addr:127.0.0.1  Mask:255.0.0.0",  
-"          inet6 addr: ::1/128 Scope:Host",  
-"          UP LOOPBACK RUNNING  MTU:16436  Metric:1",  
-"          RX packets:590 errors:0 dropped:0 overruns:0 frame:0",  
-"          TX packets:590 errors:0 dropped:0 overruns:0 carrier:0",  
-"          collisions:0 txqueuelen:0 ",  
-"          RX bytes:176413 (172.2 KiB)  TX bytes:176413 (172.2 KiB)",  
-"eth0  Link encap:Ethernet  HWaddr 0A:00:27:00:00:00  ",  
-"          inet addr:10.10.0.45  Bcast:10.10.0.255  Mask:255.255.255.0",  
-"          inet6 addr: fe80::800:27ff:fe00:0/64 Scope:Link",  
-"          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1",  
-"          RX packets:0 errors:0 dropped:0 overruns:0 frame:0",  
-"          TX packets:215 errors:0 dropped:0 overruns:0 carrier:0",  
-"          collisions:0 txqueuelen:1000 ",  
-"          RX bytes:0 (0.0 b)  TX bytes:19754 (19.2 KiB)"
-)
-
-#services
+FAKE_RM = "rm: Permission denied"
 FAKE_SERVICES = ("httpd", "sendmail")
-FAKE_SERVICE_USAGE = "Usage: {0} {{start|stop|restart}}"
 FAKE_SERVICE_ALL = ("abrtd (pid  1844) is running...", 
 "abrt-dump-oops (pid 1854) is running...", 
 "acpid (pid  1317) is running...", 
@@ -1696,3 +1680,8 @@ FAKE_SERVICE_ALL = ("abrtd (pid  1844) is running...",
 "svnserve is stopped", 
 "tomcat6 is stopped                                         [  OK  ]", 
 "ypbind is stopped")
+FAKE_SERVICE_USAGE = "Usage: {0} {{start|stop|restart}}"
+FAKE_TOUCH = "touch: Permission denied"
+FAKE_UNAME = "Linux " + FQDN + " 2.6.9-5.ELsmp #1 SMP Mon May 5 20:55:05 EDT " + str(FAKEYEARM2) + " i686 Intel(R) Pentium(R) 4 CPU 3.40GHz GNU/Linux"
+FAKE_UPTIME = " 11:05:27 up 15 days, 7 min,  4 users,  load average: 0.07, 0.06, 0.04"
+FAKE_WGET = "--00:32:24--  http://../","           => `index.html'", "Resolving ..... Failed: unable to resolve domain name."
