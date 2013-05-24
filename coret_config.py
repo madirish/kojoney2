@@ -23,10 +23,13 @@ DATABASE_PASS = 'db_password'
 DATABASE_HOST = 'db_host'
 DATABASE_NAME = 'kojoney'
 
-#list of ip addresses to exclude from database entries
-#whitelist functionality added by Josh Bauer <joshbauer3@gmail.com>
+# List of ip addresses to exclude from database entries
+# whitelist functionality added by Josh Bauer <joshbauer3@gmail.com>
+# Ex: WHITELIST = ['127.0.0.1', '192.168.0.3', '10.0.0.2']
 WHITELIST = []
 
+# Sensor id should be unique if you have more than one Kojoney2 instance
+# logging to the same database.
 SENSOR_ID = 1
 
 if os.getuid() == 0:
