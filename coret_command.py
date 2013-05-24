@@ -24,7 +24,9 @@
 import coret_std_unix
 
 def executeCommand(cmdLine, ip):
-
+    """ 
+    Wrapper method for supporting actual commands run on the honeypot
+    """
     command = cmdLine[0]
 
     if command == "wget":
