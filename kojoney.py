@@ -273,10 +273,41 @@ class HoneypotPasswordChecker:
             if self.checkUserPass(username, response):
                 return defer.succeed(username)
         return defer.fail(TCerror.UnauthorizedLogin())
+    
+    def checkRecentAttempts(self,username):
+        'Get recent login attempts with a username to limit valid passwords for a set time'
+        #added by Josh Bauer <joshbauer3@gmail.com>
+        try:
+          connection = MySQLdb.connect(host=DATABASE_HOST, 
+                                             user=DATABASE_USER, 
+                                             passwd=DATABASE_PASS, 
+                                             db=DATABASE_NAME)
+          cursor = connection.cursor()
+          sql = 'select password from login_attempts '
+          sql += 'where time > date_sub(now(), interval 1 hour) '
+          sql += 'and username = %s order by time desc'
+          cursor.execute(sql, username)
+          retval = cursor.fetchone()
+          cursor.close()
+          return retval
+        except Exception as err:
+          print "Transaction error in checkRecentAttempts " , err
+          return False
 
     def checkUserPass(self, username, password):
         # Determine success or failure
-        if username in self.authorizedCredentials:
+        # Updated to limit one valid password per username after a valid combo is used
+        # all passwords become valid for a given username 1 hour after last succesful login
+        # password limiting added by Josh Bauer <joshbauer3@gmail.com>
+        recentpass=self.checkRecentAttempts(username)
+        if recentpass:
+            if password == recentpass[0]:
+                log.msg('login attempt [%s %s] succeeded' % (username, password))
+                return True
+            else:
+                print 'login attempt [%s %s] failed' % (username, password)
+                return False
+        elif username in self.authorizedCredentials:
             passwords = self.authorizedCredentials[username].split(',')
             if passwords.count(password) > 0:
                 log.msg('login attempt [%s %s] succeeded' % (username, password))
