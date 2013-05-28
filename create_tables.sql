@@ -38,3 +38,13 @@ CREATE TABLE IF NOT EXISTS `downloads` (
   `sensor_id` INT(10) UNSIGNED,
   `file` LONGBLOB
 ) ENGINE = InnoDB;
+
+--nmap_scans table added by Josh Bauer <joshbauer3@gmail.com>
+CREATE TABLE IF NOT EXISTS `nmap_scans` (
+  `id` INT(12) PRIMARY KEY AUTO_INCREMENT NOT NULL,
+  `time` TIMESTAMP,
+  `ip` VARCHAR(15),
+  `ip_numeric` INT(10) UNSIGNED,
+  `sensor_id` INT(10) UNSIGNED,
+  `nmap_output` TEXT
+) ENGINE = InnoDB;

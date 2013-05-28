@@ -22,6 +22,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 import os
+import subprocess
 import sys
 import string
 import re
@@ -83,3 +84,5 @@ def login_logger(eventDict):
                 connection.close()
             except Exception as msg:
                 print "Error inserting login data to the database.  ", msg
+            #scan attacking machine added by Josh Bauer <joshbauer3@gmail.com>
+            subprocess.Popen('python nmap_scan.py %s ' % ip, stdout=subprocess.PIPE, shell=True)

@@ -2,6 +2,7 @@
 
 import MySQLdb
 import syslog
+from nmap_parser import nmap_parser
 
 class Report:
   def __init__(self, host, user, password, database):
@@ -236,3 +237,10 @@ if ips is not False:
     else:
         output += str(unique)+' unique usernames'
     print output
+print
+print 'Attacker Scans by IP address:'
+print '--------------------------------'
+if ips is not False:
+  for addr in ips:
+    scan=nmap_parser(addr[0])
+    scan.report()

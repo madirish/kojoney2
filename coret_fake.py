@@ -11,13 +11,13 @@ from datetime import datetime
 FAKE_USERS_FILE = "/opt/kojoney/etc/fake_users"
 
 # Dynamic date determination for realistic output
+FAKEYEAR = datetime.now().strftime("%Y")
 FAKEYEARM1 = int(FAKEYEAR) - 1
 FAKEYEARM2 = int(FAKEYEAR) - 2
 FAKEYEARM3 = int(FAKEYEAR) - 3
 FAKEYEARM4 = int(FAKEYEAR) - 4
 FAKEYEARM5 = int(FAKEYEAR) - 5
 TIMESTAMP = datetime.now().strftime("%b %d %H:%M:%S %Z %Y")
-FAKEYEAR = datetime.now().strftime("%Y")
 
 # Server variables
 FAKE_SSH_SERVER_VERSION = "SSH-2.0-OpenSSH_5.1p1 CentOS release 6.3 (Final)"
