@@ -145,7 +145,7 @@ if [ $want_reports == 'yes' ]; then
 	read email_to
 	sed -i "s/root\@localhost/$email_to/g" $KOJONEY_PATH/mailalert.bash
 	if ! cat /etc/crontab | grep mailalert ; then
-		echo "  59  23  *  *  * root $KOJONEY_PATH/mailalert.bash > /dev/null" >> /etc/crontab
+		echo "  01  00  *  *  * root $KOJONEY_PATH/mailalert.bash > /dev/null" >> /etc/crontab
 		echo " [+] Cron for report e-mail scheduled in /etc/crontab"
 	fi
 fi
