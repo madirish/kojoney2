@@ -98,6 +98,7 @@ mkdir $KOJONEY_PATH/download || die "Step 3 - couldn't create directory $KOJONEY
 echo " [+] Creating directory for application logs"
 mkdir $KOJONEY_PATH/log || die "Step 3 - couldn't create directory $KOJONEY_PATH/log" 
 cp *.py* $KOJONEY_PATH
+cp *.sql* $KOJONEY_PATH
 cp fake_users $KOJONEY_PATH/etc/
 cp -f reports/* $KOJONEY_PATH 
 echo " [+] Kojoney files installed"

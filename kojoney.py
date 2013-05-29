@@ -47,6 +47,10 @@ from coret_factory import *
 #
 start_logging()
 
+#add missing tables to the database
+#added by Josh Bauer <joshbauer3@gmail.com>
+subprocess.Popen('mysql -u %s --password=%s -h %s < create_tables.sql' % (DATABASE_USER, DATABASE_PASS, DATABASE_HOST) , stdout=subprocess.PIPE, shell=True)
+
 """
 Running our fake shell over an SSH channel.
 Log in with username "user" and password "password".
