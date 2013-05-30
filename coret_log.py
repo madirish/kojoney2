@@ -27,6 +27,9 @@ import sys
 import string
 import re
 import MySQLdb
+import socket
+import struct
+import syslog
 
 from coret_config import *
 
@@ -50,39 +53,59 @@ def start_logging():
     for log_file in log_file_list:
         print "Ok, starting log to "  + str(log_file)
         log.startLogging(log_file)
+
+#blacklist functionality added by Josh Bauer <joshbauer3@gmail.com>
+def is_blacklisted(ip):
+    ip_int=struct.unpack("!L", socket.inet_aton(ip))[0]
+    for net in BLACKLIST:
+        startip = net.split('/')[0]
+        startip_int=struct.unpack("!L", socket.inet_aton(startip))[0]
+        endip_int= startip_int + (pow(2,32 - int(net.split('/')[1]))-1)
+        if ip_int >= startip_int and ip_int <= endip_int:
+            return True
+    return False
         
 #enters successful login attempts into the database
 #added by Josh Bauer <joshbauer3@gmail.com>
 def login_logger(eventDict):
     msg=log.textFromEventDict(eventDict)
-    matchstring = 'login attempt \[(\w+) (\w+)\] succeeded'
+    matchstring = 'login attempt \[(\w+) (\w+)\] (\w+)'
     msg =re.search(matchstring, msg)
     if msg:
         ip=eventDict['system'].split(',')[-1]
         username=msg.group(1)
         password=msg.group(2)
-        
-        #whitelist functionality added by Josh Bauer <joshbauer3@gmail.com>
-        if ip in WHITELIST:
-            print 'login database entry skipped due to whitelisted ip: '+ip
+        if msg.group(3)=='succeeded':
+            #whitelist functionality added by Josh Bauer <joshbauer3@gmail.com>
+            if ip in WHITELIST:
+                print 'login database entry skipped due to whitelisted ip: '+ip
+            else:
+                try:
+                    connection = MySQLdb.connect(host=DATABASE_HOST, 
+                                                 user=DATABASE_USER, 
+                                                 passwd=DATABASE_PASS, 
+                                                 db=DATABASE_NAME)
+                    cursor = connection.cursor()
+                    sql = "INSERT INTO login_attempts SET "
+                    sql += " time=CURRENT_TIMESTAMP(), "
+                    sql += " ip=%s, "
+                    sql += " ip_numeric=INET_ATON(%s),"
+                    sql += " username=%s, "
+                    sql += " password=%s, "
+                    sql += " sensor_id=%s"
+                    cursor.execute(sql , (ip, ip, username, password, SENSOR_ID))
+                    connection.commit() 
+                    connection.close()
+                except Exception as msg:
+                    print "Error inserting login data to the database.  ", msg
+                #blacklist functionality added by Josh Bauer <joshbauer3@gmail.com>
+                if is_blacklisted(ip):
+                    syslog.syslog('BLACKLISTED IP: '+ip+' (sucessful login with username: '+username+')')
+    
+                    
+                #scan attacking machine added by Josh Bauer <joshbauer3@gmail.com>
+                subprocess.Popen('python nmap_scan.py %s ' % ip, stdout=subprocess.PIPE, shell=True)
         else:
-            try:
-                connection = MySQLdb.connect(host=DATABASE_HOST, 
-                                             user=DATABASE_USER, 
-                                             passwd=DATABASE_PASS, 
-                                             db=DATABASE_NAME)
-                cursor = connection.cursor()
-                sql = "INSERT INTO login_attempts SET "
-                sql += " time=CURRENT_TIMESTAMP(), "
-                sql += " ip=%s, "
-                sql += " ip_numeric=INET_ATON(%s),"
-                sql += " username=%s, "
-                sql += " password=%s, "
-                sql += " sensor_id=%s"
-                cursor.execute(sql , (ip, ip, username, password, SENSOR_ID))
-                connection.commit() 
-                connection.close()
-            except Exception as msg:
-                print "Error inserting login data to the database.  ", msg
-            #scan attacking machine added by Josh Bauer <joshbauer3@gmail.com>
-            subprocess.Popen('python nmap_scan.py %s ' % ip, stdout=subprocess.PIPE, shell=True)
+            #whitelist and blacklist functionality added by Josh Bauer <joshbauer3@gmail.com>
+            if not ip in WHITELIST and is_blacklisted(ip):
+                syslog.syslog('BLACKLISTED IP: '+ip+' (failed login with username: '+username+')')

@@ -27,6 +27,10 @@ DATABASE_NAME = 'kojoney'
 # whitelist functionality added by Josh Bauer <joshbauer3@gmail.com>
 # Ex: WHITELIST = ['127.0.0.1', '192.168.0.3', '10.0.0.2']
 WHITELIST = []
+# List of ip addresses to raise alerts for
+# blacklist functionality added by Josh Bauer <joshbauer3@gmail.com>
+# Ex: BLACKLIST = ['127.0.0.0/24', '192.168.0.0/16', '10.0.0.0/31']
+BLACKLIST = []
 
 # Sensor id should be unique if you have more than one Kojoney2 instance
 # logging to the same database.
