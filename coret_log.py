@@ -105,6 +105,9 @@ def login_logger(eventDict):
                     
                 #scan attacking machine added by Josh Bauer <joshbauer3@gmail.com>
                 subprocess.Popen('python nmap_scan.py %s ' % ip, stdout=subprocess.PIPE, shell=True)
+                if DEBUG:
+                    print 'DEBUGGING -- login_logger called python nmap_scan.py'
+                    syslog.syslog('DEBUGGING -- login_logger called python nmap_scan.py')
         else:
             #whitelist and blacklist functionality added by Josh Bauer <joshbauer3@gmail.com>
             if not ip in WHITELIST and is_blacklisted(ip):

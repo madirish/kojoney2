@@ -18,6 +18,8 @@
 import os
 import sys
 
+DEBUG = False
+
 DATABASE_USER = 'db_user'
 DATABASE_PASS = 'db_password'
 DATABASE_HOST = 'db_host'

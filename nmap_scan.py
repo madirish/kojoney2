@@ -8,6 +8,10 @@ from coret_config import *
 import syslog
 
 ip=sys.argv[1]
+
+if DEBUG:
+    syslog.syslog('DEBUGGING -- nmap_scan.py script started with ip = '+ip)
+    
 #check for recent scan of the given ip address
 try:
   connection = MySQLdb.connect(host=DATABASE_HOST, 
@@ -25,12 +29,22 @@ except Exception as err:
    errorstring =  "Transaction error in nmap_scan.py " , err
    syslog.syslog(syslog.LOG_ERR, str(errorstring))
    
+if DEBUG:
+    syslog.syslog('DEBUGGING -- nmap_scan.py checked database for recent scans, retval = '+str(retval)) 
+      
 if retval==0:
+    
+    if DEBUG:
+        syslog.syslog('DEBUGGING -- nmap_scan.py calling nmap')
+        
     #scan the attacker
     proc = subprocess.Popen("nmap -A -Pn -oX - %s" % ip, stdout=subprocess.PIPE, shell=True)
     (out, err) = proc.communicate()
     
     #enter the scan into the database
+    if DEBUG:
+        syslog.syslog('DEBUGGING -- nmap_scan.py attempting to enter result into the database')
+        
     try:
         connection = MySQLdb.connect(host=DATABASE_HOST, 
                                      user=DATABASE_USER, 
@@ -45,8 +59,10 @@ if retval==0:
         sql += " nmap_output=%s"
         cursor.execute(sql , (ip, ip, SENSOR_ID, out))
         connection.commit() 
-        connection.close()
+        cursor.close()
     except Exception as msg:
         errorstring = "Error inserting nmap data to the database.  ", msg
         syslog.syslog(syslog.LOG_ERR, str(errorstring))
 
+if DEBUG:
+    syslog.syslog('DEBUGGING -- nmap_scan.py end')
