@@ -6,9 +6,7 @@ from twisted.internet import protocol
 from coret_fake import *
 from coret_honey import *
 from coret_config import *
-
-# Global holder
-FAKE_USERNAME = ""
+import coret_avatar
 
 class CoretProtocol(protocol.Protocol):
     """
@@ -19,10 +17,10 @@ class CoretProtocol(protocol.Protocol):
 
 
     def connectionMade(self):
-        global FAKE_USERNAME, FAKE_PROMPT, FAKE_CWD, FAKE_HOMEDIRS
-        self.fake_username = FAKE_USERNAME
-        if FAKE_USERNAME in FAKE_HOMEDIRS:
-            self.fake_workingdir = FAKE_HOMEDIRS[FAKE_USERNAME]
+        global FAKE_PROMPT, FAKE_CWD, FAKE_HOMEDIRS
+        self.fake_username = coret_avatar.FAKE_USERNAME
+        if self.fake_username in FAKE_HOMEDIRS:
+            self.fake_workingdir = FAKE_HOMEDIRS[self.fake_username]
         else:
             FAKE_CWD = "/"
         if self.fake_username == 'root':
@@ -33,7 +31,7 @@ class CoretProtocol(protocol.Protocol):
     #backspace bug fix, arrow key bug fix (by ignoring arrow input),
     #removal of line breaks from commands (to prevent logs from being broken).
     def dataReceived(self, data):
-        global FAKE_PROMPT, FAKE_USERNAME, FAKE_CWD
+        global FAKE_PROMPT, FAKE_CWD
         
         if data == '\r':
             self.lastCmd = string.replace(self.lastCmd, '\r', '')
@@ -65,20 +63,20 @@ class CoretProtocol(protocol.Protocol):
                 for command in self.lastCmd.split(';'):
                     retvalue = processCmd(command, 
                                           self.transport, 
-                                          FAKE_USERNAME, 
+                                          self.fake_username, 
                                           ip,  
                                           self.fake_workingdir)
-                    (printlinebreak, self.fake_workingdir, FAKE_USERNAME) = retvalue
+                    (printlinebreak, self.fake_workingdir, self.fake_username) = retvalue
             else:
                 retvalue = processCmd(self.lastCmd, 
                                       self.transport, 
-                                      FAKE_USERNAME, 
+                                      self.fake_username, 
                                       ip, 
                                       self.fake_workingdir)
-                (printlinebreak, self.fake_workingdir, FAKE_USERNAME) = retvalue
+                (printlinebreak, self.fake_workingdir, self.fake_username) = retvalue
                 
             self.lastCmd = ""
-            if FAKE_USERNAME == 'root':
+            if self.fake_username == 'root':
                 FAKE_PROMPT = string.replace(FAKE_PROMPT, '$', '#')
             else:
                 FAKE_PROMPT = string.replace(FAKE_PROMPT, '#', '$')

@@ -115,6 +115,17 @@ class ProcessCmd:
         self.transport.loseConnection()
     def process_export(self):
         pass
+    def process_free(self):
+        if len(self.params)>0 and self.params[0]=='-m':
+            self.transport.write('             total       used       free     shared    buffers     cached\r\n')
+            self.transport.write('Mem:          7858       5622       2235          0        277       3113\r\n')
+            self.transport.write('-/+ buffers/cache:       2231       5626\r\n')
+            self.transport.write('Swap:         7871        191       7680\r\n')
+        else:
+            self.transport.write('             total       used       free     shared    buffers     cached\r\n')
+            self.transport.write('Mem:       8046892    5757244    2289648          0     284060    3188352\r\n')
+            self.transport.write('-/+ buffers/cache:    2284832    5762060\r\n')
+            self.transport.write('Swap:      8060924     196176    7864748\r\n')
     def process_gcc(self):
         self.transport.write('gcc: no input files\r\n')
     def process_history(self):
@@ -161,6 +172,8 @@ class ProcessCmd:
             self.transport.write('ls: Error.\r\n')
     def process_make(self):
         self.transport.write('make: *** No targets specified and no makefile found.  Stop.\r\n')
+    def process_mail(self):
+        self.transport.write('No mail for ' + self.attacker_username + '\r\n')
     def process_mkdir(self):
         if len(self.params) == 0:
             self.transport.write("mkdir: missing operand\r\nTry `mkdir --help' for more information.\r\n")
@@ -232,22 +245,21 @@ class ProcessCmd:
         else:
             self.process_undef()
     def process_su(self):
-        if self.cmd=='sudo':
-            if len(self.params)>0 and self.params[0]=='su':
-                self.attacker_username = 'root'
+        if len(self.params)==0:
+            self.attacker_username = 'root'
+        else:
+            switchtouser = self.params[0]
+            print "Attempting to su to " + switchtouser
+            if switchtouser in FAKE_HOMEDIRS:
+                self.attacker_username = switchtouser
+                print 'Changing FAKE_USERNAME to ' + switchtouser
             else:
-                self.process_undef()
-        else:#cmd = 'su'
-            if len(self.params)==0:
-                self.attacker_username = 'root'
-            else:
-                switchtouser = self.params[0]
-                print "Attempting to su to " + switchtouser
-                if switchtouser in FAKE_HOMEDIRS:
-                    self.attacker_username = switchtouser
-                    print 'Changing FAKE_USERNAME to ' + switchtouser
-                else:
-                    self.transport.write('Unknown user: ' + switchtouser + '\r\n')
+                self.transport.write('Unknown user: ' + switchtouser + '\r\n')
+    def process_sudo(self):
+        if len(self.params)>0 and self.params[0]=='su':
+            self.attacker_username = 'root'
+        else:
+            self.process_undef()
     def process_tar(self):
         self.transport.write("tar: You must specify one of the `-Acdtrux' or `--test-label'  options\r\n")
         self.transport.write("Try `tar --help' or `tar --usage' for more information.\r\n")
@@ -287,7 +299,7 @@ class ProcessCmd:
 
         
 def processCmd(data, transport, attacker_username, ip, fake_workingdir):
-    global FAKE_SHELL, con, FAKE_USERNAME
+    global FAKE_SHELL, con
     #each command proccessor function takes care of printing its own ending linebreaks
     #printlinebreak is not used in ProcessCmd
     printlinebreak = 0 
