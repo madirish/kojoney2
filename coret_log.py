@@ -69,7 +69,7 @@ def is_blacklisted(ip):
 #added by Josh Bauer <joshbauer3@gmail.com>
 def login_logger(eventDict):
     msg=log.textFromEventDict(eventDict)
-    matchstring = 'login attempt \[(\w+) (\w+)\] (\w+)'
+    matchstring = 'login attempt \[(\S+) (\S+)\] (\w+)'
     msg =re.search(matchstring, msg)
     if msg:
         ip=eventDict['system'].split(',')[-1]
