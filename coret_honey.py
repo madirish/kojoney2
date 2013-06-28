@@ -24,7 +24,7 @@
 """
 
 import re
-
+import time
 from coret_fake import *
 from coret_log import *
 from coret_command import *
@@ -128,6 +128,12 @@ class ProcessCmd:
             self.transport.write('Swap:      8060924     196176    7864748\r\n')
     def process_gcc(self):
         self.transport.write('gcc: no input files\r\n')
+    def process_halt(self):
+        now=time.strftime("%H:%M",time.localtime())
+        self.transport.write('\r\nBroadcast message from root@' +FQDN+'\r\n')
+        self.transport.write('\t(/dev/pts/0) at ' +now+ ' ...\r\n\r\n')
+        self.transport.write('The system is going down for halt NOW!\r\n')
+        self.transport.loseConnection()
     def process_history(self):
         pass
     def process_hostname(self):
@@ -205,6 +211,12 @@ class ProcessCmd:
             self.transport.write(line + '\r\n')
     def process_pwd(self):
         self.transport.write(self.fake_workingdir + '\r\n')
+    def process_reboot(self):
+        now=time.strftime("%H:%M",time.localtime())
+        self.transport.write('\r\nBroadcast message from root@' +FQDN+'\r\n')
+        self.transport.write('\t(/dev/pts/0) at ' +now+ ' ...\r\n\r\n')
+        self.transport.write('The system is going down for reboot NOW!\r\n')
+        self.transport.loseConnection()
     def process_rpm(self):
         self.transport.write('RPM version 4.8.0\r\n')
         self.transport.write('Copyright (C) 1998-2002 - Red Hat, Inc.\r\n')
