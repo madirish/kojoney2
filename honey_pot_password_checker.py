@@ -24,9 +24,9 @@ class HoneypotPasswordChecker:
             i += 1
             data = line.split(' ')
             if data[0] in self.authorizedCredentials:
-                self.authorizedCredentials[data[0]] = self.authorizedCredentials[data[0]] + data[1].rstrip() + ','
+                self.authorizedCredentials[data[0]] = self.authorizedCredentials[data[0]] + ',' + data[1].rstrip()
             else:
-                self.authorizedCredentials[data[0]] = data[1].rstrip() + ','
+                self.authorizedCredentials[data[0]] = data[1].rstrip()
         print "Loaded " + str(i) + " accounts from " + FAKE_USERS_FILE
 
     def requestAvatarId(self, credentials):
