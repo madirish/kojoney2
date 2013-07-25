@@ -67,8 +67,8 @@ class Report:
     'Show last login for the ip before the time'
     try:
       cursor = self.conn.cursor()
-      sql = 'select max(time), username, password from login_attempts '
-      sql += ' where ip_numeric = INET_ATON("%s") AND time < "%s"'
+      sql = 'select username, password from login_attempts '
+      sql += ' where ip_numeric = INET_ATON("%s") AND time < "%s" order by time desc'
       cursor.execute(sql % (ip, time))
       retval = cursor.fetchone()
       cursor.close()
@@ -186,7 +186,7 @@ if ips is not False:
         if x == 1:
           creds = report.get_login_creds(ip, time)
           if creds is not False:
-            print '\t' + str(creds[1]) + ' : ' + str(creds[2])
+            print '\t' + str(creds[0]) + ' : ' + str(creds[1])
           x = 0
         print '\t' + time + '\t' + command
 print
