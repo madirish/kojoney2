@@ -3,8 +3,13 @@
 #
 # Main Developer - Justin C. Klein Keane <jukeane@sas.upenn.edu>
 # Original Developer - Jose Antonio Coret <joxeankoret@yahoo.es>
-# Last updated 28 January, 2013
+# Last updated 23 July 2014
 #
+# chkconfig: 2345 99 15
+# description: Starts and stops OSSEC HIDS (Host Intrusion Detection System)
+#
+# This will work on Redhat systems (maybe others too)
+
 set -e
 
 # /etc/init.d/ssh: start and stop the Koret honeypot for the "secure shell(tm)" protocol
