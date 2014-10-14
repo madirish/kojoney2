@@ -222,7 +222,7 @@ class ProcessCmd:
         self.transport.write('Copyright (C) 1998-2002 - Red Hat, Inc.\r\n')
         self.transport.write('This program may be freely redistributed under the terms of the GNU GPL\r\n')
     def process_rm(self):
-			self.transport.write(self.FAKE_RM + '\r\n')
+			self.transport.write('\r\n' + FAKE_RM + '\r\n')
     def process_service(self):
         if (len(self.params)) == 2:
             if self.params[0] in FAKE_SERVICES:
