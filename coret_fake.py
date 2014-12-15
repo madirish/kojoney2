@@ -36,7 +36,7 @@ EhQ0wahUTCk1gKA4uPD6TMTChavbh4K63OvbKg==
 -----END RSA PRIVATE KEY-----"""
 
 # Global variables for sessions
-FQDN = "forensics.jukeane01.sas.upenn.edu" # www.example.com, installer should replace this
+FQDN = "fqdn_placeholder" # www.example.com, installer should replace this
 FAKE_USERNAME = ""
 FAKE_USER_CHAR = "$"
 FAKE_OS = "Linux " + FQDN + " 2.6.9-5.ELsmp #1 SMP " + TIMESTAMP + " i386 GNU/Linux"
