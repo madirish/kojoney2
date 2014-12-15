@@ -27,22 +27,6 @@ echo Step 1 of 11 - Checking for prerequisite dependencies...
 
 # Do prerequisites for RedHat systems
 if [ -e /etc/redhat-release ]; then
-	if rpm -q python-devel | grep not ; then
-		echo " [+] Python development libraries and C headers are not installed!"
-		yum install python-devel
-	fi
-	if [ ! -e /usr/bin/gcc ]; then
-		echo " [+] GNU C compiler is not installed!"
-		yum install gcc
-	fi
-	if rpm -q mysql-devel | grep not ; then
-	  echo " [+] MySQL development libraries and C headers are not installed!"
-	  yum install mysql-devel
-	fi
-	if rpm -q logrotate | grep not ; then
-	  echo " [+] Logrotate not installed!"
-	  yum install logrotate
-	fi
 	# Install the Python libraries
 	if rpm -q MySQL-python | grep not ; then
 		echo " [+] Python MySQL library not installed!"

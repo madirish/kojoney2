@@ -26,12 +26,12 @@ import subprocess
 import sys
 import string
 import re
-import MySQLdb
 import socket
 import struct
 import syslog
 
 from coret_config import *
+from honeypot_db import *
 
 from twisted.python import log
 
@@ -80,24 +80,8 @@ def login_logger(eventDict):
             if ip in WHITELIST:
                 print 'login database entry skipped due to whitelisted ip: '+ip
             else:
-                try:
-                    connection = MySQLdb.connect(host=DATABASE_HOST, 
-                                                 user=DATABASE_USER, 
-                                                 passwd=DATABASE_PASS, 
-                                                 db=DATABASE_NAME)
-                    cursor = connection.cursor()
-                    sql = "INSERT INTO login_attempts SET "
-                    sql += " time=CURRENT_TIMESTAMP(), "
-                    sql += " ip=%s, "
-                    sql += " ip_numeric=INET_ATON(%s),"
-                    sql += " username=%s, "
-                    sql += " password=%s, "
-                    sql += " sensor_id=%s"
-                    cursor.execute(sql , (ip, ip, username, password, SENSOR_ID))
-                    connection.commit() 
-                    connection.close()
-                except Exception as msg:
-                    print "Error inserting login data to the database.  ", msg
+                dblog = HoneypotDB()
+                dblog.log_login(ip, username, password)
                 #blacklist functionality added by Josh Bauer <joshbauer3@gmail.com>
                 if is_blacklisted(ip):
                     syslog.syslog('BLACKLISTED IP: '+ip+' (sucessful login with username: '+username+')')

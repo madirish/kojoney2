@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import MySQLdb
+
 from coret_config import *
 from coret_fake import *
 from twisted.python import log
@@ -8,6 +8,8 @@ from twisted.cred import checkers, credentials
 from twisted.internet import defer
 from zope.interface import implements
 from twisted.cred import error as TCerror
+from honeypot_db import *
+
 # blatantly stolen from Kippo (and modified)
 class HoneypotPasswordChecker:
     implements(checkers.ICredentialsChecker)
@@ -28,6 +30,7 @@ class HoneypotPasswordChecker:
             else:
                 self.authorizedCredentials[data[0]] = data[1].rstrip()
         print "Loaded " + str(i) + " accounts from " + FAKE_USERS_FILE
+        self.checkCreds = HoneypotDB()
 
     def requestAvatarId(self, credentials):
         if hasattr(credentials, 'password'):
@@ -51,24 +54,7 @@ class HoneypotPasswordChecker:
         return defer.fail(TCerror.UnauthorizedLogin())
     
     def checkRecentAttempts(self,username):
-        'Get recent login attempts with a username to limit valid passwords for a set time'
-        #added by Josh Bauer <joshbauer3@gmail.com>
-        try:
-          connection = MySQLdb.connect(host=DATABASE_HOST, 
-                                             user=DATABASE_USER, 
-                                             passwd=DATABASE_PASS, 
-                                             db=DATABASE_NAME)
-          cursor = connection.cursor()
-          sql = 'select password from login_attempts '
-          sql += 'where time > date_sub(now(), interval 1 hour) '
-          sql += 'and username = %s order by time desc'
-          cursor.execute(sql, username)
-          retval = cursor.fetchone()
-          cursor.close()
-          return retval
-        except Exception as err:
-          print "Transaction error in checkRecentAttempts " , err
-          return False
+        return self.checkCreds.check_recent(username)
 
     def checkUserPass(self, username, password):
         # Determine success or failure

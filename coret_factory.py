@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 from coret_fake import *
 from honey_pot_ssh_user_auth_server import *
-from twisted.conch.ssh import factory, connection, keys, transport
-
-publicKey = FAKE_SSH_KEY
-privateKey = FAKE_SSH_PRIVKEY
+from twisted.conch.ssh import factory, connection, transport, userauth
+from twisted.conch.ssh import keys as tkeys
+from twisted.conch.ssh.common import *
 
 class CoretFactory(factory.SSHFactory):
-    publicKeys = {'ssh-rsa': keys.getPublicKeyString(data=publicKey)}
-    privateKeys = {'ssh-rsa': keys.getPrivateKeyObject(data=privateKey)}
+    publicKeys = {'ssh-rsa': tkeys.Key.fromString(data=FAKE_SSH_KEY)}
+    privateKeys = {'ssh-rsa': tkeys.Key.fromString(data=FAKE_SSH_PRIVKEY)}
     services = {
                 'ssh-userauth': HoneyPotSSHUserAuthServer,
                 'ssh-connection': connection.SSHConnection

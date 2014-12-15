@@ -29,6 +29,7 @@ from coret_fake import *
 from coret_log import *
 from coret_command import *
 import coret_std_unix
+from honeypot_db import *
 
 
 # Koret Honey ;)
@@ -49,7 +50,8 @@ class ProcessCmd:
         self.attacker_username = attacker_username
         self.ip = ip
         self.fake_workingdir = fake_workingdir
-
+        self.dbConn = HoneypotDB()
+        self.dbConn.log_command(cmd, ip)
         self.process_cmd = 'self.process_' + self.cmd + '()'
         try:
             eval(self.process_cmd)
@@ -58,14 +60,13 @@ class ProcessCmd:
         
     def get_values(self):
         return (self.fake_workingdir,self.attacker_username)    
+    
     def process_apachectl(self):
         if len(self.params)>0 and self.params[0]=='status':
-            self.transport.write('Not Found\r\n\r\n')
-            self.transport.write('The requested URL /server-status was not found on this server.\r\n\r\n')
-            self.transport.write(' --------------------------------------------------------------------------\r\n\r\n')
-            self.transport.write('Apache/2.2.15 (CentOS) Server at localhost Port 80\r\n')
+            self.transport.write(FAKE_APACHECTL)
         else:
             self.process_undef()
+            
     def process_cd(self):
         if self.params == '':
             if self.attacker_username in FAKE_HOMEDIRS:
@@ -104,10 +105,10 @@ class ProcessCmd:
                 self.transport.write('-bash: cat: ' + self.params[0] + ': No such file or directory\r\n')
     def process_curl(self):
         line=[self.cmd,]
-        if len(self.params)>0:
+        if len(self.params) > 0:
             line.extend(self.params)
-        result_data = executeCommand(line, self.ip)
-        if type(result_data) is not bool and result_data != "":
+        result_data = coret_std_unix.curl(line[0], self.ip)
+        if result_data != "":
             self.transport.write(result_data+'\r\n')
     def process_date(self):
         self.transport.write(TIMESTAMP+'\r\n')
@@ -296,9 +297,10 @@ class ProcessCmd:
         line=[self.cmd,]
         if len(self.params)>0:
             line.extend(self.params)
-        result_data = executeCommand(line, self.ip)
-        if type(result_data) is not bool and result_data != "":
+        result_data = coret_std_unix.wget(line[0], self.ip)                                  
+        if result_data != "":
             self.transport.write(result_data+'\r\n')
+            
     def process_who(self):
         self.transport.write(self.attacker_username + '\tpts/1\r\n')
     def process_whoami(self):

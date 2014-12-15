@@ -27,8 +27,27 @@
 import os
 import sys
 import string
-import MySQLdb
+import imp
 
+try:
+    imp.find_module('MySQLdb')
+    USE_DB = True
+except ImportError:
+    print "MySQLdb module wasn't found, skipping it."
+    print "Maybe try:"
+    print "pip install mysqldb"
+    USE_DB = False
+if USE_DB:
+    import MySQLdb
+
+try:
+    imp.find_module('twisted')
+except ImportError:
+    print "Twisted module wasn't found so Kojoney can't run."
+    print "Maybe try:"
+    print "pip install twisted"
+    sys.exit()
+    
 from twisted.cred import portal
 from twisted.conch import error, avatar, interfaces as conchinterfaces
 from twisted.conch.checkers import SSHPublicKeyDatabase
@@ -50,7 +69,8 @@ start_logging()
 
 #add missing tables to the database
 #added by Josh Bauer <joshbauer3@gmail.com>
-subprocess.Popen('mysql -u %s --password=%s -h %s < create_tables.sql' % (DATABASE_USER, DATABASE_PASS, DATABASE_HOST) , stdout=subprocess.PIPE, shell=True)
+if USE_DB:
+    subprocess.Popen('mysql -u %s --password=%s -h %s < create_tables.sql' % (DATABASE_USER, DATABASE_PASS, DATABASE_HOST) , stdout=subprocess.PIPE, shell=True)
 
 """
 Running our fake shell over an SSH channel.

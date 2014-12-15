@@ -36,7 +36,7 @@ EhQ0wahUTCk1gKA4uPD6TMTChavbh4K63OvbKg==
 -----END RSA PRIVATE KEY-----"""
 
 # Global variables for sessions
-FQDN = "fqdn_placeholder" # www.example.com, installer should replace this
+FQDN = "forensics.jukeane01.sas.upenn.edu" # www.example.com, installer should replace this
 FAKE_USERNAME = ""
 FAKE_USER_CHAR = "$"
 FAKE_OS = "Linux " + FQDN + " 2.6.9-5.ELsmp #1 SMP " + TIMESTAMP + " i386 GNU/Linux"
@@ -1685,3 +1685,7 @@ FAKE_TOUCH = "touch: Permission denied"
 FAKE_UNAME = "Linux " + FQDN + " 2.6.9-5.ELsmp #1 SMP Mon May 5 20:55:05 EDT " + str(FAKEYEARM2) + " i686 Intel(R) Pentium(R) 4 CPU 3.40GHz GNU/Linux"
 FAKE_UPTIME = " 11:05:27 up 15 days, 7 min,  4 users,  load average: 0.07, 0.06, 0.04"
 FAKE_WGET = "--00:32:24--  http://../","           => `index.html'", "Resolving ..... Failed: unable to resolve domain name."
+FAKE_APACHECTL = ("Not Found\r\n\r\n"
+				"The requested URL /server-status was not found on this server.\r\n\r\n"
+				"--------------------------------------------------------------------------\r\n\r\n"
+				"Apache/2.2.15 (CentOS) Server at localhost Port 80\r\n")

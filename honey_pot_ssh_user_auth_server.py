@@ -2,6 +2,7 @@
 
 from coret_fake import *
 from twisted.conch.ssh import userauth
+
 # blatantly stolen from Kippo (and modified)    
 from twisted.conch.ssh.common import NS, getNS
 class HoneyPotSSHUserAuthServer(userauth.SSHUserAuthServer):

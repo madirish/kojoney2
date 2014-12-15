@@ -126,7 +126,7 @@ else:
 # ROOT_CONFIG_PORTS = [5022, 5999]
 #       Listen in the ports 5022, 5999
 #
-    CONFIG_PORTS = [5022]
+    CONFIG_PORTS = [2222]
 #
 # STANDARD CONFIGURATION OPTIONS
 #
