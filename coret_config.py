@@ -20,11 +20,6 @@ import sys
 
 DEBUG = False
 
-DATABASE_USER = 'db_user'
-DATABASE_PASS = 'db_password'
-DATABASE_HOST = 'db_host'
-DATABASE_NAME = 'kojoney'
-
 FAKE_USERS_FILE = "/opt/kojoney/etc/fake_users"
 
 # List of ip addresses to exclude from database entries

@@ -30,7 +30,7 @@ if [ -e /etc/redhat-release ]; then
 	# Install the Python libraries
 	if rpm -q MySQL-python | grep not ; then
 		echo " [+] Python MySQL library not installed!"
-		yum install MySQL-python
+		yum install python-sqlite3
 	fi
 	if rpm -q python-crypto | grep not ; then
 	  echo Python crypto library not installed!
