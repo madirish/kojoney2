@@ -5,7 +5,6 @@
 
     Main Developer - Justin C. Klein Keane <jukeane@sas.upenn.edu>
     Original Developer - Jose Antonio Coret <joxeankoret@yahoo.es>
-    Last updated: January 28, 2013
 
     Kojoney - A honeypot that emulates a secure shell (SSH) server.
 
