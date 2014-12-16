@@ -51,7 +51,8 @@ from honeypot_db import HoneypotDB
 start_logging()
 
 # update the database if necessary
-HoneypotDB().update_db()
+HONEYPOTDB = HoneypotDB()
+HONEYPOTDB.update_db()
 
 """
 Running our fake shell over an SSH channel.

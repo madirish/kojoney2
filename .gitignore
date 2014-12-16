@@ -2,3 +2,4 @@
 .project
 .idea
 *.pyc
+kojoney.sqlite3

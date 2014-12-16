@@ -35,7 +35,7 @@ def process_command(data, transport, attacker_username, ip, fake_workingdir):
         cmd = data[0]
     if len(data)>1:
         params=data[1:len(data)]
-    cmd_processor=ProcessCmd(cmd, params, transport, attacker_username, ip, fake_workingdir)
-    (fake_workingdir,attacker_username)=cmd_processor.get_values()
+    cmd_processor = ProcessCmd(cmd, params, transport, attacker_username, ip, fake_workingdir)
+    (fake_workingdir, attacker_username) = cmd_processor.get_values()
     # return some values so they remain dynamic        
     return (printlinebreak, fake_workingdir, attacker_username)

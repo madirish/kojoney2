@@ -66,15 +66,19 @@ class HoneypotPasswordChecker:
         # Updated to limit one valid password per username after a valid combo is used
         # all passwords become valid for a given username 1 hour after last succesful login
         # password limiting added by Josh Bauer <joshbauer3@gmail.com>
-        recentpass=self._db_cred_checker.check_recent(username)
-        if recentpass:
-            if password == recentpass[0]:
-                log.msg('login attempt [%s %s] succeeded' % (username, password))
-                return True
-            else:
-                print 'login attempt [%s %s] failed' % (username, password)
-                return False
-        elif username in self._authorized_credentials:
+        #
+        # This doesn't really work because it pins the password for everyone, not just the
+        # IP address requesting the password.
+        #recentpass=self._db_cred_checker.check_recent(username)
+        #if recentpass:
+        #    if password == recentpass[0]:
+        #        log.msg('login attempt [%s %s] succeeded' % (username, password))
+        #        return True
+        #    else:
+        #        print 'login attempt [%s %s] failed' % (username, password)
+        #        return False
+        #elif username in self._authorized_credentials:
+        if username in self._authorized_credentials:
             passwords = self._authorized_credentials[username].split(',')
             if passwords.count(password) > 0:
                 log.msg('login attempt [%s %s] succeeded' % (username, password))

@@ -21,17 +21,14 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
-import os
-import subprocess
-import sys
-import string
+
 import re
 import socket
 import struct
 import syslog
 
 from coret_config import *
-from honeypot_db import *
+from honeypot_db import HoneypotDB
 
 from twisted.python import log
 
@@ -44,6 +41,7 @@ def log_cmd_session(session, data):
     pass
 
 def start_logging():
+    # Add a log observer to modify logging on the fly
     log.addObserver(login_logger)
     if os.getuid() == 0:
         log_file_list = ROOT_CONFIG_LOGS
@@ -59,40 +57,37 @@ def is_blacklisted(ip):
     ip_int=struct.unpack("!L", socket.inet_aton(ip))[0]
     for net in BLACKLIST:
         startip = net.split('/')[0]
-        startip_int=struct.unpack("!L", socket.inet_aton(startip))[0]
-        endip_int= startip_int + (pow(2,32 - int(net.split('/')[1]))-1)
+        startip_int = struct.unpack("!L", socket.inet_aton(startip))[0]
+        endip_int = startip_int + (pow(2,32 - int(net.split('/')[1]))-1)
         if ip_int >= startip_int and ip_int <= endip_int:
             return True
     return False
         
 #enters successful login attempts into the database
 #added by Josh Bauer <joshbauer3@gmail.com>
+"""
+The log observer watches logs as they are being generated.
+We want to intercept entries from the whitelist and not
+log them, and entries from the blacklist and do something
+more with them.
+"""
 def login_logger(eventDict):
-    msg=log.textFromEventDict(eventDict)
+    log_message = log.textFromEventDict(eventDict)
     matchstring = 'login attempt \[(\S+) (\S+)\] (\w+)'
-    msg =re.search(matchstring, msg)
+    msg = re.search(matchstring, log_message)
     if msg:
         ip=eventDict['system'].split(',')[-1]
         username=msg.group(1)
         password=msg.group(2)
-        if msg.group(3)=='succeeded':
-            #whitelist functionality added by Josh Bauer <joshbauer3@gmail.com>
-            if ip in WHITELIST:
-                print 'login database entry skipped due to whitelisted ip: '+ip
-            else:
-                dblog = HoneypotDB()
-                dblog.log_login(ip, username, password)
-                #blacklist functionality added by Josh Bauer <joshbauer3@gmail.com>
-                if is_blacklisted(ip):
-                    syslog.syslog('BLACKLISTED IP: '+ip+' (sucessful login with username: '+username+')')
-    
-                    
-                #scan attacking machine added by Josh Bauer <joshbauer3@gmail.com>
-                subprocess.Popen('/usr/bin/python /opt/kojoney/nmap_scan.py %s ' % ip, stdout=subprocess.PIPE, shell=True)
-                if DEBUG:
-                    print 'DEBUGGING -- login_logger called python nmap_scan.py'
-                    syslog.syslog('DEBUGGING -- login_logger called python nmap_scan.py')
+        # Whitelist trumps blacklist
+        if ip in WHITELIST:
+            print 'Logging skipped due to whitelist for ' + ip
         else:
-            #whitelist and blacklist functionality added by Josh Bauer <joshbauer3@gmail.com>
-            if not ip in WHITELIST and is_blacklisted(ip):
-                syslog.syslog('BLACKLISTED IP: '+ip+' (failed login with username: '+username+')')
+            if ip in BLACKLIST:
+                print 'BLACKLISTED IP ' + ip + ' (successful login with username: ' + username + ')'
+                syslog.syslog('BLACKLISTED IP: '+ip+' (successful login with username: '+username+')')
+            dbconn = HoneypotDB()
+            dbconn.log_login(ip, username, password)
+            # ToDo: Check last nmap scan to rate limit
+            # ToDo: Dynamic path for the actual script
+            # subprocess.Popen('/usr/bin/python /opt/kojoney/nmap_scan.py %s ' % ip, stdout=subprocess.PIPE, shell=True)

@@ -39,13 +39,22 @@ class ProcessCmd:
         self.attacker_username = attacker_username
         self.ip = ip
         self.fake_workingdir = fake_workingdir
-        self.dbConn = HoneypotDB()
-        self.dbConn.log_command(cmd, ip)
-        self.process_cmd = 'self.process_' + self.cmd + '()'
-        try:
-            eval(self.process_cmd)
-        except:
-            self.process_undef()
+        _process_cmd = 'self.process_' + self.cmd + '()'
+
+        print 'Command to process is ' + _process_cmd
+        HoneypotDB().log_command(cmd, ip)
+
+        _methodname = 'process_' + cmd
+        if hasattr(ProcessCmd, _methodname):
+            eval(_process_cmd)
+        else:
+            print self.process_undef()
+
+        #try:
+        #    eval(self.process_cmd)
+        #except:
+        #    print sys.exc_info()[0] # Dump out generic exception msg
+        #    self.process_undef()
 
     def get_values(self):
         return (self.fake_workingdir,self.attacker_username)
@@ -55,6 +64,9 @@ class ProcessCmd:
             self.transport.write(FAKE_APACHECTL)
         else:
             self.process_undef()
+
+    def process_awk(self):
+        self.transport.write(FAKE_AWK)
 
     def process_cd(self):
         if self.params == '':
@@ -76,6 +88,7 @@ class ProcessCmd:
             elif self.fake_workingdir not in FAKE_DIR_STRUCT:
                 self.transport.write('-bash: cd: ' + self.params[0] + ': No such file or directory\r\n')
                 self.fake_workingdir = old_dir
+
     def process_cat(self):
         if len(self.params)>0:
             #cat /etc/passwd
@@ -92,19 +105,21 @@ class ProcessCmd:
                     self.transport.write(line + '\r\n')
             else:
                 self.transport.write('-bash: cat: ' + self.params[0] + ': No such file or directory\r\n')
+
     def process_curl(self):
-        line=[self.cmd,]
-        if len(self.params) > 0:
-            line.extend(self.params)
-        result_data = coret_std_unix.curl(line[0], self.ip)
+        result_data = coret_std_unix.curl(self.params, self.ip)
         if result_data != "":
             self.transport.write(result_data+'\r\n')
+
     def process_date(self):
         self.transport.write(TIMESTAMP+'\r\n')
+
     def process_exit(self):
         self.transport.loseConnection()
+
     def process_export(self):
         pass
+
     def process_free(self):
         if len(self.params)>0 and self.params[0]=='-m':
             self.transport.write('             total       used       free     shared    buffers     cached\r\n')
@@ -116,18 +131,29 @@ class ProcessCmd:
             self.transport.write('Mem:       8046892    5757244    2289648          0     284060    3188352\r\n')
             self.transport.write('-/+ buffers/cache:    2284832    5762060\r\n')
             self.transport.write('Swap:      8060924     196176    7864748\r\n')
+
+    def process_gawk(self):
+        self.transport.write(FAKE_AWK)
+
     def process_gcc(self):
         self.transport.write('gcc: no input files\r\n')
+
+    def process_grep(self):
+        self.transport.write(FAKE_GREP)
+
     def process_halt(self):
         now=time.strftime("%H:%M",time.localtime())
         self.transport.write('\r\nBroadcast message from root@' +FQDN+'\r\n')
         self.transport.write('\t(/dev/pts/0) at ' +now+ ' ...\r\n\r\n')
         self.transport.write('The system is going down for halt NOW!\r\n')
         self.transport.loseConnection()
+
     def process_history(self):
         pass
+
     def process_hostname(self):
         self.transport.write(FQDN+'\r\n')
+
     def process_id(self):
         if self.attacker_username == "root":
             self.transport.write('uid=0(root) gid=0(root) groups=0(root),1(bin),2(daemon),3(sys),4(adm),6(disk),10(wheel)\r\n')
@@ -136,8 +162,10 @@ class ProcessCmd:
     def process_ifconfig(self):
         for line in FAKE_IFCONFIG:
             self.transport.write(line + '\r\n')
+
     def process_logout(self):
         self.transport.loseConnection()
+
     def process_ls(self):
         if len(self.params) > 0:
             dir_to_ls = self.params[0]
@@ -166,10 +194,13 @@ class ProcessCmd:
             self.transport.write('\r\n')
         else:
             self.transport.write('ls: Error.\r\n')
+
     def process_make(self):
         self.transport.write('make: *** No targets specified and no makefile found.  Stop.\r\n')
+
     def process_mail(self):
         self.transport.write('No mail for ' + self.attacker_username + '\r\n')
+
     def process_mkdir(self):
         if len(self.params) == 0:
             self.transport.write("mkdir: missing operand\r\nTry `mkdir --help' for more information.\r\n")
@@ -179,12 +210,15 @@ class ProcessCmd:
             newdirectory = 'drwx--x--x 70 ' + self.attacker_username + '     users 4.0K ' + datetime.now().strftime("%Y-%m-%d %H:%M ") + self.params[0] + '/'
             FAKE_DIR_STRUCT[self.fake_workingdir].append(newdirectory)
             FAKE_DIR_STRUCT[self.fake_workingdir + '/' + self.params[0]] = ""
+
     def process_netstat(self):
         for line in FAKE_NETSTAT:
             self.transport.write(line + '\r\n')
+
     def process_passwd(self):
         self.transport.write('Changing password for user.\r\n')
         self.transport.write('New password: \r\n')
+
     def process_perl(self):
         self.transport.write('This is perl 5, version 12, subversion 4 (v5.12.4) ')
         self.transport.write('built for i386-linux-thread-multi\r\n\r\n')
@@ -196,23 +230,32 @@ class ProcessCmd:
         self.transport.write('should be found on\r\nthis system using "man perl" or ')
         self.transport.write('"perldoc perl".  If you have access to the\r\nInternet, ')
         self.transport.write( 'point your browser at http://www.perl.org/, the Perl Home Page.\r\n')
+
+    def process_php(self):
+        self.transport.write(FAKE_PHP)
+
     def process_ps(self):
         for line in FAKE_PS:
             self.transport.write(line + '\r\n')
+
     def process_pwd(self):
         self.transport.write(self.fake_workingdir + '\r\n')
+
     def process_reboot(self):
         now=time.strftime("%H:%M",time.localtime())
         self.transport.write('\r\nBroadcast message from root@' +FQDN+'\r\n')
         self.transport.write('\t(/dev/pts/0) at ' +now+ ' ...\r\n\r\n')
         self.transport.write('The system is going down for reboot NOW!\r\n')
         self.transport.loseConnection()
+
     def process_rpm(self):
         self.transport.write('RPM version 4.8.0\r\n')
         self.transport.write('Copyright (C) 1998-2002 - Red Hat, Inc.\r\n')
         self.transport.write('This program may be freely redistributed under the terms of the GNU GPL\r\n')
+
     def process_rm(self):
-			self.transport.write('\r\n' + FAKE_RM + '\r\n')
+        self.transport.write('\r\n' + FAKE_RM + '\r\n')
+
     def process_service(self):
         if (len(self.params)) == 2:
             if self.params[0] in FAKE_SERVICES:
@@ -238,6 +281,7 @@ class ProcessCmd:
                 self.transport.write(self.params[0] + ': unrecognized service\r\n')
         else:
             self.transport.write('Usage: service < option > | --status-all | [ service_name [ command | --full-restart ] ]\r\n')
+
     def process_strings(self):
         #accepts strings -a /usr/sbin/sshd | grep %s:%s -A2 -B2
         if len(self.params)>1 and self.params== ['-a','/usr/sbin/sshd','|','grep','%s:%s','-A2','-B2']:
@@ -248,6 +292,7 @@ class ProcessCmd:
             self.transport.write('maxstartups %d:%d:%d\r\n')
         else:
             self.process_undef()
+
     def process_su(self):
         if len(self.params)==0:
             self.attacker_username = 'root'
@@ -259,41 +304,49 @@ class ProcessCmd:
                 print 'Changing FAKE_USERNAME to ' + switchtouser
             else:
                 self.transport.write('Unknown user: ' + switchtouser + '\r\n')
+
     def process_sudo(self):
         if len(self.params)>0 and self.params[0]=='su':
             self.attacker_username = 'root'
         else:
             self.process_undef()
+
     def process_tar(self):
         self.transport.write("tar: You must specify one of the `-Acdtrux' or `--test-label'  options\r\n")
         self.transport.write("Try `tar --help' or `tar --usage' for more information.\r\n")
+
     def process_uname(self):
         self.transport.write(FAKE_OS+'\r\n')
+
     def process_undef(self):
-        print "Potentially unknown command"
+        print "Potentially unknown command " + self.cmd
         if self.cmd == "":
             pass
         else:
             self.transport.write(FAKE_SHELL + ": " + self.cmd + ": command not found\r\n")
+
     def process_unset(self):
         pass
+
     def process_uptime(self):
         self.transport.write(FAKE_UPTIME+'\r\n')
+
     def process_w(self):
         self.transport.write('USER\tTTY\tFROM\tLOGIN@\t\tIDLE\tJCPU\tPCPU\tWHAT\r\n')
         self.transport.write(self.attacker_username + '\tpts/1\t'+self.ip+'\t09:05\t0.00s\t0.04s\t0.00s\tw\r\n')
+
     def process_wget(self):
-        line=[self.cmd,]
-        if len(self.params)>0:
-            line.extend(self.params)
-        result_data = coret_std_unix.wget(line[0], self.ip)
+        result_data = coret_std_unix.wget(self.params, self.ip)
         if result_data != "":
             self.transport.write(result_data+'\r\n')
+        return True
 
     def process_who(self):
         self.transport.write(self.attacker_username + '\tpts/1\r\n')
+
     def process_whoami(self):
         self.transport.write(self.attacker_username+'\r\n')
+
     def process_yum(self):
         if len(self.params)>0 and (self.params[0] == 'install' or self.params[0] == 'update'):
             self.transport.write('Another app is currently holding the yum lock; waiting for it to exit...\r\n')
