@@ -76,32 +76,25 @@ def _download_file_to(url, directory, ip):
 
 def wget(params, ip):
     data = ""
-    print "Attempting wget with " + ', '.join(params)
-
     if len(params) == 0:
         data  = "wget: You need to specify the URL\r\n"
         data +="\r\n"
         data +="Usage: wget [OPTIONS] [URL]\r\n"
         data +="\r\n"
         data +="Use wget --help to read the complete option list.\r\n"
-
     for param in params:
         if not param.startswith("-"):
-            
             if DOWNLOAD_REAL_FILE:
                 _download_file_to(param, DOWNLOAD_REAL_DIR, ip)
             
             data = "Downloading URL " + str(' '.join(params))
             data += "\r\nwget: Unknown error"
-
     return data
 
 def curl(params, ip):
     data = ""
-
     if len(params) == 0:
         data  = "curl: try 'curl --help' or 'curl --manual' for more information\r\n"
-
     for param in params:
         if not param.startswith("-"):
             if DOWNLOAD_REAL_FILE:
@@ -109,5 +102,4 @@ def curl(params, ip):
 
             data = "Downloading URL " + str(' '.join(params))
             return data + "\r\ncurl: Unknown error"
-
     return data

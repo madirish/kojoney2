@@ -136,6 +136,7 @@ class Report:
       sql = """select count(distinct(username)) from login_attempts
               where time > date('now','-1 day')
               and ip = ? order by time asc """
+      print "Looking for connects with IP " + ip
       cursor.execute(sql, (ip))
       unique = cursor.fetchone()
       cursor.close()

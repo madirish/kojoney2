@@ -40,10 +40,7 @@ class ProcessCmd:
         self.ip = ip
         self.fake_workingdir = fake_workingdir
         _process_cmd = 'self.process_' + self.cmd + '()'
-
-        print 'Command to process is ' + _process_cmd
         HoneypotDB().log_command(cmd, ip)
-
         _methodname = 'process_' + cmd
         if hasattr(ProcessCmd, _methodname):
             eval(_process_cmd)
