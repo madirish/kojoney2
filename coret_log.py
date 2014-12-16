@@ -26,6 +26,7 @@ import re
 import socket
 import struct
 import syslog
+import subprocess
 
 from coret_config import *
 from honeypot_db import HoneypotDB
@@ -88,6 +89,4 @@ def login_logger(eventDict):
                 syslog.syslog('BLACKLISTED IP: '+ip+' (successful login with username: '+username+')')
             dbconn = HoneypotDB()
             dbconn.log_login(ip, username, password)
-            # ToDo: Check last nmap scan to rate limit
-            # ToDo: Dynamic path for the actual script
-            # subprocess.Popen('/usr/bin/python /opt/kojoney/nmap_scan.py %s ' % ip, stdout=subprocess.PIPE, shell=True)
+            subprocess.Popen('/usr/bin/python /opt/kojoney/nmap_scan.py %s ' % ip, stdout=subprocess.PIPE, shell=True)
