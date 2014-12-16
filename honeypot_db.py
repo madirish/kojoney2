@@ -127,6 +127,7 @@ class HoneypotDB:
                   `ip` VARCHAR(15),
                   `ip_numeric` INTEGER,
                   `url` VARCHAR(100),
+                  `filename` TEXT,
                   `md5sum` VARCHAR(32),
                   `filetype` VARCHAR(255),
                   `clamsig` TEXT,
