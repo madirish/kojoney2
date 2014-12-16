@@ -35,7 +35,10 @@ if [ $res = 'yes' ]; then
 
 	echo " [-] Backing up downloads (you can manually delete them)"
 	if [ -d /opt/kojoney/download ]; then
-		mv /opt/kojoney/download /opt/kojoney_dls_bak
+		mv /opt/kojoney/download /opt/kojoney_dls_bak/
+	fi
+	if [ -d /opt/kojoney/kojoney.sqlite ]; then
+		mv /opt/kojoney/kojoney.sqlite /opt/kojoney_dls_bak/
 	fi
 
 	echo " [-] Removing main directory"
