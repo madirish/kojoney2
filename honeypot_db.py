@@ -62,9 +62,9 @@ class HoneypotDB:
         elif not self._dberr:
             try:
                 sql = """INSERT INTO executed_commands
-                      (command,ip, ip_numeric, sensor_id)
+                      (time, command, ip, ip_numeric, sensor_id)
                       VALUES
-                      (?, ?, ?, ?)"""
+                      (CURRENT_TIMESTAMP, ?, ?, ?, ?)"""
                 cursor = self.conn.cursor()
                 cursor.execute(sql , (command, ip, socket.inet_aton(ip), SENSOR_ID))
                 self.conn.commit()
@@ -76,7 +76,7 @@ class HoneypotDB:
         if not self._dberr:
             try:
                 sql = """INSERT INTO downloads (time, ip, ip_numeric, url, md5sum, filename, filetype, sensor_id)
-                          VALUES (CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?)"""
+                          VALUES (CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?)"""
                 cursor = self.conn.cursor()
                 cursor.execute(sql , (ip, socket.inet_aton(ip), url, filemd5, filename, filetype, SENSOR_ID))
                 self.conn.commit()
