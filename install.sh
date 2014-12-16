@@ -14,6 +14,12 @@ function die
 	exit 1
 }
 
+if [ "$(id -u)" != "0" ]; then
+	echo "This script must be run as root, please use sudo"
+    exit 1
+fi
+
+
 KOJONEY_PATH=/opt/kojoney
 
 clear
@@ -144,14 +150,14 @@ echo "Step 8 of 9 - Changing permissions and creating symbolic links"
 chmod u+x $KOJONEY_PATH/kojoney.py || die "Step 10" 
 
 echo " [+] Creating symlinks"
-ln -s $KOJONEY_PATH/kojoney.py /usr/bin/kojoneyd || die "Step 10 - symlink for kononey.py" 
-ln -s $KOJONEY_PATH/kojreport /usr/bin/kojreport || die "Step 10 - symlink for kojreport" 
-ln -s $KOJONEY_PATH/kojreport-filter /usr/bin/kojreport-filter || die "Step 10 - symlink for kojreport-filter" 
-ln -s $KOJONEY_PATH/kip2country.py /usr/bin/kip2country || die "Step 10 - symlink for kip2country.py" 
-ln -s $KOJONEY_PATH/kojhumans /usr/bin/kojhumans || die "Step 10 - symlink for kojhumans" 
-ln -s $KOJONEY_PATH/kojsession /usr/bin/kojsession || die "Step 10 - symlink for kojsession" 
-ln -s $KOJONEY_PATH/sessions_with_commands /usr/bin/sessions_with_commands || die "Step 10 - symlink for sessions_with_commands"
-ln -s $KOJONEY_PATH/commands_by_session_and_ip /usr/bin/commands_by_session_and_ip || die "Step 10 - symlink for commands_by_session_and_ip"
+ln -s $KOJONEY_PATH/kojoney.py /usr/bin/kojoneyd || die "Step 8 - symlink for kononey.py"
+ln -s $KOJONEY_PATH/kojreport /usr/bin/kojreport || die "Step 8 - symlink for kojreport"
+ln -s $KOJONEY_PATH/kojreport-filter /usr/bin/kojreport-filter || die "Step 8 - symlink for kojreport-filter"
+ln -s $KOJONEY_PATH/kip2country.py /usr/bin/kip2country || die "Step 8 - symlink for kip2country.py"
+ln -s $KOJONEY_PATH/kojhumans /usr/bin/kojhumans || die "Step 8 - symlink for kojhumans"
+ln -s $KOJONEY_PATH/kojsession /usr/bin/kojsession || die "Step 8 - symlink for kojsession"
+ln -s $KOJONEY_PATH/sessions_with_commands /usr/bin/sessions_with_commands || die "Step 8 - symlink for sessions_with_commands"
+ln -s $KOJONEY_PATH/commands_by_session_and_ip /usr/bin/commands_by_session_and_ip || die "Step 8 - symlink for commands_by_session_and_ip"
 echo
 echo "Step 9 of 9 - Final questions and fun"
 echo
