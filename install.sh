@@ -36,7 +36,7 @@ if [ -e /etc/redhat-release ]; then
 	# Install the Python libraries
 	if rpm -q python-crypto | grep not ; then
 	  echo Python crypto library not installed!
-	  yum install python-crypt
+	  yum install python-crypto
 	fi
 	if rpm -q python-twisted-conch | grep not ; then
 	  echo " [+] Python Twisted Conch library not installed!"
