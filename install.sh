@@ -21,17 +21,13 @@ echo "******************************************"
 echo " Kojoney2 Honeypot Installer "
 echo "******************************************"
 echo "by Justin C. Klein Keane <justin@madirish.net>"
-echo based on Kojoney, by Jose Antonio Coret
+echo "based on Kojoney, by Jose Antonio Coret"
 echo 
-echo Step 1 of 11 - Checking for prerequisite dependencies...
+echo "Step 1 of 9 - Checking for prerequisite dependencies..."
 
 # Do prerequisites for RedHat systems
 if [ -e /etc/redhat-release ]; then
 	# Install the Python libraries
-	if rpm -q MySQL-python | grep not ; then
-		echo " [+] Python MySQL library not installed!"
-		yum install python-sqlite3
-	fi
 	if rpm -q python-crypto | grep not ; then
 	  echo Python crypto library not installed!
 	  yum install python-crypt
@@ -47,7 +43,7 @@ if [ -e /etc/redhat-release ]; then
 fi
 echo " [+] Dependency check complete."
 echo 
-echo Step 2 of 11 - Licenses
+echo "Step 2 of 9 - Licenses"
 echo Kojoney2 is bound by a number of license agreements
 echo which are included in the install path.
 echo
@@ -65,7 +61,7 @@ else
 fi
 
 echo 
-echo "Step 3 of 11 - Creating directory structure"
+echo "Step 3 of 9 - Creating directory structure"
 if [ -d $KOJONEY_PATH ]; then
 	echo " [-] Kojoney2 directory $KOJONEY_PATH already exists."
 	echo " [-] Please uninstall Kojoney2 with the uninstall.bash script, then try again."
@@ -89,38 +85,9 @@ echo " [+] Kojoney files installed"
 echo 
 echo " [+] Installed at $KOJONEY_PATH"
 echo
-echo "Step 4 of 11 - Database configuration"
-NEED_DATABASE="unspecified"
-while [ $NEED_DATABASE == 'unspecified' ]
-do
-	echo -e "Do you need to create a MySQL database for Kojoney? (yes/no)"
-	read create_db
-	if [[ $create_db == 'yes' || $create_db == 'no' ]]; then
-		NEED_DATABASE="specified"
-	fi
-done
 
-if [ $create_db == 'yes' ]; then
-	echo We will now create the Kojoney2 database.  The credentials used to create the
-	echo database are stored in coret_config.py and can be changed at a later time if
-	echo necessary.  By default the database will be called kojoney.
-	echo
-	echo Please enter the MySQL username that can create the kojoney database and tables:
-	read mysql_user
-	echo Please enter the MySQL password for this user:
-	read mysql_password
-	echo -e "Please enter the MySQL database server (i.e. localhost)"
-	read mysql_host
-	/usr/bin/mysql -u $mysql_user --password=$mysql_password -h $mysql_host < create_tables.sql
-	
-	echo Updating the config file...
-	# Replace tokens with user specified values
-	sed -i "s/db_user/$mysql_user/g" $KOJONEY_PATH/coret_config.py
-	sed -i "s/db_password/$mysql_password/g" $KOJONEY_PATH/coret_config.py
-	sed -i "s/db_host/$mysql_host/g" $KOJONEY_PATH/coret_config.py
-fi
 echo 
-echo "Step 5 of 11 - Email reporting configuration"
+echo "Step 4 of 9 - Email reporting configuration"
 # Daily reports
 echo -e "Would you like daily reports e-mailed? (yes/no)"
 read want_reports
@@ -134,7 +101,7 @@ if [ $want_reports == 'yes' ]; then
 	fi
 fi
 echo 
-echo "Step 6 of 11 - Housekeeping configuration"
+echo "Step 5 of 9 - Housekeeping configuration"
 # Assume logrotate is installed
 touch /etc/logrotate.d/kojoney
 echo "/var/log/honeypot.log {" > /etc/logrotate.d/kojoney
@@ -144,13 +111,13 @@ echo "    endscript" >> /etc/logrotate.d/kojoney
 echo "}" >> /etc/logrotate.d/kojoney
 echo " [+] Logrotate scheduled"
 echo 
-echo "Step 7 of 11 - Honeypot customization"
+echo "Step 6 of 9 - Honeypot customization"
 # Customize honeypot
 echo Please enter the fully qualified hostname for your honeypot:
 read user_fqdn
 sed -i "s/fqdn_placeholder/$user_fqdn/g" $KOJONEY_PATH/coret_fake.py
 echo 
-echo "Step 9 of 11 - Installing documentation "
+echo "Step 7 of 9 - Installing documentation "
 echo " [+] Installing man pages"
 
 if [ -d /usr/share/man/man1 ]; then
@@ -173,7 +140,7 @@ else
 	unset MANPATH
 fi
 echo 
-echo "Step 10 of 11 - Changing permissions and creating symbolic links"
+echo "Step 8 of 9 - Changing permissions and creating symbolic links"
 chmod u+x $KOJONEY_PATH/kojoney.py || die "Step 10" 
 
 echo " [+] Creating symlinks"
@@ -186,7 +153,7 @@ ln -s $KOJONEY_PATH/kojsession /usr/bin/kojsession || die "Step 10 - symlink for
 ln -s $KOJONEY_PATH/sessions_with_commands /usr/bin/sessions_with_commands || die "Step 10 - symlink for sessions_with_commands"
 ln -s $KOJONEY_PATH/commands_by_session_and_ip /usr/bin/commands_by_session_and_ip || die "Step 10 - symlink for commands_by_session_and_ip"
 echo
-echo "Step 11 of 11 - Final questions and fun"
+echo "Step 9 of 9 - Final questions and fun"
 echo
 
 IS_CYGWIN=`uname -s | grep CYGWIN | grep -v grep | wc -l`
@@ -198,7 +165,7 @@ if [ $IS_CYGWIN -eq 0 ]; then
 	if [ $res_sysv != 'yes' ]; then
 		echo -e "Skipping System V script installation"
 	else
-		cp init.d/* /etc/init.d/ || die "Step 11 - Init script installation failed" 
+		cp init.d/* /etc/init.d/ || die "Step 9 - Init script installation failed"
 		echo 
 		echo -e "***No run levels were assigned. You need to do this manually.***"
 		echo
