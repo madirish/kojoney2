@@ -1,3 +1,10 @@
+Version 2.1 - <jukeane@sas.upenn.edu>
+	* Yeah, the gitlog is a better place to look for this info
+	* Switched from MySQL to SQLite (syslog & OSSEC for remote transport)
+	* Got NMAP scans actually working
+	* Updated the installer
+	* Refactored a bunch of the code for easier maintenance
+
 Version 2.0 - <jukeane@sas.upenn.edu>
 	* Changed the name to Kojoney2 to reflect massive changes including:
 	* Support for MySQL database back end added
