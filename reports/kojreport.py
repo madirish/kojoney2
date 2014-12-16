@@ -53,7 +53,7 @@ class Report:
       sql = """select time, command, ip from executed_commands '
           where time > date('now','-1 day')
           and ip = ? order by time asc """
-      cursor.execute(sql, ip)
+      cursor.execute(sql, (str(ip),))
       retval = cursor.fetchall()
       cursor.close()
       return retval
@@ -125,19 +125,19 @@ class Report:
   def get_attempts(self, ip):
     'Show the successful login attempts by the ip address issued since yesterday at midnight'
     try:
+      print "Looking for connects with IP " + ip
       # total succeful attempts by ip
       cursor = self.conn.cursor()
       sql = """select count(id) from login_attempts
             where time > date('now','-1 day')
-            and ip = ? order by time asc"""
-      cursor.execute(sql, (ip))
+            and ip = ?"""
+      cursor.execute(sql, (str(ip),))
       total = cursor.fetchone()
       #succesful attemps with unique username by ip
       sql = """select count(distinct(username)) from login_attempts
               where time > date('now','-1 day')
-              and ip = ? order by time asc """
-      print "Looking for connects with IP " + ip
-      cursor.execute(sql, (ip))
+              and ip = ?"""
+      cursor.execute(sql, (str(ip),))
       unique = cursor.fetchone()
       cursor.close()
       return (total[0], unique[0])
