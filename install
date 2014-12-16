@@ -2,16 +2,24 @@ This file is part of the Kojoney2 honeypot
 
 Main Developer - Justin C. Klein Keane <jukeane@sas.upenn.edu>
 Original Developer - Jose Antonio Coret <joxeankoret@yahoo.es>
-Last updated 28 January 2013
+Last updated 16 December 2014
 
 Kojoney2 - A honeypot that emulates a secure shell (SSH) server.
 -----------------------------------------------------------------
-1.  You should simply be able to run the install.bash script
-2.  If you want to install manually first create a MySQL user for kojoney, 
-    and create a database to use.
-3.  When this is done, modify the first line of create_tables.sql to use your
-    database (default is kojoney) and run it.
-4.  Modify coret_config.py to contain any settings changes you may want, being
-    sure to add your mysql user, password, host, and database name.
-5.  If you want e-mail alerts, be sure to change the address in 
-    /opt/kojoney/reports/mailalert.bash.
+By default Kojoney2 will listen on TCP port 22 for incoming connections.
+You should be sure to modify your host firewall rules to allow for
+incoming connections to port 22.
+
+If you're already running SSH on your host, be sure to move it to an
+alternate port (for instance by editing /etc/ssh/sshd_config and
+restarting the service).  Ensure that your firewall allows for access
+to the alternate port as well.
+
+Kojoney2 has a number of Python dependencies, including zope, pycrypto,
+and the Twisted Conch libraries.  Installation is easiest on a CentOS 6
+server.  You should be able to install Kojoney2 using the install.sh
+script as root.
+
+If you want to schedule, using cron, or manually send out reports from
+Kojoney2 use the reports/mailalert.sh script, or you can generate the
+report output simply using the reports/kojreport.py program.
