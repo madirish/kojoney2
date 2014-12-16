@@ -4,7 +4,6 @@ import sqlite3
 import syslog
 import socket
 import os
-from nmap_parser import nmap_parser
 
 
 class Report:
@@ -149,7 +148,7 @@ class Report:
 
 import urllib
 import socket
-from coret_config import *
+from nmapparser import NmapParser
 
 report = Report()
 print 'Kojoney2 activity in the last 24 hours.'
@@ -241,5 +240,5 @@ print 'Attacker Scans by IP address:'
 print '--------------------------------'
 if ips is not False:
   for addr in ips:
-    scan = nmap_parser(addr[0])
+    scan = NmapParser(addr[0])
     scan.report()

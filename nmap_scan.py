@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 #This script scans the attacker's machine if no recent scans have been completed
 #added by Josh Bauer <joshbauer3@gmail.com>
+
 import sys
 import subprocess
-import MySQLdb
+import sqlite3
 from coret_config import *
 import syslog
+import socket
 
 ip=sys.argv[1]
 
@@ -14,51 +16,41 @@ if DEBUG:
     
 #check for recent scan of the given ip address
 try:
-  connection = MySQLdb.connect(host=DATABASE_HOST, 
-                                     user=DATABASE_USER, 
-                                     passwd=DATABASE_PASS, 
-                                     db=DATABASE_NAME)
+  connection = sqlite3.connect('/opt/kojoney/kojoney.sqlite3')
   cursor = connection.cursor()
-  sql = 'select count(id) from nmap_scans '
-  sql += 'where time > date_sub(now(), interval 1 hour) '
-  sql += 'and ip = %s order by time desc'
+  # Only scan if we havne't done so recently (throttle)
+  sql = """select count(id) from nmap_scans
+            where time >  date('now','-5 minutes')
+            and ip = ? order by time desc"""
   cursor.execute(sql, ip)
-  retval = cursor.fetchone()[0]
+  num_recent_scans = cursor.fetchone()[0]
   cursor.close()
 except Exception as err:
    errorstring =  "Transaction error in nmap_scan.py " , err
    syslog.syslog(syslog.LOG_ERR, str(errorstring))
    
 if DEBUG:
-    syslog.syslog('DEBUGGING -- nmap_scan.py checked database for recent scans, retval = '+str(retval)) 
+    syslog.syslog('DEBUGGING -- nmap_scan.py checked database for recent scans, retval = '+str(num_recent_scans))
       
-if retval==0:
+if num_recent_scans==0:
     
     if DEBUG:
         syslog.syslog('DEBUGGING -- nmap_scan.py calling nmap')
         
     #scan the attacker
     proc = subprocess.Popen("nmap -A -Pn -oX - %s" % ip, stdout=subprocess.PIPE, shell=True)
-    (out, err) = proc.communicate()
+    (nmap_output, err) = proc.communicate()
 
-    if out:
+    if nmap_output:
         #enter the scan into the database
         if DEBUG:
             syslog.syslog('DEBUGGING -- nmap_scan.py attempting to enter result into the database')
             
         try:
-            connection = MySQLdb.connect(host=DATABASE_HOST, 
-                                         user=DATABASE_USER, 
-                                         passwd=DATABASE_PASS, 
-                                         db=DATABASE_NAME)
             cursor = connection.cursor()
-            sql = "INSERT INTO nmap_scans SET "
-            sql += " time=CURRENT_TIMESTAMP(), "
-            sql += " ip=%s, "
-            sql += " ip_numeric=INET_ATON(%s),"
-            sql += " sensor_id=%s, "
-            sql += " nmap_output=%s"
-            cursor.execute(sql , (ip, ip, SENSOR_ID, out))
+            sql = """INSERT INTO nmap_scans (time, ip, ip_numeric, sensor_id, nmap_output)
+                  VALUES (CURRENT_TIMESTAMP, ?, ?, ?, ?)"""
+            cursor.execute(sql , (ip, socket.inet_aton(ip), SENSOR_ID, nmap_output))
             connection.commit() 
             cursor.close()
         except Exception as msg:

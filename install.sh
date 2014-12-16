@@ -46,6 +46,10 @@ if [ -e /etc/redhat-release ]; then
 	  echo " [+] Zope library not installed!"
 	  yum install python-zope-interface
 	fi
+	if rpm -q nmap | grep not ; then
+	  echo " [+] Nmap not installed!"
+	  yum install nmap
+	fi
 fi
 echo " [+] Dependency check complete."
 echo 

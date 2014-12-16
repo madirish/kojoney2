@@ -1,33 +1,29 @@
 #!/usr/bin/env python
-import sys
-import MySQLdb
-from coret_config import *
+import syslog
+import sqlite3
 from xml.dom.minidom import *
 
-#nmap_parser retrieves recent nmap scans from the data base and prints report information
-#added by Josh Bauer <joshbauer3@gmail.com>
-class nmap_parser:
+# nmap_parser retrieves recent nmap scans from the data base and prints report information
+# added by Josh Bauer <joshbauer3@gmail.com>
+class NmapParser:
     'Parses nmap xml output for reports'
     def __init__(self,ip):
         self.ip = ip
         self.scan = ''
         self.ports= ''
-        if self.get_recent_scan():
+        self.conn = sqlite3.connect('/opt/kojoney/kojoney.sqlite3')
+        if self.get_scans_since_yetserday():
             self.dom = parseString(self.scan)
             self.ports = self.get_ports()
         
-    def get_recent_scan(self):
+    def get_scans_since_yetserday(self):
         'Gets the most recent scan from the last 24 hours from the database'
         try:
-          connection = MySQLdb.connect(host=DATABASE_HOST, 
-                                             user=DATABASE_USER, 
-                                             passwd=DATABASE_PASS, 
-                                             db=DATABASE_NAME)
-          cursor = connection.cursor()
-          sql = 'select nmap_output from nmap_scans '
-          sql += 'where time > date_sub(curdate(), interval 1 day) '
-          sql += 'and ip = %s order by time desc'
-          cursor.execute(sql, self.ip)
+          cursor = self.conn.cursor()
+          sql = """select nmap_output from nmap_scans
+                  where time > date('now','-1 day')
+                  and ip = ? order by time desc"""
+          cursor.execute(sql, (str(self.ip),))
           retval = cursor.fetchone()          
           cursor.close()
           if retval:
@@ -39,6 +35,7 @@ class nmap_parser:
            errorstring =  "Transaction error in nmap_parser.py " , err
            syslog.syslog(syslog.LOG_ERR, str(errorstring))
            return False
+
     def get_ports(self):
         'Parses the ports from the scan'
         return self.dom.getElementsByTagName('port')
