@@ -30,7 +30,7 @@ import hashlib
 from honeypot_db import HoneypotDB
 from coret_config import DOWNLOAD_REAL_FILE, DOWNLOAD_REAL_DIR, SENSOR_ID
 
-def getGoodFilename(filename):
+def _get_good_filename(filename):
     
     buf = ""
     
@@ -42,14 +42,14 @@ def getGoodFilename(filename):
     
     return(buf + str(random.randint(0, 999)))
 
-def downloadFileTo(url, directory, ip):
+def _download_file_to(url, directory, ip):
     print "Attempting download of " + url
     try:
         if url.find("://") == -1:
             url = "http://" + url
         data = urllib.urlopen(url)
         data = data.read()
-        filename = getGoodFilename(url)
+        filename = _get_good_filename(url)
 
         # Todo: Don't write file if it's a duplicate!
         f = open(directory + filename, "wb")
@@ -89,7 +89,7 @@ def wget(params, ip):
         if not param.startswith("-"):
             
             if DOWNLOAD_REAL_FILE:
-                downloadFileTo(param, DOWNLOAD_REAL_DIR, ip)
+                _download_file_to(param, DOWNLOAD_REAL_DIR, ip)
             
             data = "Downloading URL " + str(' '.join(params))
             data += "\r\nwget: Unknown error"
@@ -105,7 +105,7 @@ def curl(params, ip):
     for param in params:
         if not param.startswith("-"):
             if DOWNLOAD_REAL_FILE:
-                downloadFileTo(param, DOWNLOAD_REAL_DIR, ip)
+                _download_file_to(param, DOWNLOAD_REAL_DIR, ip)
 
             data = "Downloading URL " + str(' '.join(params))
             return data + "\r\ncurl: Unknown error"
