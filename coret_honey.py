@@ -23,14 +23,9 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-import re
-import time
 from coret_fake import *
-from coret_log import *
-from coret_command import *
 import coret_std_unix
 from honeypot_db import *
-
 
 # Koret Honey ;)
 
