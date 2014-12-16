@@ -1,20 +1,33 @@
 #!/usr/bin/env python
 
-import MySQLdb
+
 from coret_config import *
+import imp
+
+try:
+    imp.find_module('MySQLdb')
+    USE_DB = True
+except ImportError:
+    print "MySQLdb module wasn't found, skipping it."
+    print "Maybe try:"
+    print "pip install mysqldb"
+    USE_DB = False
+if USE_DB:
+    import MySQLdb
 
 class HoneypotDB:
     
     def __init__(self):
         self.dberr = False
-        try:
-          self.connection = MySQLdb.connect(host=DATABASE_HOST, 
-                                             user=DATABASE_USER, 
-                                             passwd=DATABASE_PASS, 
-                                             db=DATABASE_NAME)
-        except Exception as err:
-            print "Error connecting to the database."
-            self.dberr = True
+        if USE_DB:
+            try:
+              self.connection = MySQLdb.connect(host=DATABASE_HOST,
+                                                 user=DATABASE_USER,
+                                                 passwd=DATABASE_PASS,
+                                                 db=DATABASE_NAME)
+            except Exception as err:
+                print "Error connecting to the database."
+                self.dberr = True
         return None;
     
     def __del(self):
