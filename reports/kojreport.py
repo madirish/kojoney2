@@ -28,7 +28,7 @@ class Report:
     except Exception as err:
       errorstring = "Kojoney2: kojreport - Transaction error in count_connects ", err
       syslog.syslog(syslog.LOG_ERR, str(errorstring))
-      return False
+      return (False, False)
 
   def connects_from(self):
     'Show the IP address connections since yesterday at midnight'
@@ -49,7 +49,7 @@ class Report:
     'Show the commands that the ip address issued'
     try:
       cursor = self.conn.cursor()
-      sql = """select time, command, ip from executed_commands '
+      sql = """select time, command, ip from executed_commands
           where time > date('now','-1 day')
           and ip = ? order by time asc """
       cursor.execute(sql, (str(ip),))
