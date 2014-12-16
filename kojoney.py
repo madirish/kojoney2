@@ -23,21 +23,8 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-import os
 import sys
-import string
 import imp
-
-try:
-    imp.find_module('MySQLdb')
-    USE_DB = True
-except ImportError:
-    print "MySQLdb module wasn't found, skipping it."
-    print "Maybe try:"
-    print "pip install mysqldb"
-    USE_DB = False
-if USE_DB:
-    import MySQLdb
 
 try:
     imp.find_module('twisted')
@@ -48,17 +35,14 @@ except ImportError:
     sys.exit()
     
 from twisted.cred import portal
-from twisted.conch import error, avatar, interfaces as conchinterfaces
-from twisted.conch.checkers import SSHPublicKeyDatabase
-from twisted.conch.ssh import session
 from twisted.internet import reactor
 
 from coret_log import *
-from coret_avatar import *
 from coret_realm import *
 from coret_session import *
 from honey_pot_password_checker import *
 from coret_factory import *
+from honeypot_db import HoneypotDB
 
 
 #
@@ -66,10 +50,8 @@ from coret_factory import *
 #
 start_logging()
 
-#add missing tables to the database
-#added by Josh Bauer <joshbauer3@gmail.com>
-if USE_DB:
-    subprocess.Popen('mysql -u %s --password=%s -h %s < create_tables.sql' % (DATABASE_USER, DATABASE_PASS, DATABASE_HOST) , stdout=subprocess.PIPE, shell=True)
+# update the database if necessary
+HoneypotDB().update_db()
 
 """
 Running our fake shell over an SSH channel.

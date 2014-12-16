@@ -3,6 +3,7 @@
 
 from coret_config import *
 import imp
+import subprocess
 
 try:
     imp.find_module('MySQLdb')
@@ -80,4 +81,8 @@ class HoneypotDB:
                 self.connection.commit() 
             except Exception as inst:
                 print "Error inserting command data to the database.  ", inst
-                
+
+    #add missing tables to the database
+    #added by Josh Bauer <joshbauer3@gmail.com>
+    def update_db(self):
+        subprocess.Popen('mysql -u %s --password=%s -h %s < create_tables.sql' % (DATABASE_USER, DATABASE_PASS, DATABASE_HOST) , stdout=subprocess.PIPE, shell=True)
