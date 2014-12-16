@@ -106,8 +106,8 @@ class HoneypotDB:
                   `id` INTEGER PRIMARY KEY,
                   `time` TIMESTAMP,
                   `ip` VARCHAR(15),
-                  `username` VARCHAR(16),
-                  `password` VARCHAR(20),
+                  `username` TEXT,
+                  `password` TEXT,
                   `ip_numeric` INTEGER,
                   `sensor_id` INTEGER
                 );
@@ -116,7 +116,7 @@ class HoneypotDB:
                   `id` INTEGER PRIMARY KEY,
                   `time` TIMESTAMP,
                   `ip` VARCHAR(15),
-                  `command` VARCHAR(100),
+                  `command` TEXT,
                   `ip_numeric` INTEGER,
                   `sensor_id` INTEGER
                 );
@@ -129,7 +129,7 @@ class HoneypotDB:
                   `url` VARCHAR(100),
                   `filename` TEXT,
                   `md5sum` VARCHAR(32),
-                  `filetype` VARCHAR(255),
+                  `filetype` TEXT,
                   `clamsig` TEXT,
                   `sensor_id` INTEGER
                   `file` LONGBLOB
