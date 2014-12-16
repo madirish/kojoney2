@@ -68,7 +68,7 @@ class Report:
       cursor = self.conn.cursor()
       sql = """select username, password from login_attempts
             where ip_numeric = ? AND time < ? order by time desc"""
-      cursor.execute(sql % (socket.inet_aton(ip), time))
+      cursor.execute(sql, (socket.inet_aton(ip), time))
       retval = cursor.fetchone()
       cursor.close()
       return retval
@@ -129,14 +129,14 @@ class Report:
       cursor = self.conn.cursor()
       sql = """select count(id) from login_attempts
             where time > date('now','-1 day')
-            and ip = %s order by time asc"""
-      cursor.execute(sql, ip)
+            and ip = ? order by time asc"""
+      cursor.execute(sql, (ip))
       total = cursor.fetchone()
       #succesful attemps with unique username by ip
       sql = """select count(distinct(username)) from login_attempts
               where time > date('now','-1 day')
-              and ip = %s order by time asc """
-      cursor.execute(sql, ip)
+              and ip = ? order by time asc """
+      cursor.execute(sql, (ip))
       unique = cursor.fetchone()
       cursor.close()
       return (total[0], unique[0])
