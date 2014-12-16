@@ -1,19 +1,18 @@
 #! /bin/python
 
-import MySQLdb
+import sqlite3
 import syslog
+import socket
+import os
 from nmap_parser import nmap_parser
 
+
 class Report:
-  def __init__(self, host, user, password, database):
+  def __init__(self):
     try:
-      self.conn = MySQLdb.connect(host=host,
-                                  user=user,
-                                  passwd=password,
-                                  db=database,
-                                  port=3306)
+      self.conn = sqlite3.connect(os.path.dirname(__file__) + '/../kojoney.sqlite3')
     except Exception as err:
-      errorstring = "Kojoney2: kojreport - Error connecting to the database" , err
+      errorstring = "Kojoney2: kojreport - Error connecting to the database", err
       syslog.syslog(syslog.LOG_ERR, errorstring)
       return False
 
@@ -21,14 +20,14 @@ class Report:
     'Show the number of connections since yesterday at midnight'
     try:
       cursor = self.conn.cursor()
-      sql = 'select count(distinct(ip)) as session from executed_commands '
-      sql += 'where time > date_sub(curdate(), interval 1 day) order by time desc '
+      sql = """select count(distinct(ip)) as session from executed_commands
+            where time > date('now','-1 day') order by time desc """
       cursor.execute(sql)
       retval = cursor.fetchone()[0]
       cursor.close()
       return retval
     except Exception as err:
-      errorstring = "Kojoney2: kojreport - Transaction error in count_connects " , err
+      errorstring = "Kojoney2: kojreport - Transaction error in count_connects ", err
       syslog.syslog(syslog.LOG_ERR, str(errorstring))
       return False
 
@@ -36,123 +35,122 @@ class Report:
     'Show the IP address connections since yesterday at midnight'
     try:
       cursor = self.conn.cursor()
-      sql = 'select distinct(ip) as session from executed_commands '
-      sql += 'where time > date_sub(curdate(), interval 1 day) order by time desc '
+      sql = """select distinct(ip) as session from executed_commands
+            where time > date('now','-1 day') order by time desc """
       cursor.execute(sql)
       retval = cursor.fetchall()
       cursor.close()
       return retval
     except Exception as err:
-      errorstring = "Transaction error in count_connects " , err
+      errorstring = "Transaction error in count_connects ", err
       syslog.syslog(syslog.LOG_ERR, str(errorstring))
       return False
-  
+
   def get_commands(self, ip):
     'Show the commands that the ip address issued'
     try:
       cursor = self.conn.cursor()
-      sql = 'select time, command, ip from executed_commands '
-      sql += 'where time > date_sub(curdate(), interval 1 day) '
-      sql += ' and ip = %s order by time asc '
+      sql = """select time, command, ip from executed_commands '
+          where time > date('now','-1 day')
+          and ip = ? order by time asc """
       cursor.execute(sql, ip)
       retval = cursor.fetchall()
       cursor.close()
       return retval
     except Exception as err:
-      errorstring = "Kojoney2: kojreport - Transaction error in get_commands " , err
+      errorstring = "Kojoney2: kojreport - Transaction error in get_commands ", err
       syslog.syslog(syslog.LOG_ERR, str(errorstring))
       return False
-    
+
   def get_login_creds(self, ip, time):
     'Show last login for the ip before the time'
     try:
       cursor = self.conn.cursor()
-      sql = 'select username, password from login_attempts '
-      sql += ' where ip_numeric = INET_ATON("%s") AND time < "%s" order by time desc'
-      cursor.execute(sql % (ip, time))
+      sql = """select username, password from login_attempts
+            where ip_numeric = ? AND time < ? order by time desc"""
+      cursor.execute(sql % (socket.inet_aton(ip), time))
       retval = cursor.fetchone()
       cursor.close()
       return retval
     except Exception as err:
-      errorstring = "Kojoney2: kojreport - Transaction error in get_login_creds " , err
+      errorstring = "Kojoney2: kojreport - Transaction error in get_login_creds ", err
       syslog.syslog(syslog.LOG_ERR, str(errorstring))
       return False
-    
+
   def get_file_downloads(self):
     'Show file downloads for the last day'
     try:
       cursor = self.conn.cursor()
-      sql = 'select time, ip, url, md5sum, filetype from downloads '
-      sql += ' where time > date_sub(curdate(), interval 1 day) order by ip, time desc '
+      sql = """select time, ip, url, md5sum, filetype from downloads
+            where time > date('now','-1 day') order by ip, time desc"""
       cursor.execute(sql)
       retval = cursor.fetchall()
       cursor.close()
       return retval
     except Exception as err:
-      errorstring = "Kojoney2: kojreport - Transaction error in get_file_downloads " , err
+      errorstring = "Kojoney2: kojreport - Transaction error in get_file_downloads ", err
       syslog.syslog(syslog.LOG_ERR, str(errorstring))
       return False
-  
+
   def count_attempts(self):
     'Show the number of successful login attempts since yesterday at midnight'
     try:
       cursor = self.conn.cursor()
-      sql = 'select count(id) from login_attempts '
-      sql += 'where time > date_sub(curdate(), interval 1 day)'
+      sql = """select count(id) from login_attempts
+              where time > date('now','-1 day')"""
       cursor.execute(sql)
       retval = cursor.fetchone()[0]
       cursor.close()
       return retval
     except Exception as err:
-      errorstring = "Kojoney2: kojreport - Transaction error in count_attempts " , err
+      errorstring = "Kojoney2: kojreport - Transaction error in count_attempts ", err
       syslog.syslog(syslog.LOG_ERR, str(errorstring))
       return False
-  
+
   def attempts_from(self):
     'Show the ip addresses of successful login attempts since yesterday at midnight'
     try:
       cursor = self.conn.cursor()
-      sql = 'select distinct(ip) from login_attempts '
-      sql += 'where time > date_sub(curdate(), interval 1 day)'
+      sql = """select distinct(ip) from login_attempts
+              where time > date('now','-1 day')"""
       cursor.execute(sql)
       retval = cursor.fetchall()
       cursor.close()
       return retval
     except Exception as err:
-      errorstring = "Kojoney2: kojreport - Transaction error in attempts_from " , err
+      errorstring = "Kojoney2: kojreport - Transaction error in attempts_from ", err
       syslog.syslog(syslog.LOG_ERR, str(errorstring))
       return False
-  
+
   def get_attempts(self, ip):
     'Show the successful login attempts by the ip address issued since yesterday at midnight'
     try:
-      #total succeful attempts by ip
+      # total succeful attempts by ip
       cursor = self.conn.cursor()
-      sql = 'select count(id) from login_attempts '
-      sql += 'where time > date_sub(curdate(), interval 1 day) '
-      sql += ' and ip = %s order by time asc '
+      sql = """select count(id) from login_attempts
+            where time > date('now','-1 day')
+            and ip = %s order by time asc"""
       cursor.execute(sql, ip)
       total = cursor.fetchone()
       #succesful attemps with unique username by ip
-      sql = 'select count(distinct(username)) from login_attempts '
-      sql += 'where time > date_sub(curdate(), interval 1 day) '
-      sql += ' and ip = %s order by time asc '
+      sql = """select count(distinct(username)) from login_attempts
+              where time > date('now','-1 day')
+              and ip = %s order by time asc """
       cursor.execute(sql, ip)
-      unique=cursor.fetchone()
+      unique = cursor.fetchone()
       cursor.close()
       return (total[0], unique[0])
     except Exception as err:
-      errorstring = "Kojoney2: kojreport - Transaction error in get_attempts " , err
+      errorstring = "Kojoney2: kojreport - Transaction error in get_attempts ", err
       syslog.syslog(syslog.LOG_ERR, str(errorstring))
       return False
-  
+
+
 import urllib
-import sys
 import socket
-import re
 from coret_config import *
-      
-report = Report(DATABASE_HOST, DATABASE_USER, DATABASE_PASS, DATABASE_NAME)
+
+report = Report()
 print 'Kojoney2 activity in the last 24 hours.'
 print
 print 'Number of times a remote shell was opened:'
@@ -227,20 +225,20 @@ if ips is not False:
   for addr in ips:
     print addr[0]
     total, unique = report.get_attempts(addr[0])
-    output =''
-    if total==1:
-        output += '\t' + str(total)+' login with '
+    output = ''
+    if total == 1:
+      output += '\t' + str(total) + ' login with '
     else:
-        output += '\t' + str(total)+' logins with '
-    if unique ==1:
-        output += str(unique)+' unique username'
+      output += '\t' + str(total) + ' logins with '
+    if unique == 1:
+      output += str(unique) + ' unique username'
     else:
-        output += str(unique)+' unique usernames'
+      output += str(unique) + ' unique usernames'
     print output
 print
 print 'Attacker Scans by IP address:'
 print '--------------------------------'
 if ips is not False:
   for addr in ips:
-    scan=nmap_parser(addr[0])
+    scan = nmap_parser(addr[0])
     scan.report()
