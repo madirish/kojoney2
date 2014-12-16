@@ -28,7 +28,7 @@ class HoneypotDB:
     def __init__(self):
         if USE_DB:
             try:
-                self.conn = sqlite3.connect('kojoney.sqlite3')
+                self.conn = sqlite3.connect('/opt/kojoney/kojoney.sqlite3')
             except Exception as err:
                 print "ERROR: SQLite error in HoneypotDB.__init__() " , err
                 self._dberr = True

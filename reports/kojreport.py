@@ -10,7 +10,7 @@ from nmap_parser import nmap_parser
 class Report:
   def __init__(self):
     try:
-      self.conn = sqlite3.connect(os.path.dirname(__file__) + '/../kojoney.sqlite3')
+      self.conn = sqlite3.connect('/opt/kojoney/kojoney.sqlite3')
     except Exception as err:
       errorstring = "Kojoney2: kojreport - Error connecting to the database", err
       syslog.syslog(syslog.LOG_ERR, errorstring)
