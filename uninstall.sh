@@ -34,7 +34,9 @@ if [ $res = 'yes' ]; then
 	fi
 
 	echo " [-] Backing up downloads (you can manually delete them)"
-	if [ -d /opt/kojoney/download ]; then
+	if [ -d /opt/kojoney_dls_bak/ ]; then
+		mv /opt/kojoney/download/* /opt/kojoney_dls_bak/
+	else if [ -d /opt/kojoney/download ]; then
 		mv /opt/kojoney/download /opt/kojoney_dls_bak/
 	fi
 	if [ -d /opt/kojoney/kojoney.sqlite ]; then
