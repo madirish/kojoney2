@@ -172,9 +172,7 @@ if [ $IS_CYGWIN -eq 0 ]; then
 		echo -e "Skipping System V script installation"
 	else
 		cp init.d/* /etc/init.d/ || die "Step 9 - Init script installation failed"
-		echo 
-		echo -e "***No run levels were assigned. You need to do this manually.***"
-		echo
+		/sbin/chkconfig --level 345 kojoney on
 	fi
 else
 	res_sysv='no'
@@ -198,6 +196,11 @@ else
 	echo
 fi
 
+echo -e "Be aware that by default Kojoney2 tries to listen "
+echo -e "for connects on TCP port 22, if you have SSH installed "
+echo -e "you're going to have to have it listen on a different "
+echo -e "port, or modify /opt/kojoney/coret_config.py to have "
+echo -e "Kojoney2 use a different port."
 echo
 echo -e "Kojoney2 installation finished!  Happy hunting!"
 echo
