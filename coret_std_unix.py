@@ -29,7 +29,6 @@ import hashlib
 
 from honeypot_db import HoneypotDB
 from coret_config import DOWNLOAD_REAL_FILE, DOWNLOAD_REAL_DIR, SENSOR_ID
-from coret_config import DATABASE_HOST, DATABASE_USER, DATABASE_PASS, DATABASE_NAME, WHITELIST
 
 def getGoodFilename(filename):
     
