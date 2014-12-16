@@ -51,7 +51,7 @@ if num_recent_scans==0:
             cursor = connection.cursor()
             sql = """INSERT INTO nmap_scans (time, ip, ip_numeric, sensor_id, nmap_output)
                   VALUES (CURRENT_TIMESTAMP, ?, ?, ?, ?)"""
-            cursor.execute(sql , (ip, socket.inet_aton(ip), SENSOR_ID, nmap_output))
+            cursor.execute(sql , (ip, int(socket.inet_aton(ip).encode('hex'),16), SENSOR_ID, nmap_output))
             connection.commit() 
             cursor.close()
         except Exception as msg:
