@@ -22,7 +22,7 @@ try:
   sql = """select count(id) from nmap_scans
             where time >  date('now','-5 minutes')
             and ip = ? order by time desc"""
-  cursor.execute(sql, ip)
+  cursor.execute(sql, (str(ip),))
   num_recent_scans = cursor.fetchone()[0]
   cursor.close()
 except Exception as err:
