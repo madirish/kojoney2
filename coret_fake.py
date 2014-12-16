@@ -7,8 +7,6 @@
 import time
 from datetime import datetime
 
-# Kojoney config variables
-FAKE_USERS_FILE = "/opt/kojoney/etc/fake_users"
 
 # Dynamic date determination for realistic output
 FAKEYEAR = datetime.now().strftime("%Y")
