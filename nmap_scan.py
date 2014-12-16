@@ -17,6 +17,7 @@ if DEBUG:
 #check for recent scan of the given ip address
 try:
   connection = sqlite3.connect('/opt/kojoney/kojoney.sqlite3')
+  connection.text_factory = str
   cursor = connection.cursor()
   # Only scan if we havne't done so recently (throttle)
   sql = """select count(id) from nmap_scans

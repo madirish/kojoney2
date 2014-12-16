@@ -12,6 +12,7 @@ class NmapParser:
         self.scan = ''
         self.ports= ''
         self.conn = sqlite3.connect('/opt/kojoney/kojoney.sqlite3')
+        self.conn.text_factory = str
         if self.get_scans_since_yetserday():
             self.dom = parseString(self.scan)
             self.ports = self.get_ports()
