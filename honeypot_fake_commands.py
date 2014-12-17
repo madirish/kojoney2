@@ -322,8 +322,10 @@ class ProcessCmd:
             self.process_undef()
 
     def process_tar(self):
-        self.transport.write("tar: You must specify one of the `-Acdtrux' or `--test-label'  options\r\n")
-        self.transport.write("Try `tar --help' or `tar --usage' for more information.\r\n")
+        if len(self.params)>0 and self.params[0] == '--help':
+            self.transport.write(FAKE_TAR_HELP)
+        else:
+            self.transport.write(FAKE_TAR)
 
     def process_uname(self):
         self.transport.write(FAKE_OS+'\r\n')
