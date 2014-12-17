@@ -74,7 +74,7 @@ echo
 echo "Step 3 of 9 - Creating directory structure"
 if [ -d $KOJONEY_PATH ]; then
 	echo " [-] Kojoney2 directory $KOJONEY_PATH already exists."
-	echo " [-] Please uninstall Kojoney2 with the uninstall.bash script, then try again."
+	echo " [-] Please uninstall Kojoney2 with the uninstall.sh script, then try again."
 	echo " [-] Exiting..."
 	exit
 else
@@ -104,9 +104,9 @@ read want_reports
 if [ $want_reports == 'yes' ]; then
 	echo -e "Please enter e-mail of desired recipient:"
 	read email_to
-	sed -i "s/root\@localhost/$email_to/g" $KOJONEY_PATH/mailalert.bash
+	sed -i "s/root\@localhost/$email_to/g" $KOJONEY_PATH/mailalert.sh
 	if ! cat /etc/crontab | grep mailalert ; then
-		echo "  01  00  *  *  * root $KOJONEY_PATH/mailalert.bash > /dev/null" >> /etc/crontab
+		echo "  01  00  *  *  * root $KOJONEY_PATH/mailalert.sh > /dev/null" >> /etc/crontab
 		echo " [+] Cron for report e-mail scheduled in /etc/crontab"
 	fi
 fi
