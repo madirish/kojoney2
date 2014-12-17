@@ -100,6 +100,9 @@ class ProcessCmd:
             elif self.params[0] == "/proc/cpuinfo":
                 for line in FAKE_CPUINFO:
                     self.transport.write(line + '\r\n')
+            #cat /etc/resolv.conf
+            elif self.params[0] == "/etc/resolv.conf":
+                self.transport.write(FAKE_ETC_RESOLV_CONF + '\r\n')
             else:
                 self.transport.write('-bash: cat: ' + self.params[0] + ': No such file or directory\r\n')
 
