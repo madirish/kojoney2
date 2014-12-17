@@ -78,7 +78,7 @@ class HoneypotDB:
                 sql = """INSERT INTO downloads (time, ip, ip_numeric, url, md5sum, filename, filetype, sensor_id)
                           VALUES (CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?)"""
                 cursor = self.conn.cursor()
-                cursor.execute(sql , (int(socket.inet_aton(ip).encode('hex'),16), url, filemd5, filename, filetype, SENSOR_ID))
+                cursor.execute(sql , ip, (int(socket.inet_aton(ip).encode('hex'),16), url, filemd5, filename, filetype, SENSOR_ID))
                 self.conn.commit()
                 cursor.close()
             except sqlite3.Error as msg:
