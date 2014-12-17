@@ -124,7 +124,6 @@ class Report:
   def get_attempts(self, ip):
     'Show the successful login attempts by the ip address issued since yesterday at midnight'
     try:
-      print "Looking for connects with IP " + ip
       # total succeful attempts by ip
       cursor = self.conn.cursor()
       sql = """select count(id) from login_attempts
