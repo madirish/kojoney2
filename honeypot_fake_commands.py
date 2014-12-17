@@ -234,6 +234,16 @@ class ProcessCmd:
     def process_php(self):
         self.transport.write(FAKE_PHP)
 
+    def process_ping(self):
+        self.transport.write('PING ' + self.params[0] + ' 56(84) bytes of data.')
+        self.transport.write('64 bytes from ' + self.params[0] + ': icmp_seq=1 ttl=63 time=81.1 ms')
+        self.transport.write('64 bytes from ' + self.params[0] + ': icmp_seq=2 ttl=63 time=83.9 ms')
+        self.transport.write('64 bytes from ' + self.params[0] + ': icmp_seq=3 ttl=63 time=81.0 ms')
+        self.transport.write('64 bytes from ' + self.params[0] + ': icmp_seq=4 ttl=63 time=83.8 ms\r\n')
+        self.transport.write('--- ' + self.params[0] + ' ping statistics ---')
+        self.transport.write('4 packets transmitted, 4 received, 0% packet loss, time 3088ms')
+        self.transport.write('rtt min/avg/max/mdev = 81.072/82.506/83.960/1.411 ms')
+
     def process_ps(self):
         for line in FAKE_PS:
             self.transport.write(line + '\r\n')
