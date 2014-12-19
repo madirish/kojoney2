@@ -39,7 +39,7 @@ if num_recent_scans==0:
         syslog.syslog('DEBUGGING -- nmap_scan.py calling nmap')
         
     #scan the attacker
-    proc = subprocess.Popen("nmap -A -Pn -oX - %s" % ip, stdout=subprocess.PIPE, shell=True)
+    proc = subprocess.Popen("nmap -A -Pn -oX -F %s" % ip, stdout=subprocess.PIPE, shell=True)
     (nmap_output, err) = proc.communicate()
 
     if nmap_output:
