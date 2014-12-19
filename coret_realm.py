@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from zope.interface import implements
+from twisted.cred import portal
 from coret_avatar import *
 
 class CoretRealm:
