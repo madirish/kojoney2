@@ -1,14 +1,16 @@
 #!/usr/bin/env python
 
 
-from coret_config import FAKE_USERS_FILE
+import os.path
+
 from twisted.python import log
 from twisted.cred import checkers, credentials
 from twisted.internet import defer
 from zope.interface import implements
 from twisted.cred import error as TCerror
+
 from honeypot_db import *
-import os.path
+
 
 # blatantly stolen from Kippo (and modified)
 class HoneypotPasswordChecker:
@@ -41,6 +43,7 @@ class HoneypotPasswordChecker:
     https://twistedmatrix.com/documents/8.2.0/api/twisted.cred.checkers.ICredentialsChecker.html
     """
     def requestAvatarId(self, credentials):
+        #self.remoteip = packetReceived.transport.transport.client[0]
         if hasattr(credentials, 'password'):
             if self._check_user_creds(credentials.username, credentials.password):
                 return defer.succeed(credentials.username)

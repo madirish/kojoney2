@@ -28,10 +28,11 @@ import struct
 import syslog
 import subprocess
 
-from coret_config import *
+from twisted.python import log
+
+from conf.coret_config import *
 from honeypot_db import HoneypotDB
 
-from twisted.python import log
 
 def log_machine(data):
     print "Log_machine: " + data
@@ -89,4 +90,4 @@ def login_logger(eventDict):
                 syslog.syslog('BLACKLISTED IP: '+ip+' (successful login with username: '+username+')')
             dbconn = HoneypotDB()
             dbconn.log_login(ip, username, password)
-            subprocess.Popen('/usr/bin/python /opt/kojoney/nmap_scan.py %s ' % ip, stdout=subprocess.PIPE, shell=True)
+            subprocess.Popen('/usr/bin/python %s %s ' % (NMAP_SCRIPT, ip), stdout=subprocess.PIPE, shell=True)

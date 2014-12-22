@@ -1,22 +1,28 @@
 #!/usr/bin/env python
-#This script scans the attacker's machine if no recent scans have been completed
-#added by Josh Bauer <joshbauer3@gmail.com>
+#
+# This script scans the attacker's machine if no recent scans have been completed
+# Called from login_loger in coret_log.py
+#
+# added by Josh Bauer <joshbauer3@gmail.com>
 
-import sys
 import subprocess
 import sqlite3
-from coret_config import *
 import syslog
 import socket
+import sys
+
+from conf.coret_config import DATABASE_FILE, SENSOR_ID, DEBUG
+
 
 ip=sys.argv[1]
+
 
 if DEBUG:
     syslog.syslog('DEBUGGING -- nmap_scan.py script started with ip = '+ip)
     
 #check for recent scan of the given ip address
 try:
-  connection = sqlite3.connect('/opt/kojoney/kojoney.sqlite3')
+  connection = sqlite3.connect(DATABASE_FILE)
   connection.text_factory = str
   cursor = connection.cursor()
   # Only scan if we havne't done so recently (throttle)
@@ -35,8 +41,7 @@ if DEBUG:
       
 if num_recent_scans==0:
     
-    if DEBUG:
-        syslog.syslog('DEBUGGING -- nmap_scan.py calling nmap')
+    syslog.syslog('Kojoney2 nmap_scan.py calling nmap')
         
     #scan the attacker
     proc = subprocess.Popen("nmap -A -Pn -oX -F %s" % ip, stdout=subprocess.PIPE, shell=True)

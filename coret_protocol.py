@@ -20,11 +20,13 @@
 """
 
 import string
+
 from twisted.internet import protocol
+
 from coret_fake import *
 from coret_honey import *
-from coret_config import *
-import coret_avatar
+from coret_avatar import CoretAvatar
+
 
 class CoretProtocol(protocol.Protocol):
     """
@@ -36,7 +38,7 @@ class CoretProtocol(protocol.Protocol):
 
     def connectionMade(self):
         global FAKE_PROMPT, FAKE_CWD, FAKE_HOMEDIRS
-        self.fake_username = coret_avatar.FAKE_USERNAME
+        self.fake_username = self.transport.session.avatar.username
         if self.fake_username in FAKE_HOMEDIRS:
             self.fake_workingdir = FAKE_HOMEDIRS[self.fake_username]
         else:

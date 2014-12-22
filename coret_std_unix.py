@@ -28,7 +28,8 @@ import random
 import hashlib
 
 from honeypot_db import HoneypotDB
-from coret_config import DOWNLOAD_REAL_FILE, DOWNLOAD_REAL_DIR, SENSOR_ID
+from conf.coret_config import DOWNLOAD_REAL_FILE, DOWNLOAD_REAL_DIR, SENSOR_ID
+
 
 def _get_good_filename(filename):
     

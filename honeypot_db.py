@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
-from coret_config import *
 import imp
 import socket
-import subprocess
+
+from conf.coret_config import *
+
 
 try:
     imp.find_module('sqlite3')
@@ -27,7 +28,7 @@ class HoneypotDB:
     def __init__(self):
         if USE_DB:
             try:
-                self.conn = sqlite3.connect('/opt/kojoney/kojoney.sqlite3')
+                self.conn = sqlite3.connect(DATABASE_FILE)
                 self.conn.text_factory = str
             except Exception as err:
                 print "ERROR: SQLite error in HoneypotDB.__init__() " , err
@@ -53,7 +54,33 @@ class HoneypotDB:
             except Exception as err:
                 print "ERROR: SQLite error in HoneypotDB.checkRecentAttempts() " , err
                 return False
-                    
+
+    def get_last_pass(self, ip, username):
+        try:
+            cursor = self.conn.cursor()
+            sql = """SELECT password FROM login_attempts
+                  WHERE username = ? AND ip = ?
+                  ORDER BY timestamp DESC LIMIT 1"""
+            return cursor.fetchone()
+            cursor.close()
+        except Exception as err:
+            print "ERROR: SQLite error in HoneypotDB.checkRecentAttempts() " , err
+            return False
+
+    def has_recent_login(self, ip, username):
+        retval = False
+        try:
+            cursor = self.conn.cursor()
+            sql = """SELECT count(id) FROM login_attempts
+                  WHERE username = ? AND ip = ? AND timestamp > date('now', '-1 day')"""
+            if cursor.fetchone() > 0:
+                retval = True
+            cursor.close()
+        except Exception as err:
+            print "ERROR: SQLite error in HoneypotDB.checkRecentAttempts() " , err
+        return retval
+
+
     def log_command(self, command, ip):
         global WHITELIST
         #whitelist functionality added by Josh Bauer <joshbauer3@gmail.com>
