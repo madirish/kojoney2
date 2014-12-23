@@ -28,6 +28,15 @@ echo " Kojoney2 Honeypot Installer "
 echo "******************************************"
 echo "by Justin C. Klein Keane <justin@madirish.net>"
 echo "based on Kojoney, by Jose Antonio Coret"
+echo
+echo "You don't actually need to install Kojoney2, "
+echo "you can just run it directly.  "
+echo "Do you wish to proceed? (installation in /opt/kojoney, init scripts, etc.)?"
+echo "(yes/no)"
+read do_install
+
+if [ "$do_install" = 'no' ]; then
+	exit
 echo 
 echo "Step 1 of 9 - Checking for prerequisite dependencies..."
 
@@ -117,7 +126,12 @@ echo "Step 6 of 9 - Honeypot customization"
 # Customize honeypot
 echo Please enter the fully qualified hostname for your honeypot:
 read user_fqdn
-sed -i "s/fqdn_placeholder/$user_fqdn/g" $KOJONEY_PATH/fake_responses.py
+sed -i "s/fqdn_placeholder/$user_fqdn/g" $KOJONEY_PATH/conf/fake_responses.py
+sed -i "s/conf\/fake_users/\/opt\/kojoney\/conf\/fake_users/g" $KOJONEY_PATH/conf/kojoney_config.py
+sed -i "s/kojoney.sqlite3/\/opt\/kojoney\/kojoney.sqlite3/g" $KOJONEY_PATH/conf/kojoney_config.py
+sed -i "s/scripts\/nmap_scan.py/\/opt\/kojoney\/scripts\/nmap_scan.py/g" $KOJONEY_PATH/conf/kojoney_config.py
+sed -i "s/log\/honeypot.log/\/var\/log\/honeypot.log/g" $KOJONEY_PATH/conf/kojoney_config.py
+sed -i "s/download\//\/opt\/kojoney\/download\//g" $KOJONEY_PATH/conf/kojoney_config.py
 echo 
 echo "Step 7 of 9 - Installing documentation "
 echo " [+] Installing man pages"
