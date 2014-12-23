@@ -76,18 +76,27 @@ several BASH shell scripts for housekeeping.
 
 FILES
 -----
-/etc/rc.d/init.d/kojoney
+/etc/init.d/kojoney
 	Init script to start, stop, and restart Kojoney</p>
 
 /opt/kojoney/kojoney.py
 	The Kojoney2 program
 
-/opt/kojoney/etc/fake_users
+/opt/kojoney/conf/fake_users
 	The flat file containing usernames and password that are
 	allowed to log into the honeypot.
 
 /var/log/honeypot.log
 	Common path to the Kojoney2 honeypot log file.
+
+/opt/kojoney/reports/kojreport.py
+	Report on statistics from the database over the last 24 hours
+
+/opt/kojoney/download
+	The repository for stashed attacker downloads
+
+/opt/kojoney/kojoney.sqlite3
+	The database of Kojoney2 data
 
 AUTHORS
 -------
