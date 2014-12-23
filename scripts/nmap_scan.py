@@ -19,7 +19,7 @@ ip=sys.argv[1]
 
 
 if DEBUG:
-    syslog.syslog('DEBUGGING -- nmap_scan.py script started with ip = '+ip)
+    syslog.syslog('DEBUGGING -- nmap_scan.py script started with ip = ' + ip)
     
 #check for recent scan of the given ip address
 try:
@@ -33,7 +33,7 @@ if DEBUG:
       
 if num_recent_scans==0:
     
-    syslog.syslog('Kojoney2 nmap_scan.py calling nmap')
+    syslog.syslog('Kojoney2 nmap_scan.py calling nmap on ip ' + ip)
         
     #scan the attacker
     proc = subprocess.Popen("nmap -A -Pn -F -oX - %s" % ip, stdout=subprocess.PIPE, shell=True)
