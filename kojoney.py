@@ -42,7 +42,7 @@ from lib.kojoney_session import *
 from lib.kojoney_password_checker import *
 from lib.kojoney_factory import *
 from lib.kojoney_db import KojoneyDB
-
+from conf.log_config import *
 
 #
 # First of all. Start logging now()!
@@ -53,7 +53,6 @@ start_logging()
 HONEYPOTDB = KojoneyDB()
 HONEYPOTDB.update_db()
 
-CONFIG_LOGS = [sys.stderr, open(LOG_LOCATION, "a")]
 
 """
 Running our fake shell over an SSH channel.

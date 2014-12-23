@@ -31,6 +31,7 @@ import subprocess
 from twisted.python import log
 
 from conf.kojoney_config import *
+from conf.log_config import *
 from lib.kojoney_db import KojoneyDB
 
 

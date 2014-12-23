@@ -5,4 +5,4 @@
 *.pyc
 kojoney.sqlite3
 honeypot.log
-download/*
+http__*
