@@ -37,6 +37,7 @@ read do_install
 
 if [ "$do_install" = 'no' ]; then
 	exit
+fi
 echo 
 echo "Step 1 of 9 - Checking for prerequisite dependencies..."
 
