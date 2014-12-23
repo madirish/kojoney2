@@ -53,6 +53,8 @@ start_logging()
 HONEYPOTDB = KojoneyDB()
 HONEYPOTDB.update_db()
 
+CONFIG_LOGS = [sys.stderr, open(LOG_LOCATION, "a")]
+
 """
 Running our fake shell over an SSH channel.
 Log in with username "user" and password "password".

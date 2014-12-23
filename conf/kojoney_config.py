@@ -62,7 +62,7 @@ if os.getuid() == 0:
 #       Append output to file /var/log/honeypot.log, output to stderr and stdout, and output to /tmp/session.log 
 #       overwriting any previous file contents.
 #
-    ROOT_CONFIG_LOGS = [sys.stderr, open(LOG_LOCATION, "a")]
+#    ROOT_CONFIG_LOGS = [sys.stderr, open(LOG_LOCATION, "a")]
 
 #
 # ROOT_CONFIG_PORTS - Listening ports. You can specify one, two or more ports to listen.
@@ -113,7 +113,7 @@ else:
 #       Append output to file /var/log/honeypot.log, output to stderr and stdout, and output to /tmp/session.log 
 #       overwriting any previous file contents.
 #
-    CONFIG_LOGS = [sys.stderr, open(LOG_LOCATION, "a")]
+#    CONFIG_LOGS = [sys.stderr, open(LOG_LOCATION, "a")]
 
 #
 # ROOT_CONFIG_PORTS - Listening ports. You can specify one, two or more ports to listen.

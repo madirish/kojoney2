@@ -82,15 +82,7 @@ else
 fi
 
 echo " [+] Creating directory for Kojoney2 configuration files"
-mkdir $KOJONEY_PATH/etc || die "Step 3 - couldn't create directory $KOJONEY_PATH/etc" 
-echo " [+] Creating directory for url archives"
-mkdir $KOJONEY_PATH/download || die "Step 3 - couldn't create directory $KOJONEY_PATH/download" 
-echo " [+] Creating directory for application logs"
-mkdir $KOJONEY_PATH/log || die "Step 3 - couldn't create directory $KOJONEY_PATH/log" 
-cp *.py* $KOJONEY_PATH
-cp *.sql* $KOJONEY_PATH
-cp fake_users $KOJONEY_PATH/etc/
-cp -f reports/* $KOJONEY_PATH 
+cp -R * $KOJONEY_PATH
 echo " [+] Kojoney files installed"
 echo 
 echo " [+] Installed at $KOJONEY_PATH"
@@ -104,9 +96,9 @@ read want_reports
 if [ $want_reports == 'yes' ]; then
 	echo -e "Please enter e-mail of desired recipient:"
 	read email_to
-	sed -i "s/root\@localhost/$email_to/g" $KOJONEY_PATH/mailalert.sh
+	sed -i "s/root\@localhost/$email_to/g" $KOJONEY_PATH/reports/mailalert.sh
 	if ! cat /etc/crontab | grep mailalert ; then
-		echo "  01  00  *  *  * root $KOJONEY_PATH/mailalert.sh > /dev/null" >> /etc/crontab
+		echo "  01  00  *  *  * root $KOJONEY_PATH/reports/mailalert.sh > /dev/null" >> /etc/crontab
 		echo " [+] Cron for report e-mail scheduled in /etc/crontab"
 	fi
 fi
@@ -125,7 +117,7 @@ echo "Step 6 of 9 - Honeypot customization"
 # Customize honeypot
 echo Please enter the fully qualified hostname for your honeypot:
 read user_fqdn
-sed -i "s/fqdn_placeholder/$user_fqdn/g" $KOJONEY_PATH/coret_fake.py
+sed -i "s/fqdn_placeholder/$user_fqdn/g" $KOJONEY_PATH/fake_responses.py
 echo 
 echo "Step 7 of 9 - Installing documentation "
 echo " [+] Installing man pages"
@@ -151,17 +143,11 @@ else
 fi
 echo 
 echo "Step 8 of 9 - Changing permissions and creating symbolic links"
-chmod u+x $KOJONEY_PATH/kojoney.py || die "Step 10" 
+chmod u+x $KOJONEY_PATH/kojoney.py || die "Step 8"
 
 echo " [+] Creating symlinks"
 ln -s $KOJONEY_PATH/kojoney.py /usr/bin/kojoneyd || die "Step 8 - symlink for kononey.py"
-ln -s $KOJONEY_PATH/kojreport /usr/bin/kojreport || die "Step 8 - symlink for kojreport"
-ln -s $KOJONEY_PATH/kojreport-filter /usr/bin/kojreport-filter || die "Step 8 - symlink for kojreport-filter"
-ln -s $KOJONEY_PATH/kip2country.py /usr/bin/kip2country || die "Step 8 - symlink for kip2country.py"
-ln -s $KOJONEY_PATH/kojhumans /usr/bin/kojhumans || die "Step 8 - symlink for kojhumans"
-ln -s $KOJONEY_PATH/kojsession /usr/bin/kojsession || die "Step 8 - symlink for kojsession"
-ln -s $KOJONEY_PATH/sessions_with_commands /usr/bin/sessions_with_commands || die "Step 8 - symlink for sessions_with_commands"
-ln -s $KOJONEY_PATH/commands_by_session_and_ip /usr/bin/commands_by_session_and_ip || die "Step 8 - symlink for commands_by_session_and_ip"
+
 echo
 echo "Step 9 of 9 - Final questions and fun"
 echo
@@ -203,8 +189,8 @@ fi
 echo -e "Be aware that by default Kojoney2 tries to listen "
 echo -e "for connects on TCP port 22, if you have SSH installed "
 echo -e "you're going to have to have it listen on a different "
-echo -e "port, or modify /opt/kojoney/coret_config.py to have "
-echo -e "Kojoney2 use a different port."
+echo -e "port, or modify /opt/kojoney/conf/kojoney_config.py to"
+echo -e "have Kojoney2 use a different port."
 echo
 echo -e "Kojoney2 installation finished!  Happy hunting!"
 echo

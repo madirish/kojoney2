@@ -8,5 +8,6 @@
 # This script will send a honeypot report to the configured email address
 #
 EMAIL="root@localhost"
-/usr/bin/python /opt/kojoney/kojreport.py | mail -s "Kojoney2 Report" $EMAIL
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+/usr/bin/python $DIR/kojreport.py | mail -s "Kojoney2 Report" $EMAIL
 logger Kojoney2 report generated and sent.
