@@ -2,8 +2,6 @@
 
 import sqlite3
 import syslog
-import socket
-import os
 
 
 class Report:
@@ -147,7 +145,7 @@ class Report:
 
 import urllib
 import socket
-from nmapparser import NmapParser
+from lib.nmapparser import NmapParser
 
 report = Report()
 print 'Kojoney2 activity in the last 24 hours.'

@@ -1,7 +1,7 @@
 This file is part of the Kojoney2 honeypot
 
 Main Developer - Justin C. Klein Keane <jukeane@sas.upenn.edu>
-Last updated 28 January 2013
+Last updated 23 December 2014
 
 Kojoney2 - A honeypot that emulates a secure shell (SSH) server.
 
@@ -9,7 +9,6 @@ The following prerequisite software is required to run Kojoney2
 
 1.- Python 2
 2.- Twisted, Twisted Internet, Twisted Conch and Zope-Interfaces.
-3.- MySQL and MySQL-python 
 
 Python is available at http://www.python.org
 Twisted is available at http://twistedmatrix.com/

@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 
-from coret_fake import *
 from twisted.conch.ssh import userauth
-from honeypot_db import HoneypotDB
+
+from conf.fake_responses import *
+
 
 # blatantly stolen from Kippo (and modified)    
-from twisted.conch.ssh.common import NS, getNS
-class HoneyPotSSHUserAuthServer(userauth.SSHUserAuthServer):
+from twisted.conch.ssh.common import NS
+
+
+class KojoneySSHUserAuthServer(userauth.SSHUserAuthServer):
     def serviceStarted(self):
         userauth.SSHUserAuthServer.serviceStarted(self)
         self.bannerSent = False

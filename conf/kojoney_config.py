@@ -22,7 +22,8 @@ DEBUG = False
 
 FAKE_USERS_FILE = "conf/fake_users"
 DATABASE_FILE = "kojoney.sqlite3"
-NMAP_SCRIPT = "nmap_scan.py"
+NMAP_SCRIPT = "scripts/nmap_scan.py"
+LOG_LOCATION = "log/honeypot.log"
 
 # List of ip addresses to exclude from database entries
 # whitelist functionality added by Josh Bauer <joshbauer3@gmail.com>
@@ -61,7 +62,7 @@ if os.getuid() == 0:
 #       Append output to file /var/log/honeypot.log, output to stderr and stdout, and output to /tmp/session.log 
 #       overwriting any previous file contents.
 #
-    ROOT_CONFIG_LOGS = [sys.stderr, open("log/honeypot.log", "a")]
+    ROOT_CONFIG_LOGS = [sys.stderr, open(LOG_LOCATION, "a")]
 
 #
 # ROOT_CONFIG_PORTS - Listening ports. You can specify one, two or more ports to listen.
@@ -112,7 +113,7 @@ else:
 #       Append output to file /var/log/honeypot.log, output to stderr and stdout, and output to /tmp/session.log 
 #       overwriting any previous file contents.
 #
-    CONFIG_LOGS = [sys.stderr, open("/tmp/honeypot.log", "a")]
+    CONFIG_LOGS = [sys.stderr, open(LOG_LOCATION, "a")]
 
 #
 # ROOT_CONFIG_PORTS - Listening ports. You can specify one, two or more ports to listen.

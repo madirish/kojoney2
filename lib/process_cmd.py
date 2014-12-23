@@ -19,9 +19,9 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-from coret_fake import *
-import coret_std_unix
-from honeypot_db import *
+from conf.fake_responses import *
+from func import download_files
+from lib.kojoney_db import *
 
 class ProcessCmd:
     """
@@ -40,7 +40,7 @@ class ProcessCmd:
         self.ip = ip
         self.fake_workingdir = fake_workingdir
         _process_cmd = 'self.process_' + self.cmd + '()'
-        HoneypotDB().log_command(cmd, ip)
+        KojoneyDB().log_command(cmd + ' ' + ' '.join(params), ip)
         _methodname = 'process_' + cmd
         if hasattr(ProcessCmd, _methodname):
             eval(_process_cmd)
@@ -107,7 +107,7 @@ class ProcessCmd:
                 self.transport.write('-bash: cat: ' + self.params[0] + ': No such file or directory\r\n')
 
     def process_curl(self):
-        result_data = coret_std_unix.curl(self.params, self.ip)
+        result_data = download_files.curl(self.params, self.ip)
         if result_data != "":
             self.transport.write(result_data+'\r\n')
 
@@ -348,7 +348,7 @@ class ProcessCmd:
         self.transport.write(self.attacker_username + '\tpts/1\t'+self.ip+'\t09:05\t0.00s\t0.04s\t0.00s\tw\r\n')
 
     def process_wget(self):
-        result_data = coret_std_unix.wget(self.params, self.ip)
+        result_data = download_files.wget(self.params, self.ip)
         if result_data != "":
             self.transport.write(result_data+'\r\n')
         return True

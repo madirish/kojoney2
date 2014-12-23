@@ -33,16 +33,15 @@ except ImportError:
     print "Maybe try:"
     print "pip install twisted"
     sys.exit()
-    
-from twisted.cred import portal
+
 from twisted.internet import reactor
 
-from coret_log import *
-from coret_realm import *
-from coret_session import *
-from honey_pot_password_checker import *
-from coret_factory import *
-from honeypot_db import HoneypotDB
+from func.logging import *
+from lib.kojoney_realm import *
+from lib.kojoney_session import *
+from lib.kojoney_password_checker import *
+from lib.kojoney_factory import *
+from lib.kojoney_db import KojoneyDB
 
 
 #
@@ -51,7 +50,7 @@ from honeypot_db import HoneypotDB
 start_logging()
 
 # update the database if necessary
-HONEYPOTDB = HoneypotDB()
+HONEYPOTDB = KojoneyDB()
 HONEYPOTDB.update_db()
 
 """
@@ -60,11 +59,11 @@ Log in with username "user" and password "password".
 """
 
 from twisted.python import components
-components.registerAdapter(CoretSession, CoretAvatar, session.ISession)
+components.registerAdapter(KojoneySession, KojoneyAvatar, session.ISession)
 
-portal = portal.Portal(CoretRealm())
-portal.registerChecker(HoneypotPasswordChecker())
-CoretFactory.portal = portal
+portal = portal.Portal(KojoneyRealm())
+portal.registerChecker(KojoneyPasswordChecker())
+KojoneyFactory.portal = portal
 
 #
 # Am I running as root?
@@ -84,6 +83,6 @@ else:
     port_nums = CONFIG_PORTS
 
 for port_num in port_nums:
-    reactor.listenTCP(int(port_num), CoretFactory())
+    reactor.listenTCP(int(port_num), KojoneyFactory())
 
 reactor.run()

@@ -1,18 +1,19 @@
 #!/usr/bin/env python
 #
 # This script scans the attacker's machine if no recent scans have been completed
-# Called from login_loger in coret_log.py
+# Called from login_loger in func.logger.py
 #
 # added by Josh Bauer <joshbauer3@gmail.com>
 
 import subprocess
-import sqlite3
 import syslog
-import socket
 import sys
+import os.path
 
-from conf.coret_config import DATABASE_FILE, SENSOR_ID, DEBUG
 
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
+from conf.kojoney_config import DEBUG
+from lib.kojoney_db import KojoneyDB
 
 ip=sys.argv[1]
 
@@ -22,19 +23,10 @@ if DEBUG:
     
 #check for recent scan of the given ip address
 try:
-  connection = sqlite3.connect(DATABASE_FILE)
-  connection.text_factory = str
-  cursor = connection.cursor()
-  # Only scan if we havne't done so recently (throttle)
-  sql = """select count(id) from nmap_scans
-            where time >  date('now','-5 minutes')
-            and ip = ? order by time desc"""
-  cursor.execute(sql, (str(ip),))
-  num_recent_scans = cursor.fetchone()[0]
-  cursor.close()
+    num_recent_scans = KojoneyDB().num_recent_connects(ip)
 except Exception as err:
-   errorstring =  "Transaction error in nmap_scan.py " , err
-   syslog.syslog(syslog.LOG_ERR, str(errorstring))
+    errorstring =  "Transaction error in nmap_scan.py " , err
+    syslog.syslog(syslog.LOG_ERR, str(errorstring))
    
 if DEBUG:
     syslog.syslog('DEBUGGING -- nmap_scan.py checked database for recent scans, retval = '+str(num_recent_scans))
@@ -44,7 +36,7 @@ if num_recent_scans==0:
     syslog.syslog('Kojoney2 nmap_scan.py calling nmap')
         
     #scan the attacker
-    proc = subprocess.Popen("nmap -A -Pn -oX -F %s" % ip, stdout=subprocess.PIPE, shell=True)
+    proc = subprocess.Popen("nmap -A -Pn -F -oX - %s" % ip, stdout=subprocess.PIPE, shell=True)
     (nmap_output, err) = proc.communicate()
 
     if nmap_output:
@@ -53,12 +45,7 @@ if num_recent_scans==0:
             syslog.syslog('DEBUGGING -- nmap_scan.py attempting to enter result into the database')
             
         try:
-            cursor = connection.cursor()
-            sql = """INSERT INTO nmap_scans (time, ip, ip_numeric, sensor_id, nmap_output)
-                  VALUES (CURRENT_TIMESTAMP, ?, ?, ?, ?)"""
-            cursor.execute(sql , (ip, int(socket.inet_aton(ip).encode('hex'),16), SENSOR_ID, nmap_output))
-            connection.commit() 
-            cursor.close()
+            KojoneyDB().log_nmap(ip, nmap_output)
         except Exception as msg:
             errorstring = "Error inserting nmap data to the database.  ", msg
             syslog.syslog(syslog.LOG_ERR, str(errorstring))

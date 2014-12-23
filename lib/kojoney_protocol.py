@@ -23,12 +23,11 @@ import string
 
 from twisted.internet import protocol
 
-from coret_fake import *
-from coret_honey import *
-from coret_avatar import CoretAvatar
+from conf.fake_responses import *
+from func.process_command import *
 
 
-class CoretProtocol(protocol.Protocol):
+class KojoneyProtocol(protocol.Protocol):
     """
     This is our Coret protocol that we will run over SSH
     """

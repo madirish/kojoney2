@@ -30,8 +30,8 @@ import subprocess
 
 from twisted.python import log
 
-from conf.coret_config import *
-from honeypot_db import HoneypotDB
+from conf.kojoney_config import *
+from lib.kojoney_db import KojoneyDB
 
 
 def log_machine(data):
@@ -88,6 +88,6 @@ def login_logger(eventDict):
             if ip in BLACKLIST:
                 print 'BLACKLISTED IP ' + ip + ' (successful login with username: ' + username + ')'
                 syslog.syslog('BLACKLISTED IP: '+ip+' (successful login with username: '+username+')')
-            dbconn = HoneypotDB()
+            dbconn = KojoneyDB()
             dbconn.log_login(ip, username, password)
             subprocess.Popen('/usr/bin/python %s %s ' % (NMAP_SCRIPT, ip), stdout=subprocess.PIPE, shell=True)

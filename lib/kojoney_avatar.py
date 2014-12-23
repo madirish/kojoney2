@@ -2,7 +2,7 @@
 
 from twisted.conch.ssh import session
 from twisted.conch import avatar
-class CoretAvatar(avatar.ConchUser):
+class KojoneyAvatar(avatar.ConchUser):
 
     def __init__(self, username):
         avatar.ConchUser.__init__(self)

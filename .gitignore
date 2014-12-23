@@ -1,5 +1,8 @@
+.DS_Store
 .buildpath
 .project
 .idea
 *.pyc
 kojoney.sqlite3
+honeypot.log
+download/*

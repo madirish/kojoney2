@@ -3,7 +3,7 @@
 import imp
 import socket
 
-from conf.coret_config import *
+from conf.kojoney_config import *
 
 
 try:
@@ -17,7 +17,7 @@ except ImportError:
 if USE_DB:
     import sqlite3
 
-class HoneypotDB:
+class KojoneyDB:
 
     _dberr = False
 
@@ -93,7 +93,7 @@ class HoneypotDB:
                       VALUES
                       (CURRENT_TIMESTAMP, ?, ?, ?, ?)"""
                 cursor = self.conn.cursor()
-                cursor.execute(sql , (command, ip, int(socket.inet_aton(ip).encode('hex'),16), SENSOR_ID))
+                cursor.execute(sql , (command.strip(), ip, int(socket.inet_aton(ip).encode('hex'),16), SENSOR_ID))
                 self.conn.commit()
                 cursor.close()
             except sqlite3.Error as msg:
@@ -105,7 +105,7 @@ class HoneypotDB:
                 sql = """INSERT INTO downloads (time, ip, ip_numeric, url, md5sum, filename, filetype, sensor_id)
                           VALUES (CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?)"""
                 cursor = self.conn.cursor()
-                cursor.execute(sql , ip, (int(socket.inet_aton(ip).encode('hex'),16), url, filemd5, filename, filetype, SENSOR_ID))
+                cursor.execute(sql , (ip, int(socket.inet_aton(ip).encode('hex'),16), url, filemd5, filename, filetype, SENSOR_ID))
                 self.conn.commit()
                 cursor.close()
             except sqlite3.Error as msg:
@@ -124,6 +124,24 @@ class HoneypotDB:
                 cursor.close()
             except sqlite3.Error as msg:
                 print "ERROR: SQLite error in HoneypotDB.log_login()  ", msg
+
+    def log_nmap(self, ip, nmap_output):
+        sql = """INSERT INTO nmap_scans (time, ip, ip_numeric, sensor_id, nmap_output)
+                  VALUES (CURRENT_TIMESTAMP, ?, ?, ?, ?)"""
+        cursor = self.conn.cursor()
+        cursor.execute(sql , (ip, int(socket.inet_aton(ip).encode('hex'),16), SENSOR_ID, nmap_output))
+        self.conn.commit()
+        cursor.close()
+
+    def num_recent_connects(self, ip):
+        sql = """select count(id) from nmap_scans
+            where time >  date('now','-5 minutes')
+            and ip = ? order by time desc"""
+        cursor = self.conn.cursor()
+        cursor.execute(sql, (str(ip),))
+        num_recent_scans = cursor.fetchone()[0]
+        cursor.close()
+        return num_recent_scans
 
     #add missing tables to the database
     #added by Josh Bauer <joshbauer3@gmail.com>

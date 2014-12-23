@@ -19,7 +19,7 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
 
-from honeypot_fake_commands import ProcessCmd
+from lib.process_cmd import ProcessCmd
 
 def process_command(data, transport, attacker_username, ip, fake_workingdir):
     #each command proccessor function takes care of printing its own ending linebreaks

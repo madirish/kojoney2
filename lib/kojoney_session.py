@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 
 from twisted.conch.ssh import session
-from coret_protocol import *
-class CoretSession:
+
+from lib.kojoney_protocol import *
+
+
+class KojoneySession:
     
     def __init__(self, avatar):
         """
@@ -17,7 +20,7 @@ class CoretSession:
         raise Exception("no executing commands")
 
     def openShell(self, trans):
-        ep = CoretProtocol()
+        ep = KojoneyProtocol()
         ep.makeConnection(trans)
         trans.makeConnection(session.wrapProtocol(ep))
 

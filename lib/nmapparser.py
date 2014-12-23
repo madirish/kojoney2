@@ -2,7 +2,7 @@
 import syslog
 import sqlite3
 from xml.dom.minidom import *
-from conf.coret_config import DATABASE_FILE
+from conf.kojoney_config import DATABASE_FILE
 
 # nmap_parser retrieves recent nmap scans from the data base and prints report information
 # added by Josh Bauer <joshbauer3@gmail.com>

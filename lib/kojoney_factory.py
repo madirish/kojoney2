@@ -1,15 +1,15 @@
 #!/usr/bin/env python
-from coret_fake import *
-from honey_pot_ssh_user_auth_server import *
-from twisted.conch.ssh import factory, connection, transport, userauth
+from twisted.conch.ssh import factory, connection, transport
 from twisted.conch.ssh import keys as tkeys
-from twisted.conch.ssh.common import *
 
-class CoretFactory(factory.SSHFactory):
+from lib.kojoney_ssh_user_auth_server import *
+
+
+class KojoneyFactory(factory.SSHFactory):
     publicKeys = {'ssh-rsa': tkeys.Key.fromString(data=FAKE_SSH_KEY)}
     privateKeys = {'ssh-rsa': tkeys.Key.fromString(data=FAKE_SSH_PRIVKEY)}
     services = {
-                'ssh-userauth': HoneyPotSSHUserAuthServer,
+                'ssh-userauth': KojoneySSHUserAuthServer,
                 'ssh-connection': connection.SSHConnection
                 }
     

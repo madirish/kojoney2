@@ -27,8 +27,8 @@ import urllib
 import random
 import hashlib
 
-from honeypot_db import HoneypotDB
-from conf.coret_config import DOWNLOAD_REAL_FILE, DOWNLOAD_REAL_DIR, SENSOR_ID
+from lib.kojoney_db import KojoneyDB
+from conf.kojoney_config import DOWNLOAD_REAL_FILE, DOWNLOAD_REAL_DIR, SENSOR_ID
 
 
 def _get_good_filename(filename):
@@ -71,9 +71,9 @@ def _download_file_to(url, directory, ip):
         filemd5 = checksum.hexdigest()
         
         # Log the download
-        HoneypotDB().log_download(ip, url, filemd5, filename, filetype, SENSOR_ID)
+        KojoneyDB().log_download(ip, url, filemd5, filename, filetype, SENSOR_ID)
     except:
-        print "Error downloading file",url,"request by attacker: ",sys.exc_info()[1]
+        print "Error downloading file",url,"request by attacker in _download_file_to(): ",sys.exc_info()[1]
 
 def wget(params, ip):
     data = ""

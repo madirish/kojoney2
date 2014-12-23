@@ -1,26 +1,25 @@
 #!/usr/bin/env python
 
 
-import os.path
-
 from twisted.python import log
 from twisted.cred import checkers, credentials
 from twisted.internet import defer
 from zope.interface import implements
 from twisted.cred import error as TCerror
 
-from honeypot_db import *
+from lib.kojoney_db import *
+
 
 
 # blatantly stolen from Kippo (and modified)
-class HoneypotPasswordChecker:
+class KojoneyPasswordChecker:
     implements(checkers.ICredentialsChecker)
 
     credentialInterfaces = (credentials.IUsernamePassword,
         credentials.IPluggableAuthenticationModules)
     
     _authorized_credentials = {}
-    _db_cred_checker = HoneypotDB()
+    _db_cred_checker = KojoneyDB()
     
     def __init__(self):
         global FAKE_USERS_FILE
