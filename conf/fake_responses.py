@@ -1759,3 +1759,6 @@ FAKE_TAR_HELP = ("Usage: tar [OPTION...] [FILE]...\r\n"
 				"      --test-label           test the archive volume label and exit\r\n"
 				"  -u, --update               only append files newer than copy in archive\r\n"
 				"  -x, --extract, --get       extract files from an archive\r\n")
+FAKE_CAT_ETC_HOSTS = ("# Do not remove the following line, or various programs\r\n"
+				"# that require network functionality will fail.\r\n"
+				"127.0.0.1		localhost.localdomain localhost\r\n")

@@ -100,6 +100,8 @@ class ProcessCmd:
             elif self.params[0] == "/proc/cpuinfo":
                 for line in FAKE_CPUINFO:
                     self.transport.write(line + '\r\n')
+            elif self.params[0] == "/etc/hosts":
+                self.transport.write(FAKE_CAT_ETC_HOSTS)
             #cat /etc/resolv.conf
             elif self.params[0] == "/etc/resolv.conf":
                 self.transport.write(FAKE_ETC_RESOLV_CONF + '\r\n')
