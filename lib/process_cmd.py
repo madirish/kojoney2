@@ -114,7 +114,7 @@ class ProcessCmd:
             self.transport.write(result_data+'\r\n')
 
     def process_date(self):
-        self.transport.write(TIMESTAMP+'\r\n')
+        self.transport.write(datetime.now().strftime("%a %b %d %H:%M:%S %Z %Y") + '\r\n')
 
     def process_exit(self):
         self.transport.loseConnection()
@@ -323,6 +323,9 @@ class ProcessCmd:
         else:
             self.process_undef()
 
+    def process_time(self):
+        self.transport.write(FAKE_TIME)
+
     def process_tar(self):
         if len(self.params)>0 and self.params[0] == '--help':
             self.transport.write(FAKE_TAR_HELP)
@@ -343,7 +346,7 @@ class ProcessCmd:
         pass
 
     def process_uptime(self):
-        self.transport.write(FAKE_UPTIME+'\r\n')
+        self.transport.write(" " + datetime.now().strftime("%H:%M:%S") + " up 15 days, 7 min,  1 users,  load average: 0.07, 0.06, 0.04\r\n")
 
     def process_w(self):
         self.transport.write('USER\tTTY\tFROM\tLOGIN@\t\tIDLE\tJCPU\tPCPU\tWHAT\r\n')
